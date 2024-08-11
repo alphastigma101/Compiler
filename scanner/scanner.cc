@@ -6,7 +6,7 @@
     *  std::string Source: the source line of code from a file or from the runprompt function
  * --------------------------------------------------------------------------------------------  
  */
-Scanner::Scanner(std::string Source): Source(this->Source) {}
+Scanner::Scanner(std::string& Source): Source(this->Source) {}
 
 /* ----------------------------------------------------------------------------------
  * (keywords) is a dictionary that holds in various keywords of programming languages 
@@ -39,7 +39,7 @@ const std::unordered_map<std::string, TokenType> Scanner::keywords = {
     {"fn", TokenType::FN},
     {"catch", TokenType::CATCH},
     {"def", TokenType::DEF},
-    {"final", TokenType::FINAL}.
+    {"final", TokenType::FINAL},
     {"std", TokenType::STD},
     {"var", TokenType::VAR}
 };
@@ -117,7 +117,7 @@ void Scanner::scanToken() {
     }
 }
 
-void Scanner::addToken(TokenType& type) { addToken(type, ""); }
+void Scanner::addToken(const TokenType type) { addToken(type, ""); }
 
 /*
  * (addToken) is a method that is apart of the Scanner class 
@@ -126,7 +126,7 @@ void Scanner::addToken(TokenType& type) { addToken(type, ""); }
     * const std::string literal: A representation of a primitive instance type 
  * This method only pushes to a vector 
 */
-void Scanner::addToken(TokenType& type, const std::string& literal) {
+void Scanner::addToken(const TokenType type, const std::string literal) {
     std::string text = Source.substr(start, current);
     tokens.push_back(Token(type, text, literal, line));
 }
@@ -155,7 +155,7 @@ void Scanner::identifier() {
  *
  *
 */
-bool Scanner::match(char& expected) {
+bool Scanner::match(const char expected) {
     if (isAtEnd()) return false;
     if (Source.at(current) != expected) return false;
     current++;
@@ -194,5 +194,5 @@ void Scanner::number() {
         advance();
         while (isDigit(peek())) advance();
     }
-    addToken(TokenType::NUMBER,Source.substr(start, current));
+    addToken(TokenType::NUMBER, Source.substr(start, current));
 }

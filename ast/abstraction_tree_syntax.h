@@ -1,7 +1,7 @@
 #ifndef _ABSTRACTION_TREE_SYNTAX_H_
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
-#include <catcher.h>
+#include <catch.h>
 #include <memory>
 
 namespace AbstractionTreeSyntax {

@@ -106,7 +106,7 @@ struct data {
     void setCode(std::string& code);
 };
 
-typedef data d;
+extern data d;
 
 class Token: public MemberConv  {
     public:
@@ -125,6 +125,4 @@ class Token: public MemberConv  {
             return conv_type + " " + lexeme + " " + literal;
         };
 };
-extern d Data;
-
 #endif

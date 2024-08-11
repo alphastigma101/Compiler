@@ -1,10 +1,9 @@
 #ifndef _SCANNER_H_
 #define _SCANNER_H_
 #include <token.h>
-
 // define data's struct functions here 
-void d::setCode(std::string& code) {this->code = code;};
-std::string d::getCode() {return this->code;};
+void data::setCode(std::string& code) {this->code = code;};
+std::string data::getCode() {return this->code;};
 
 class Scanner {
     public:
@@ -14,10 +13,10 @@ class Scanner {
     protected:
         void number();          
         void String(); 
-        bool match(char& expected);
+        bool match(const char expected);
         void identifier();
-        void addToken(TokenType& type, const std::string& literal);
-        void addToken(TokenType& type);
+        void addToken(const TokenType type, const std::string literal);
+        void addToken(const TokenType type);
         void scanToken();
     private:
         std::string Source;
@@ -27,9 +26,9 @@ class Scanner {
         int line = 1;
         inline bool isAtEnd() { return current >= Source.length();}; 
         inline char advance() { return Source.at(current++); };
-        inline bool isDigit(char& c) { return c >= '0' && c <= '9'; };
-        inline bool isAlpha(char& c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; };
-        inline bool isAlphaNumeric(char& c) { return isAlpha(c) || isDigit(c); };
+        inline bool isDigit(const char c) { return c >= '0' && c <= '9'; };
+        inline bool isAlpha(const char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'; };
+        inline bool isAlphaNumeric(const char c) { return isAlpha(c) || isDigit(c); };
         inline char peek() {
             if (isAtEnd()) return '\0';
             return Source.at(current);

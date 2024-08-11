@@ -1,11 +1,15 @@
 #pragma once
 #ifndef _LANGUAGE_TYPES_H_
 #define _LANGUAGE_TYPES_H_
-#include <lookup_languages.h>
+#include <lookup_language.h>
+#include <any>
 #include <cstdint>
 #include <optional>
 #include <variant>
-
+#include <complex>
+#include <functional>
+#include <set>
+#include <time.h>
 namespace LanguageTypes {
     struct Python {
         using Any = std::any;
@@ -273,7 +277,7 @@ namespace LanguageTypes {
         using Double = double;
         using Currency = int64_t;
         using String = std::string;
-        using Date = std::time_t;
+        using Date = time_t;
     };
     struct LISPScheme {
         using Any = std::any;
@@ -429,7 +433,7 @@ namespace LanguageTypes {
         using Single = float;
         using Double = double;
         using Decimal = long double;
-        using Date = std::time_t;
+        using Date = time_t;
         using String = std::string;
         using Object = std::any;
         template<typename T> using Array = std::vector<T>;
@@ -493,15 +497,15 @@ namespace LanguageTypes {
     };
     struct Custom {
         // alias templates
-        template<typename... Type> Object;
+        /*template<typename... Type> Object;
         using obj_types = Object<class, struct>;
         template<typename... Args> Numbers;
         using numeric_types = Numbers<int, double, float>;
         template<typename... Args> Tokens;
         using token_types = Tokens<char, std::string>;
         template<typename... Args> Pointers;
-        template<typename... Args> References;
+        template<typename... Args> References;*/
     };
 };
-using LanguageTypes
-#endif // LANGUAGE_TYPES_H
+using namespace LanguageTypes;
+#endif

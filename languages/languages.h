@@ -4,17 +4,16 @@
 #include <macros.h>
 #include <languages_types.h>
 
-//TODO: Add argument support to FINAL macro
 #define FINAL(CODE)  _Pragma(#CODE)
 
 namespace Operations {
     // operations struct 
     // functions that operate on a string aka the code
     struct operations {
-        std::string replace(std::string &code, const std::string for_loops, const std::string while_loops, const std::string if_blocks, const std::string function); 
+        std::string replace(std::string &code, const std::string for_loops, const std::string while_loops, const std::string if_blocks, const std::string function, const std::unordered_map<std::string, std::pair<int,int>> values); 
     };
 };
-using Operations
+using namespace Operations;
 namespace Languages {
     // Static languages struct
     struct static_languages: operations {
@@ -76,12 +75,11 @@ namespace Languages {
 
     // Main languages struct
     struct languages {
-        static_languages static_lang;
+        static static_languages static_lang;
         dynamic_languages dynamic_lang;
         other_languages other_lang;
     };
 };
-using Languages
-typedef languages lang;
-extern lang;
+using namespace Languages;
+extern languages type;
 #endif

@@ -110,7 +110,7 @@ typedef data d;
 
 class Token: public MemberConv  {
     public:
-        Token(TokenType& type, std::string& lexeme, const std::string& literal, int& line);
+        Token(const TokenType type, const std::string lexeme, const std::string literal, const int line);
         TokenType getType();
         std::string getLexeme();
         std::string getLiteral();
@@ -120,9 +120,11 @@ class Token: public MemberConv  {
         std::string lexeme;
         std::string literal; 
         int line;
-        char * toString() override { return type + " " + &lexeme[0] + " " + &literal[0];};
+        std::any toString() override { 
+            std::string conv_type = std::any_cast<std::string>(&type);
+            return conv_type + " " + lexeme + " " + literal;
+        };
 };
-
-extern d;
+extern d Data;
 
 #endif

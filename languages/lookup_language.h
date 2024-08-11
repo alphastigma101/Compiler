@@ -117,10 +117,10 @@ const inline Table initTable() {
     for (auto it = languageExtensions.begin(); it != languageExtensions.end(); ++it) {
         const Key& key = it->first;
         const Extension& extension = it->second;
-        auto downloadIt = download.find(key);
-        if (downloadIt != downloadIt.end()) {
-            const LanguageLinks& Values = downloadIt->second;
-            languageTable[key] = std::make_pair(extension, Values);
+        auto downloadIt = downloads.begin();
+        if (downloadIt != downloads.end()) {
+            LanguageLinks&& Links{downloadIt->second};
+            languageTable[key] = std::make_pair(extension, Links);
         }
     }
     return languageTable;

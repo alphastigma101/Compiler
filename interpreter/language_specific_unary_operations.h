@@ -2,6 +2,7 @@
 #define _LANGUAGE_SPECIFIC_UNARY_OPERATIONS_H_ 
 #include <token.h>
 #include <typeinfo>
+#include <catcher.h>
 template<class Visitor>
 class unaryOperations: public Check {
     public:
@@ -55,6 +56,7 @@ class unaryOperations: public Check {
         Visitor u-Custom(LanguageTypes& lang, Visitor& right);
     private:
         bool checkNumberOperand(auto& expr, auto& right);
+        unaryOperations *u;
     protected:
         inline bool isString(const Type& value) override { return value.type() == typeid(std::string);};
 };

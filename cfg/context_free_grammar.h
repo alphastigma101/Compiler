@@ -18,7 +18,7 @@
 
 
 namespace ContextFreeGrammar {
-    class Expr: public std::filesystem::path  {
+    class Expr  {
         /* ------------------------------------------------------------------------------------------
          * A representation of an abstraction classs which is also considered as a disoriented object
          * ------------------------(Additional Info Below)-------------------------------------------
@@ -29,9 +29,9 @@ namespace ContextFreeGrammar {
         public:
             virtual ~Expr() = default;
             void accept(Expr& expr); // let the derived classes overload this method
-            Expr* right;
-            Expr* left;
-            Token* op;
+            final Expr* right;
+            final Expr* left;
+            final Token* op;
     };
     class Binary: public virtual Expr {
         /*
@@ -51,11 +51,11 @@ namespace ContextFreeGrammar {
         public:
             Binary(Expr* left, Token op, Expr* right): left(this->left), right(this->right), op(this->op) {};
             ~Binary() {};
-            void visit(Binary& expr) {
-                 expr->left->accept(*this);
-                 expr->right->accept(*this);
+            final inline void visit(Binary&& expr) {
+                 expr.left->accept(*this);
+                 expr.right->accept(*this);
             };
-            void accecpt(Binary& binary) { binary.visit(*this);};
+            inline void accecpt(Binary&& binary) { binary.visit(*this);};
         private:
             Expr* left;
             Expr* right;
@@ -65,11 +65,8 @@ namespace ContextFreeGrammar {
         public:
             Unary(Expr* right, Token op): right(this->right) op(this->op){};
             ~Unary(){};
-            void visit(Unary& expr) {
-                expr->left->accept(*this);
-                expr->right->accept(*this);
-            };
-            void accecpt(Unary& unary) {unary.vist(*this);};  
+            final inline void visit(Unary&& expr) { expr.left->accept(*this);};
+            final inline void accecpt(Unary&& unary) {unary.vist(*this);};  
         private:
             Expr* right;
             Token op;
@@ -78,11 +75,11 @@ namespace ContextFreeGrammar {
         public:
             Grouping(Expr* expression): expression(this->expression) {};
             ~Grouping() {};
-            void visit(Grouping& expr) {
-                expr->left->accept(*this);
-                expr->right->accept(*this);
+            final inline void visit(Grouping&& expr) {
+                expr.left->accept(*this);
+                expr.right->accept(*this);
             };
-            void accept(Grouping& group) {group.visit(*this);};
+            final inline void accept(Grouping& group) {group.visit(*this);};
         private:
             Expr* expression;
     };
@@ -91,12 +88,12 @@ namespace ContextFreeGrammar {
             template<class Type>
             Literal(Type& value): value(this->value){};
             ~Literal(){};
-            std::string visit(Literal& expr) {
+            final inline std::string visit(Literal&& expr) {
                 if (expr.value == NULL) return "nil";
                 return expr.value.toString();
             };
-            void accept(Literal& literal) {literal.visit(*this);};
-            char * toString() override {
+            final inline void accept(Literal& literal) {literal.visit(*this);};
+            final inline char * toString() override {
                 static std::string cast = static_cast<std::string>(value);
                 return &cast[0];
             };

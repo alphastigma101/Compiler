@@ -10,6 +10,8 @@
 #include <functional>
 #include <set>
 #include <time.h>
+extern std::string user_choice; // get the user choice of language from the begining 
+extern std::string file_name; 
 namespace LanguageTypes {
     struct Python {
         using Any = std::any;

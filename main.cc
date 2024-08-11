@@ -70,7 +70,7 @@ LanguageTypes user_language(std::string& choice) {
     else if (choice == "Eiffel") return LanguageTypes::Eiffel;
     else if (choice == "StandardML" || choice == "SML") return LanguageTypes::StandardML;
     else if (choice == "Dlang" || choice == "D") return LanguageTypes::Dlang;
-    else throw std::runtime_error("Invalid language choice");    
+    else return NULL;
 }
 
 /* 
@@ -91,7 +91,7 @@ static void runPrompt() {
     }
 }
 
-static void report(int &line, const std::string& where, const std::string& message) {
+static void report(int &line, std::string& where, std::string& message) {
     std::cout << "[line " <<  line << "] Error" << where << ": " + message;
     hadError = true;
 }
@@ -130,6 +130,11 @@ int main(int argc, char **argv) {
     }
     else if (argc == 2) {
         interpretLanguage = user_language((std::string)argv[2]);
+        if (interpretLanguage != NULL) {
+            user_choice = (std::string)argv[2]; // user_choice comes from language_types.h
+        }
+        else {throw std::runtime_error("Invalid Language!");}
+        file_name = (std::string)argv[1];
         runFile((std::string)argv[1]);
     } 
     else { runPrompt(); }

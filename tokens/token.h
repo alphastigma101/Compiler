@@ -100,13 +100,6 @@ enum TokenType {
 };
 
 
-struct data {
-    std::string code;
-    std::string getCode();
-    void setCode(std::string& code);
-};
-
-extern data d;
 
 class Token: public MemberConv  {
     public:

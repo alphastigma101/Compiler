@@ -25,6 +25,9 @@ token.o: languages.o $(TOKENS) $(INTERFACE)
 	echo "Attempting to compile token.cc"
 	g++ -std=c++17 $(TOKENS) $(INTERFACE) $(LANGUAGES) -c tokens/token.cc -o token.o 
 
+parser.o: ast.o token.o languages.o $(TOKENS) $(CFG)
+	g++ -std=c++17 $(TOKENS) $(CFG) ast.o token.o languages.o -c parser/parser.cc -o parser.o
+
 ast.o: token.o languages.o $(AST) $(CFG) $(CATCH) $(INTERFACE)
 	echo "Attempting to compile abstraction_syntax_tree.cc into an object file"
 	g++ -std=c++17 languages.o token.o $(INTERFACE) $(AST) $(CFG) $(CATCH) -c ast/abstraction_syntax_tree.cc -o ast.o
@@ -32,9 +35,6 @@ ast.o: token.o languages.o $(AST) $(CFG) $(CATCH) $(INTERFACE)
 scanner.o: token.o languages.o $(TOKENS) $(SCANNER)
 	echo "Attempting to compile scanner.cc file into an object file"
 	g++ -std=c++17 token.o languages.o $(TOKENS) $(SCANNER) -c scanner/scanner.cc -o scanner.o
-
-parser.o: ast.o token.o languages.o $(TOKENS) $(CFG)
-	g++ -std=c++17 $(TOKENS) $(CFG) ast.o token.o languages.o -c parser/parser.cc -o parser.o
 
 binary.o: token.o $(INTERPRETER)
 	g++ -std=c++17 token.o -c interpreter/language_specific_binary_operations.cc -o binary.o

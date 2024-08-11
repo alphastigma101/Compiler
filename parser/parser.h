@@ -5,10 +5,10 @@
 namespace Parser {
     class parseError {
         virtual ~parseError() = default;
-        virtual void error(Token token, std::string& message) = 0;                   
-        virtual void report(int line, const std::string where, const std::string message) = 0;
+        virtual void error(const Token token, const std::string message) = 0;                   
+        virtual void report(const int line, const std::string where, const std::string message) = 0;
     };
-    class parser: public parseError {
+    class parser: public parseError, public printAst, public {
         /* 
          * An object that represents a parser. 
          * To add more to the parser, you need to add the new rules to the existing grammar, and define it them inside the class field 

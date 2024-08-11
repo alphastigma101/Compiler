@@ -5,21 +5,35 @@
 #include <memory>
 
 namespace AbstractionTreeSyntax {
-    class generateAst: public virtual catcher {
+    class generateAst: public std::filesystem::path, public virtual catcher {
         /* ------------------------------------------------------------------------------------------
          * class represents a generated abstraction syntax tree
+         * It will output the code data structure
          * It will inherit from the base class using the virtual keyword which makes it an disorienated object 
          * This will isolate the objects behavior 
          * -----------------------------------------------------------------------------------------
          */
         public:
-            generateAst(const std::string str) {
+            generateAst() {
                 try {
-                    if (str.length() != 0) { outputDir = str; }
-                    else { throw generateAst::catcher("Usage: generate_ast <output directory>");}
+                    path pp = path(getenv("Public-Projects"));
+                    path outputDir = pp;
+                    // Check if the path exists and is in user space
+                    if (std::filesystem::exists(outputDir) && std::filesystem::equivalent(outputDir.root_path(), pp.root_path())) {
+                        // Check if we have write permissions
+                        if (std::filesystem::is_directory(outputDir) && std::filesystem::status(outputDir).permissions() & std::filesystem::perms::owner_write) {
+                            // Set the outputDir
+                            this->outputDir = outputDir;
+                        } else { throw std::runtime_error("No write permission for the output directory");}
+                    } 
+                    else {
+                            // If the directory doesn't exist, try to create it
+                            if (std::filesystem::create_directories(outputDir)) { this->outputDir = outputDir;} 
+                            else { throw std::runtime_error("Failed to create output directory");}
+                        }
                 }
-                catch (generateAst::catcher &e) {
-                    std::cerr >> e.what();
+                catch(const std::exception& e) {
+                    std::cerr << "Error in generateAst(): " << e.what() << std::endl;
                 }
             };
             inline std::string getOutPutDir() { return outputDir; };
@@ -30,35 +44,34 @@ namespace AbstractionTreeSyntax {
     class ast: public virtual generateAst {
         // This class defines the tree for a specific programming language 
         public:
-            ast(std::string& outputDir, std::string& baseName);
-            static void defineAst();
+            ast(const std::string nameOfFile);
             ~ast(){};
-            inline void ast::setTable(const Table& table) {table = initTable();};
-            inline Table ast::getTable() {return table;};
-            inline std::string getBaseName() {return baseName;};
-        private:
-            Table table;
-            std::string code;
-            static std::string outputDir = getOutPutDir();
-            std::string baseName;
-    };
-    class printAst: public ast {
-        // This class will print the ast
-        public:
-            inline std::string parenthesize(const std::string& name, const Expr& left, const Expr& right) {
-                std::string result = "(" + name;
-                // TODO: This needs to be implemented correctly
-                // add it to the exprs object
+            inline std::string parenthesize(std::string& name, const std::vector<std::reference_wrapper<Expr>>& expressions) {
+                 for (const auto& expr : expressions) {
+                     result += " ";
+                     result += expr.accept(*this);
+                 }
+                 result += ")";
+                 // Add expressions to the exprs vector
+                 for (const auto& expr : expressions) {
+                    exprs.push_back(std::make_shared<Expr>(expr));
+                 }
                 return result;
             };
-            inline std::string visitBinaryExpr(Binary& binary) { return parenthesize(binary::Expr::op::lexeme, binary::Expr::left, binary::Expr::right);};
-            inline std::string visitGroupingExpr(Grouping& grouping) { return parenthesize("group", grouping::Expr::expression);};
+            inline std::string visitBinaryExpr(Binary& binary) { return parenthesize(binary::Expr::op::lexeme, {binary::Expr});};
+            inline std::string visitGroupingExpr(Grouping& grouping) { return parenthesize("group", {grouping::Expr});};
             inline std::string visitLiteralExpr(Literal& literal) { 
                 if (expr.value == NULL) return "nil";
-                return literal::Expr::value::toString();
+                literal::Expr->op = literal.value;
+                return literal::Expr::op::toString();
             };
-            inline std::string visitUnaryExpr(Unary& unary) { return parenthesize(unary::Exp::op::lexeme, unary::Expr::right);};
+            inline std::string visitUnaryExpr(Unary& unary) { return parenthesize(unary::Exp::op::lexeme, {unary::Expr});};
+            inline void setTable(const Table& table) {table = initTable();};
+            inline Table getTable() {return table;};
         private:
+            Table table;
+            static std::string nameOfFile = file_name; // language_types.h 
+            static std::string outputDir = getOutPutDir();
             std::vector<std::shared_ptr<Expr>> exprs;
     };
     class analyzeSemantics: public virtual catcher {

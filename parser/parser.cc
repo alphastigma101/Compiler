@@ -1,12 +1,11 @@
 #include <parser.h>
-// define the visitor functions inside the ast, that call in the visitor method for each class
-// and add each object into a vector from the abstraction_syntax_tree.cc
 Expr parser::equality() {
     Expr expr = comparison();
     while (match(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)) {
         const Token op = previous();
         expr->right = comparison();
         expr->left = expr;
+        visitBinaryExpr(expr);
         expr = new Binary(expr->left, op, expr->right);
     }
     return expr;
@@ -18,6 +17,7 @@ Expr parser::comparison() {
         const Token op = previous();
         expr->right = term();
         expr->left = expr;
+        visitBinaryExpr(expr);
         expr = new Binary(expr->left, op, expr->right);
     }
     return expr;
@@ -29,6 +29,7 @@ Expr parser::term() {
       const Token op = previous();
       expr->right = factor();
       expr->left = expr;
+      visitBinaryExpr(expr);
       expr = new Binary(expr->left, op, expr->right);
     }
     return expr;
@@ -41,6 +42,7 @@ Expr parser::factor() {
         const Token op = previous();
         expr->right = unary();
         expr->left = expr;
+        visitBinaryExpr(expr);
         expr = new Binary(expr->left, op, expr->right);
     }
     return expr;
@@ -49,24 +51,36 @@ Expr parser::factor() {
 Expr parser::unary() {
     if (match(TokenType::BANG, TokenType::MINUS)) {
       const Token op = previous();
-      Expr right = unary();
+      Expr expr = unary();
       expr->right = right;
+      visitUnaryExpr(expr);
       return new Unary(op, expr->right); // this might not work even though Unary class has the same behavior as Expr
     }
     return primary();
 }
 
 Expr parser::primary() {
-    if (match(TokenType::FALSE)) return new Literal(false);
-    if (match(TokenType::TRUE)) return new Literal(true);
-    if (match(TokenType::NIL)) return new Literal(NULL);
-
-    if (match(TokenType::NUMBER, TokenType::STRING)) {
-      return new Literal(previous().literal);
+    if (match(TokenType::FALSE)) {
+        Expr expr = new Literal(false);
+        visitLiteralExpr(expr); 
+        return expr;
     }
-
+    if (match(TokenType::TRUE)) {
+        visitLiteralExpr(expr);
+        return new Literal(true);
+    }
+    if (match(TokenType::NIL)) {
+        visitLiteralExpr(expr);
+        return new Literal(NULL);
+    }
+    if (match(TokenType::NUMBER, TokenType::STRING)) {
+      Expr expr = new Literal(previous().literal);
+      visitLiteralExpr(expr);
+      return expr;
+    }
     if (match(TokenType::LEFT_PAREN)) {
       Expr expr = expression();
+      visitGroupingExpr(expr);
       consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
       return new Grouping(expr);
     }

@@ -1,10 +1,6 @@
 #ifndef _SCANNER_H_
 #define _SCANNER_H_
 #include <token.h>
-// define data's struct functions here 
-void data::setCode(std::string& code) {this->code = code;};
-std::string data::getCode() {return this->code;};
-
 class Scanner {
     public:
         Scanner(std::string& Source);

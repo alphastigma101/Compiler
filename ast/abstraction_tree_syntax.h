@@ -3,7 +3,6 @@
 #include <context_free_grammar.h>
 #include <catch.h>
 #include <memory>
-#include <functional> // For std::reference_wrapper
 using ExprTypes = std::variant<Binary, Unary, Grouping, Literal>; // type-safe union 
 extern ExprTypes* expr;                                                                
 namespace AbstractionTreeSyntax {

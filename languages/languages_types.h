@@ -499,14 +499,15 @@ namespace LanguageTypes {
     };
     struct Custom {
         // alias templates
-        /*template<typename... Type> Object;
-        using obj_types = Object<class, struct>;
-        template<typename... Args> Numbers;
-        using numeric_types = Numbers<int, double, float>;
-        template<typename... Args> Tokens;
-        using token_types = Tokens<char, std::string>;
-        template<typename... Args> Pointers;
-        template<typename... Args> References;*/
+        template<typename...> using Object = void;
+        using numeric = Object<int, double, float>;
+        using tokens = Object<char, std::string>;
+        using list = Object<std::vector<std::any>>;
+        using dict = Object<std::map<std::any,std::any>>;
+        template<typename...> using Ptr = void*;
+        template<typename...> using Ref = void;
+        using ptr = Ptr<numeric, tokens>;
+        using ref = Ref<std::reference_wrapper<numeric>, std::reference_wrapper<tokens>>;
     };
 };
 using namespace LanguageTypes;

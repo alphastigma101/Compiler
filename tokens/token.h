@@ -101,8 +101,9 @@ enum TokenType {
 
 
 
-class Token: public MemberConv  {
+class Token: public MemberConv<Token>  {
     public:
+        Token();
         Token(const TokenType type, const std::string lexeme, const std::string literal, const int line);
         TokenType getType();
         std::string getLexeme();
@@ -113,7 +114,7 @@ class Token: public MemberConv  {
         std::string lexeme;
         std::string literal; 
         int line;
-        std::any toString() override { 
+        inline std::any toString() override { 
             std::string conv_type = std::any_cast<std::string>(&type);
             return conv_type + " " + lexeme + " " + literal;
         };

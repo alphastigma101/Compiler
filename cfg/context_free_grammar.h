@@ -3,7 +3,7 @@
 #define _CONTEXT_FREE_GRAMMAR_H_
 #include <token.h>
 #include <filesystem>
-
+#include <stdexcept>
 /*
  * A Context Free Grammar consists of a head and a body, which describes what it can generate.
  * The body's purest form will be a list of symbols and these symbols are:
@@ -18,6 +18,7 @@
 
 
 namespace ContextFreeGrammar {
+    template<typename Derived>
     class Expr  {
         /* ------------------------------------------------------------------------------------------
          * A representation of an abstraction classs which is also considered as a disoriented object
@@ -27,13 +28,15 @@ namespace ContextFreeGrammar {
          * ------------------------------------------------------------------------------------------
          */
         public:
-            virtual ~Expr() = default;
-            void accept(Expr& expr); // let the derived classes overload this method
-            final Expr* right;
-            final Expr* left;
-            final Token* op;
+            virtual ~Expr() noexcept = default;
+            std::string accept(Expr& visitor) {
+                return static_cast<Derived*>(this)->visit(static_cast<Derived&>(visitor));
+            };
+            Expr* right;
+            Expr* left;
+            Token* op;
     };
-    class Binary: public virtual Expr {
+    class Binary: public Expr<Binary> {
         /*
          * A class that represents a binary abstraction syntax tree
          * ------------------------(Additional Info Below)-------------------------------------------
@@ -49,56 +52,73 @@ namespace ContextFreeGrammar {
          * Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            Binary(Expr* left, Token op, Expr* right): left(this->left), right(this->right), op(this->op) {};
+            Binary(const Expr&& left, const Token& op, const Expr&& right): left(std::move(this->left)), op(std::move(this->op)), right(std::move(this->right)){};
             ~Binary() {};
-            final inline void visit(Binary&& expr) {
-                 expr.left->accept(*this);
-                 expr.right->accept(*this);
+            inline std::string visit(Binary& expr) {
+                 std::string leftResult = expr.left->accept(*this);
+                 std::string rightResult = expr.right->accept(*this);
+                 return " " + leftResult + " " + rightResult;
             };
-            inline void accecpt(Binary&& binary) { binary.visit(*this);};
+            inline Token getToken() {return op;};
         private:
             Expr* left;
             Expr* right;
             Token op;
     };
-    class Unary: public virtual Expr {
+    class Unary: public Expr<Unary> {
         public:
-            Unary(Expr* right, Token op): right(this->right) op(this->op){};
+            Unary(const Expr&& right, const Token& op): right(std::move(this->right)), op(this->op) {};
             ~Unary(){};
-            final inline void visit(Unary&& expr) { expr.left->accept(*this);};
-            final inline void accecpt(Unary&& unary) {unary.vist(*this);};  
+            inline std::string visit(Unary& expr) {
+                std::string rightResult = expr.right->accept(*this);
+                return " " + rightResult;
+            };
+            inline Token getToken() {return op;};
         private:
             Expr* right;
             Token op;
     };
-    class Grouping: public virtual Expr {
+    class Grouping: public Expr<Grouping> {
         public:
-            Grouping(Expr* expression): expression(this->expression) {};
-            ~Grouping() {};
-            final inline void visit(Grouping&& expr) {
-                expr.left->accept(*this);
-                expr.right->accept(*this);
+            Grouping(const Expr&& expression): expression(std::move(this->expression)){};
+            ~Grouping(){};
+            inline std::string visit(Grouping& expr) {
+                std::string leftResult = expr.left->accept(*this);
+                std::string rightResult = expr.right->accept(*this);
+                return "(" + leftResult + " " + rightResult + ")";
             };
-            final inline void accept(Grouping& group) {group.visit(*this);};
         private:
             Expr* expression;
     };
-    class Literal: public MemberConv, public virtual Expr {
+    class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
-            template<class Type>
-            Literal(Type& value): value(this->value){};
+            Literal(const auto&& value): value(std::move(this->value)){};
             ~Literal(){};
-            final inline std::string visit(Literal&& expr) {
-                if (expr.value == NULL) return "nil";
-                return expr.value.toString();
+            inline std::string visit(Literal& expr) {
+                if (!expr.getValue().has_value()) return "nil";
+                try {
+                    // Cast the std::any to std::string
+                    auto val = std::any_cast<std::string>(expr.toString());
+                    return val;
+                } catch (const std::bad_any_cast& e) {
+                    //TODO: Logging needs to be implemented here
+                    //log[].push_back("error: " + std::string(e.what()));
+                    return "\0";
+                }
+                return "\0";
             };
-            final inline void accept(Literal& literal) {literal.visit(*this);};
-            final inline char * toString() override {
-                static std::string cast = static_cast<std::string>(value);
-                return &cast[0];
+            inline std::any toString() override {
+                try {
+                    return std::any_cast<std::string>(value);
+                } 
+                catch (const std::bad_any_cast& e) {
+                    //TODO: Logging needs to be implemented here 
+                    return "error: " + std::string(e.what());
+                }
             };
+            inline std::any getValue() {return value;};
         private:
-            Type value;
+            std::any value;
     };
 };
 using namespace ContextFreeGrammar;

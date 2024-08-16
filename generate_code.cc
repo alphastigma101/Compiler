@@ -317,12 +317,40 @@ static void static_langs(static_languages& s_t, std::string& choice) {
 }
 
 int main(int argc, char** argv) {
+    /*Table table = initTable();
+    std::cout << "Type help for more details!" << std::endl;
+    for (;;) { 
+        std::cout << "> ";
+        std::string line;
+        std::getline(std::cin, line); // get user input
+        if (line == "help") {
+            // list out the commands
+            std::cout << "list"  << std::endl;
+            std::cout << "quit" << std::endl;
+            std::cout << "print" << std::endl;
+            std::cout << "generate" << std::endl;
+         }
+         else if (line == "list") {
+             for (auto &it: table) {
+                 std::cout << it->first << std::endl;
+             }
+
+         }
+         else if (line == "quit") {exit(0);}
+         // use regex for pattern matching. So match one part of the stirng literal to see if it is print and the other to see if substring is a key in the map
+         else if (line == "print") {
+         
+         }
+    }*/
     static_languages s_t;
     if (argc > 1) {
         std::string to_print = argv[1];
         static_langs(s_t, to_print);
     }
     else {
+        for (auto &it: table) {
+            std::cout << it->first << std::endl;
+        }
         std::cerr << "Usage: [Name of language to print]";
         exit(1);
     }

@@ -4,7 +4,7 @@
 #include <typeinfo>
 #include <catcher.h>
 template<class Visitor>
-class unaryOperations: public Check {
+class unaryOperations: public Check<unaryOperations>, public catcher<unaryOperations> {
     public:
         Vistor u-Python(LanguageTypes& lang, Vistor& right); 
         Visitor u-JavaScript(LanguageTypes& lang, Visitor& right); 

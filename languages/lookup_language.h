@@ -1,10 +1,7 @@
 #ifndef _LOOKUP_TABLE_H_
 #define _LOOKUP_TABLE_H_
+#include <logging.h>
 #include <string>
-#include <unordered_map>
-#include <map>
-#include <vector>
-#include <iostream> 
 
 const std::unordered_map<std::string, std::string> downloads = {
     {"C", "https://gcc.gnu.org/"},

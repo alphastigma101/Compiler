@@ -6,6 +6,7 @@
 #include <language_specific_truthy_operations.h> 
 
 namespace Interpreter {
+    template<class Type>
     class RunTimeError: public std::runtime_error {
         // Class that represents a custom runtime_error object 
         public:
@@ -16,7 +17,7 @@ namespace Interpreter {
             Token token;
             std::string message;
     };
-    class interpreter: public unaryOperations, public binaryOperations, public isTruthyOperations, public RunTimeError {
+    class interpreter: public unaryOperations, public binaryOperations, public isTruthyOperations, public RunTimeError<interpreter> {
         // A class object that visits Binary, Unary, Grouping, or Literal.
         public:
             interpreter(Vistor* expr, LanguageTypes& lang): expr(this->expr) lang(currentLanguage) {

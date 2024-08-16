@@ -3,7 +3,6 @@
 #define _LANGUAGES_H_
 #include <macros.h>
 #include <languages_types.h>
-
 #define FINAL(CODE)  _Pragma(#CODE)
 
 namespace Operations {

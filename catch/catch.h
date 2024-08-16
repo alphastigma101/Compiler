@@ -1,14 +1,14 @@
 #ifndef _CATCH_H_
 #define _CATCH_H_
 #include <exception>
-
+template<class Type>
 class catcher: public std::exception {
     public:
-        catcher(const *char message): messge(this->message) {}; // Do not allow implicit conversions or copying 
-        ~catcher() {};
-        inline char * what () { return message; };
+        explicit catcher() {};
+        explicit catcher(const char* message) : message(this->message) {};
+        virtual const char* what() const noexcept { return message; };
+        virtual ~catcher() noexcept = default;
     private:
-        const *char message;
+        const char* message;
 };
-
 #endif

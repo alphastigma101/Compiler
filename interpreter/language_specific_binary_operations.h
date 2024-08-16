@@ -3,7 +3,7 @@
 #include <catch.h>
 #include <token.h>
 #include <typeinfo>
-class binaryOperations: public Check, public NonMemberConv, public virtual catcher {
+class binaryOperations: public Check, public NonMemberConv<binaryOperations>, public virtual catcher {
     public:
         template<class Binary>
         auto arithmeticOperations(Binary* expr, Binary& left, Binary& right);

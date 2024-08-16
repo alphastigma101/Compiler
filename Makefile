@@ -14,36 +14,38 @@ AST =: -I ast/
 COMPILER =: -I compiler/
 VM =: -I vm/
 CATCH =: -I catch/
+LOGGING =: -I logging/
 
-# Object files are linked, therefore -L command should not be needed if a .o or .obj file exists
+logging.o: $(LOGGING)
+	g++ -std=c++17 $(LOGGING) -c logging/logging.c -o logging.o
 
-languages.o: $(LANGUAGES)
+languages.o: logging.o $(LANGUAGES) $(LOGGING)
 	echo "Attempting to compile languages.cc"
-	g++ -std=c++17 $(LANGUAGES) -c languages/languages.cc -o languages.o
+	g++ -std=c++17 $(LANGUAGES) $(LOGGING) -c languages/languages.cc -o languages.o
 
-token.o: languages.o $(TOKENS) $(INTERFACE)
+token.o: logging.o languages.o $(TOKENS) $(INTERFACE) $(LOGGING)
 	echo "Attempting to compile token.cc"
-	g++ -std=c++17 $(TOKENS) $(INTERFACE) $(LANGUAGES) -c tokens/token.cc -o token.o 
+	g++ -std=c++17 $(TOKENS) $(LOGGING) $(INTERFACE) $(LANGUAGES) logging.o languages.o -c tokens/token.cc -o token.o 
 
-parser.o: ast.o token.o languages.o $(TOKENS) $(CFG)
-	g++ -std=c++17 $(TOKENS) $(CFG) ast.o token.o languages.o -c parser/parser.cc -o parser.o
-
-ast.o: token.o languages.o $(AST) $(CFG) $(CATCH) $(INTERFACE)
+ast.o: logging.o token.o languages.o $(AST) $(CFG) $(CATCH) $(INTERFACE)
 	echo "Attempting to compile abstraction_syntax_tree.cc into an object file"
-	g++ -std=c++17 languages.o token.o $(INTERFACE) $(AST) $(CFG) $(CATCH) -c ast/abstraction_syntax_tree.cc -o ast.o
+	g++ -std=c++17 $(INTERFACE) $(AST) $(CFG) $(CATCH) $(LOGGING) token.o languages.o logging.o -c ast/abstraction_syntax_tree.cc -o ast.o -fconcepts
 
-scanner.o: token.o languages.o $(TOKENS) $(SCANNER)
+parser.o: logging.o ast.o token.o languages.o $(TOKENS) $(CFG) $(LOGGING)
+	g++ -std=c++17 $(TOKENS) $(CFG) ast.o token.o languages.o logging.o -c parser/parser.cc -o parser.o
+
+scanner.o: logging.o token.o languages.o $(TOKENS) $(SCANNER)
 	echo "Attempting to compile scanner.cc file into an object file"
-	g++ -std=c++17 token.o languages.o $(TOKENS) $(SCANNER) -c scanner/scanner.cc -o scanner.o
+	g++ -std=c++17 $(TOKENS) $(SCANNER) logging.o token.o languages.o -c scanner/scanner.cc -o scanner.o
 
-binary.o: token.o $(INTERPRETER)
-	g++ -std=c++17 token.o -c interpreter/language_specific_binary_operations.cc -o binary.o
+binary.o: logging.o token.o $(INTERPRETER) $(LOGGING)
+	g++ -std=c++17 $(INTERPRETER) $(LOGGING) logging.o token.o -c interpreter/language_specific_binary_operations.cc -o binary.o
 
-unary.o: token.o $(INTERPRETER)
-	g++ -std=c++17 $(INTERPRETER) token.o -c interpreter/language_specific_unary_operations.cc -o unary.o
+unary.o: logging.o token.o $(INTERPRETER) $(LOGGING)
+	g++ -std=c++17 $(INTERPRETER) logging.o token.o -c interpreter/language_specific_unary_operations.cc -o unary.o
 
-truthy.o: token.o $(INTERPRETER)
-	g++ -std=c++17 token.o -c interpreter/language_specific_truthy_operations.cc -o truthy.o
+truthy.o: logging.o token.o $(INTERPRETER) $(LOGGING)
+	g++ -std=c++17 $(INTERPRETER) $(LOGGING) logging.o token.o -c interpreter/language_specific_truthy_operations.cc -o truthy.o
 
 interp.o: token.o languages.o unary.o truthy.o binary.o
 	g++ -std=c++17 $(INTERPRETER) token.o languages.o unary.o -c interpreter/interpreter.cc -o interp.o

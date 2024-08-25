@@ -1,4 +1,23 @@
 #include <interpreter.h>
+#include <abstraction_syntax_tree.h>
+/*
+ *
+ * 
+ *
+*/
+interpreter(ExprTypes<Binary, Unary, Grouping, Literal>& expr, LanguageTypes& lang): expr(this->expr), lang(currentLanguage) {
+    try {
+        for (auto &it : expr) {
+            if (std::get<1>(it).first == "Binary") { auto value = evaluate(std::get<1>(it).second); }
+            else if (std::get<1>(it).first == "Unary") { auto value = evaluate(std::get<1>(it).second); }
+            else if (std::get<1>(it).first == "Grouping") { auto value = evaluate(std::get<1>(it).second); }
+            else if (std::get<1>(it).first == "Literal") { auto value = evaluate(std::get<1>(it).second); }
+        }
+        //TODO: Add print debugging here                            
+    } catch (RuntimeError& error) {
+        std::cout << error.what();
+    }                               
+}
 /* -------------------------------------------------------------------------------------------------------------------------
  * visitUnaryExpr Description: 
     Is a method that visits the unary abstract syntax tree
@@ -8,9 +27,9 @@
     A Unary abstraction tree syntax node
  * -------------------------------------------------------------------------------------------------------------------------   
 */
-auto interpreter::visitUnaryExpr(Visitor* expr) -> Any {
-    auto right = evaluate(expr->right);
-    switch (expr->op->getType()) {
+auto interpreter::visitUnaryExpr(std::any& expr) -> std::any {
+    auto right = evaluate(expr.right);
+    switch (expr.op.getType()) {
         case TokenType::BANG:
             return !isTruthy(right);
         case TokenType::MINUS:
@@ -133,10 +152,10 @@ auto interpreter::visitUnaryExpr(Visitor* expr) -> Any {
     A Binary abstraction syntax tree node 
  * --------------------------------------------------------------------------------------------------------------------
 */
-auto interpreter::visitBinaryExpr(Visitor* expr) -> Any {
+auto interpreter::visitBinaryExpr(std::any& expr) -> std::any {
     // In go, := makes a object. It must be represented in c++ as = 
-    auto left = evaluate(expr->left);
-    auto right = evaluate(expr->right);
+    auto left = evaluate(expr.left);
+    auto right = evaluate(expr.right);
     switch (currentLanguage) {
         case LanguageTypes::Python:
             if (arithmeticOperations(currentLanguage, expr, left, right) != NULL) {
@@ -285,7 +304,7 @@ auto interpreter::visitBinaryExpr(Visitor* expr) -> Any {
             // This should be defined as a struct using templates for the objects to add flexibility 
             break;
         default:
-            throw std::runtime_error("Operand must be a number.");           
+            throw RunTimeError("Operand must be a number.");           
     }
     // Unreachable.
     return NULL;
@@ -300,7 +319,7 @@ auto interpreter::visitBinaryExpr(Visitor* expr) -> Any {
     Otherwise, return false 
  * ---------------------------------------------------------------------------------------------------------
 */
-bool interpreter::isTruthy(const Type& object) {
+bool interpreter::isTruthy(const std::any& object) {
     switch(currentLanguage) {
         case LanguageTypes::Python:
             if (std::any_cast<LanguageTypes::Python::None>(&object) != nullptr) return false;

@@ -97,7 +97,7 @@ namespace Parser {
             virtual std::string error(Token token, const std::string message) = 0;                   
             virtual std::string report(int line, const std::string where, const std::string message) = 0;
     };
-    class parser: public parseError<parser>, public ast, public Token {
+    class parser: public parseError<parser>, public Token {
         /* ----------------------------------------------------------------------------------------------------------------------------
          * An object that represents a parser. 
          * To add more to the parser, you need to add the new rules to the existing grammar, and define it them inside the class field 
@@ -107,18 +107,18 @@ namespace Parser {
         public:
             parser(std::vector<Token>& tokens): tokens(this->tokens), Token(){};
             ~parser(){};
+            ExprTypes<Binary, Unary, Grouping, Literal>* expr;
         protected:
             // Current rules that were made from a grammar 
-            ExprTypes* equality();
-            ExprTypes* comparison();
-            ExprTypes* expression();
-            ExprTypes* term();
-            ExprTypes* factor();
-            ExprTypes* parse();
-            ExprTypes* unary();
-            ExprTypes* primary();
-        protected:
-            //TODO: END_OF_FILE needs to be linked to EOF
+            ExprTypes<Binary, Unary, Grouping, Literal>* equality();
+            ExprTypes<Binary, Unary, Grouping, Literal>* comparison();
+            ExprTypes<Binary, Unary, Grouping, Literal>* expression();
+            ExprTypes<Binary, Unary, Grouping, Literal>* term();
+            ExprTypes<Binary, Unary, Grouping, Literal>* factor();
+            ExprTypes<Binary, Unary, Grouping, Literal>* parse();
+            ExprTypes<Binary, Unary, Grouping, Literal>* unary();
+            ExprTypes<Binary, Unary, Grouping, Literal>* primary();     
+        private:
             inline Token previous() { return tokens.at(current - 1); };
             inline Token peek() { return tokens.at(current); }; 
             inline bool isAtEnd() { return peek().getType() == TokenType::END_OF_FILE; };
@@ -146,8 +146,8 @@ namespace Parser {
                     advance();
                 }
             };
-        private:
             int current = 0;
+            int node = 0;
             std::vector<Token> tokens;
             inline std::string error(Token token, const std::string message) override {
                 if (token.getType() == TokenType::END_OF_FILE) { return report(token.getLine(), " at end", message);}

@@ -1,7 +1,6 @@
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
-#include <any>
-#include <iostream>
+#include <declarations.h>
 
 template<class Type>
 class NonMemberConv {

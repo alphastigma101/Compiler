@@ -30,7 +30,7 @@ namespace ContextFreeGrammar {
         public:
             virtual ~Expr() noexcept = default;
             std::string accept(Expr& visitor) {
-                return static_cast<Derived*>(this)->visit(static_cast<Derived&>(visitor));
+                return static_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
             };
             Expr* right;
             Expr* left;
@@ -52,9 +52,9 @@ namespace ContextFreeGrammar {
          * Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            Binary(const Expr&& left, const Token& op, const Expr&& right): left(std::move(this->left)), op(std::move(this->op)), right(std::move(this->right)){};
+            Binary(const Expr& left, const Token& op, const Expr& right): left(this->left), op(this->op), right(this->right){};
             ~Binary() {};
-            inline std::string visit(Binary& expr) {
+            inline std::string visit(Binary&& expr) {
                  std::string leftResult = expr.left->accept(*this);
                  std::string rightResult = expr.right->accept(*this);
                  return " " + leftResult + " " + rightResult;
@@ -67,9 +67,9 @@ namespace ContextFreeGrammar {
     };
     class Unary: public Expr<Unary> {
         public:
-            Unary(const Expr&& right, const Token& op): right(std::move(this->right)), op(this->op) {};
+            Unary(const Expr& right, const Token& op): right(this->right), op(this->op) {};
             ~Unary(){};
-            inline std::string visit(Unary& expr) {
+            inline std::string visit(Unary&& expr) {
                 std::string rightResult = expr.right->accept(*this);
                 return " " + rightResult;
             };
@@ -80,9 +80,9 @@ namespace ContextFreeGrammar {
     };
     class Grouping: public Expr<Grouping> {
         public:
-            Grouping(const Expr&& expression): expression(std::move(this->expression)){};
-            ~Grouping(){};
-            inline std::string visit(Grouping& expr) {
+            Grouping(const Expr& expression): expression(this->expression){};
+            ~Grouping() noexcept {};
+            inline std::string visit(Grouping&& expr) {
                 std::string leftResult = expr.left->accept(*this);
                 std::string rightResult = expr.right->accept(*this);
                 return "(" + leftResult + " " + rightResult + ")";
@@ -92,9 +92,9 @@ namespace ContextFreeGrammar {
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
-            Literal(const auto&& value): value(std::move(this->value)){};
+            Literal(const auto& value): value(this->value){};
             ~Literal(){};
-            inline std::string visit(Literal& expr) {
+            inline std::string visit(Literal&& expr) {
                 if (!expr.getValue().has_value()) return "nil";
                 try {
                     // Cast the std::any to std::string

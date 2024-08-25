@@ -1,21 +1,5 @@
 #include <language_specific_unary_operations.h>
-/* -----------------------------------------------------------------------------
- * isNumeric Description:
-    Is a helper function for (checkNumberOperands) and (checkNumberOperands)
- * Arguments:
-    * Type: Is a generic type that must have a concrete type during run time
- * Returns:
-    True if the object at runtime is type: int, int64_t, float, double, etc.
-    Otherwise, return false
- * ----------------------------------------------------------------------------
-*/
-bool binaryOperations::isNumeric(const Type& value) override {
-    // TODO: Need to add more supported types here. refer to languages_types.h
-    return value.type() == typeid(int) ||
-           value.type() == typeid(int64_t) ||
-           value.type() == typeid(float) ||
-           value.type() == typeid(double);
-}
+
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------
  * checkNumberOperand Description: 
     Is a method that calls in isNumeric, the helper function
@@ -36,7 +20,7 @@ bool unaryOperations::checkNumberOperand(auto& right) {
  *
  *
 */
-Vistor unaryOperations::Python(LanguageTypes& lang, Vistor& right) {
+Visitor unaryOperations::dynamicLanguages::u-Python(LanguageTypes& lang, Vistor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -47,10 +31,7 @@ Vistor unaryOperations::Python(LanguageTypes& lang, Vistor& right) {
 
         }
     }
-    catch(u->catcher("Failed to convert a python type into a c++ type!")& e) {
-        
-        
-    }
+    catch(u->catcher("Failed to convert a python type into a c++ type!")& e) { std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -64,7 +45,7 @@ Vistor unaryOperations::Python(LanguageTypes& lang, Vistor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::JavaScript(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-JavaScript(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -72,7 +53,7 @@ Visitor unaryOperations::JavaScript(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert JavaScript type into a c++ type!")& e) {}
+    catch(u->catcher("Failed to convert JavaScript type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -86,7 +67,7 @@ Visitor unaryOperations::JavaScript(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-VisitorunaryOperations::Ruby(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguges::u-Ruby(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -96,7 +77,7 @@ VisitorunaryOperations::Ruby(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert Ruby type into a c++ type!")& e) {}
+    catch(u->catcher("Failed to convert Ruby type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -110,14 +91,14 @@ VisitorunaryOperations::Ruby(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::C(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-C(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL;}
         else {
     
         }
     }
-    catch(u->catcher("Failed to convert C type into c++ type!")& e) {}
+    catch(u->catcher("Failed to convert C type into c++ type!")& e) {std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -131,7 +112,7 @@ Visitor unaryOperations::C(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::CPP(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-CPP(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -141,7 +122,7 @@ Visitor unaryOperations::CPP(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert c++ type into a c++ type!")& e) {}
+    catch(u->catcher("Failed to convert c++ type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -155,7 +136,7 @@ Visitor unaryOperations::CPP(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Java(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Java(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -165,7 +146,7 @@ Visitor unaryOperations::Java(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert Java type into c++ type!")& e) {}
+    catch(u->catcher("Failed to convert Java type into c++ type!")& e) {std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -179,7 +160,7 @@ Visitor unaryOperations::Java(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Go(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Go(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -189,7 +170,7 @@ Visitor unaryOperations::Go(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert Go type into c++ type!")& e) {}
+    catch(u->catcher("Failed to convert Go type into c++ type!")& e) {std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -203,7 +184,7 @@ Visitor unaryOperations::Go(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Kotlin(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Kotlin(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -215,7 +196,7 @@ Visitor unaryOperations::Kotlin(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert Kotlin type into a c++ type!")& e) {}
+    catch(u->catcher("Failed to convert Kotlin type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -229,7 +210,7 @@ Visitor unaryOperations::Kotlin(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Swift(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Swift(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -239,7 +220,7 @@ Visitor unaryOperations::Swift(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert swift type into a c++ type!")& e) {}
+    catch(u->catcher("Failed to convert swift type into a c++ type!")& e) { std::cout << e.what() << std::endl;}
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -253,7 +234,7 @@ Visitor unaryOperations::Swift(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Rust(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Rust(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -279,7 +260,9 @@ Visitor unaryOperations::Rust(LanguageTypes& lang, Visitor& right) {
                 return -(*val);
         }
     }
-    catch(u->catcher("Failed to convert a rust type into a c++ type!")& e) {}
+    catch(u->catcher("Failed to convert a rust type into a c++ type!")& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
@@ -293,7 +276,7 @@ Visitor unaryOperations::Rust(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::CSharp(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-CSharp(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL;}
         else {
@@ -335,7 +318,7 @@ Visitor unaryOperations::CSharp(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor LanguageTypes::FSharp(LanguageTypes& lang, Visitor& right) {
+Visitor LanguageTypes::staticLanguages::u-FSharp(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -361,7 +344,7 @@ Visitor LanguageTypes::FSharp(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::ObjectiveC(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-ObjectiveC(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -387,7 +370,7 @@ Visitor unaryOperations::ObjectiveC(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Scala(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Scala(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -415,7 +398,7 @@ Visitor unaryOperations::Scala(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::TypeScript(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-TypeScript(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -438,7 +421,7 @@ Visitor unaryOperations::TypeScript(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Dart(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Dart(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -462,7 +445,7 @@ Visitor unaryOperations::Dart(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::PHP(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-PHP(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -486,7 +469,7 @@ Visitor unaryOperations::PHP(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::R(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-R(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -510,7 +493,7 @@ Visitor unaryOperations::R(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Lua(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-Lua(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -532,7 +515,7 @@ Visitor unaryOperations::Lua(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::MATLAB(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::MATLAB(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -555,7 +538,7 @@ Visitor unaryOperations::MATLAB(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::VBA(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::VBA(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -585,7 +568,7 @@ Visitor unaryOperations::VBA(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Groovy(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::Groovy(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -613,7 +596,7 @@ Visitor unaryOperations::Groovy(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Julia(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::Julia(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -637,7 +620,7 @@ Visitor unaryOperations::Julia(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::PowerShell(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::PowerShell(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -659,7 +642,7 @@ Visitor unaryOperations::PowerShell(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor LanguageTypes::VisualBasic(LanguageTypes& lang, Visitor& right) {
+Visitor LanguageTypes::dynamicLanguages::VisualBasic(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -686,7 +669,7 @@ Visitor LanguageTypes::VisualBasic(LanguageTypes& lang, Visitor& right) {
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::Dlang(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::Dlang(LanguageTypes& lang, Visitor& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -700,7 +683,7 @@ Visitor unaryOperations::Dlang(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Haskell(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::Haskell(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<LanguageTypes::Haskell::Int>(&right))
@@ -713,7 +696,7 @@ Visitor unaryOperations::Haskell(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Erlang(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::Erlang(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         try {
@@ -729,14 +712,14 @@ Visitor unaryOperations::Erlang(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Clojure(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::Clojure(LanguageTypes& lang, Visitor& right) {
     if (auto val = static_cast<LanguageTypes::Clojure::Number>(&right))
         return -(*val);
 }
 /*
  *
 */
-Visitor unaryOperations::StandardML(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::StandardML(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
 
@@ -753,7 +736,7 @@ Visitor unaryOperations::StandardML(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Elm(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::Elm(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<double>(&right))
@@ -764,7 +747,7 @@ Visitor unaryOperations::Elm(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::VHDLVerilog(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::VHDLVerilog(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         // TODO: This needs to be redone
@@ -780,7 +763,7 @@ Visitor unaryOperations::VHDLVerilog(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Fortran(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::Fortran(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<LanguageTypes::Fortran::interger>(&right))
@@ -793,7 +776,7 @@ Visitor unaryOperations::Fortran(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::COBOL(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::COBOL(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<LanguageTypes::COBOL::numeric>(&right))
@@ -804,7 +787,7 @@ Visitor unaryOperations::COBOL(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Pascal(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::Pascal(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<LanguageTypes::Pascal::integer>(&right))
@@ -817,7 +800,7 @@ Visitor unaryOperations::Pascal(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Ada(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::Ada(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<LanguageTypes::Ada::integer>(&right))
@@ -830,7 +813,7 @@ Visitor unaryOperations::Ada(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Perl(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::Perl(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         // TODO: This needs to be redone
@@ -846,7 +829,7 @@ Visitor unaryOperations::Perl(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::AWK(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-AWK(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         //TODO: Add support for AWK
@@ -856,7 +839,7 @@ Visitor unaryOperations::AWK(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::TCL(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::u-TCL(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<double>(&right))
@@ -867,13 +850,13 @@ Visitor unaryOperations::TCL(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Shell(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-Shell(LanguageTypes& lang, Visitor& right) {
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::LISPScheme(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguges::u-LISPScheme(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {    
         if (auto val = static_cast<LanguageTypes::LISPScheme::Double>(&right))
@@ -884,7 +867,7 @@ Visitor unaryOperations::LISPScheme(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Racket(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::dynamicLanguages::u-Racket(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<double>(&right))
@@ -895,13 +878,13 @@ Visitor unaryOperations::Racket(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Prolog(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::u-Prolog(LanguageTypes& lang, Visitor& right) {
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::Smalltalk(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::u-Smalltalk(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<double>(&right))
@@ -911,7 +894,7 @@ Visitor unaryOperations::Smalltalk(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::HTMLCSS(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::u-HTMLCSS(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<LanguageTypes::HTMLCSS::Number>(&right))
@@ -922,7 +905,7 @@ Visitor unaryOperations::HTMLCSS(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::SQL(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::u-SQL(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<LanguageTypes::SQL::Integer>(&right))
@@ -937,13 +920,13 @@ Visitor unaryOperations::SQL(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::LabVIEW(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::u-LabVIEW(LanguageTypes& lang, Visitor& right) {
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::Eiffel(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::staticLanguages::u-Eiffel(LanguageTypes& lang, Visitor& right) {
     if (checkNumberOperand(right) == false) {return NULL;}
     else {
         if (auto val = static_cast<double>(&right))
@@ -954,7 +937,7 @@ Visitor unaryOperations::Eiffel(LanguageTypes& lang, Visitor& right) {
 /*
  *
 */
-Visitor unaryOperations::Custom(LanguageTypes& lang, Visitor& right) {
+Visitor unaryOperations::otherLanguages::u-Custom(LanguageTypes& lang, Visitor& right) {
     //TODO: This needs to be redone
     // This should be defined as a struct using templates for the objects to add flexibility 
 }

@@ -15,12 +15,15 @@ namespace Interpreter {
     class interpreter: public unaryOperations, public binaryOperations, public truthyOperations, public runtimeerror<interpreter>, public catcher<interpreter> {
         // A class object that visits Binary, Unary, Grouping, or Literal.
         public:
-            interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, LanguageTokenTypes& lang);
-            ~interpreter() noexcept {};
+            interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, const LanguageTokenTypes lang);
+            ~interpreter() noexcept = default;
             inline Literal visitLiteralExpr(Literal& expr) { return expr.getValue(); };
             Unary visitUnaryExpr(Unary& expr);
             Binary visitBinaryExpr(Binary& expr);
             Grouping visitGroupingExpr(Grouping& expr);
+            char* toString(std::any& left, std::any& right) override {
+                return NULL;
+            };
         private:
             LanguageTokenTypes currentLanguage;
             std::vector<std::tuple<int, std::pair<std::string, std::any>>> expr;

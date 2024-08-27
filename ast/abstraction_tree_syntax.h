@@ -44,14 +44,14 @@ namespace AbstractionTreeSyntax {
          * -------------------------------------------------------------------------------------------
          */
         public:
-            ast(ExprTypes<Binary, Unary, Grouping, Literal>& expr);
-            ~ast(){};
-            inline void setTable() {this->table = initTable();};
+            ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr);
+            ~ast() noexcept = default;
+            inline void setTable() { this->table = initTable(); };
             inline Table getTable() {return table;};
             friend class analyzeSemantics;
         private:
             Table table;
-            ExprTypes<Binary, Unary, Grouping, Literal> expr;
+            std::vector<std::tuple<int, std::pair<std::string, std::any>>> expr;
     };
     class analyzeSemantics: public ast {
         // This class performs the semantic analysis 
@@ -73,5 +73,4 @@ namespace AbstractionTreeSyntax {
 };
 
 using namespace AbstractionTreeSyntax;
-
 #endif

@@ -5,11 +5,11 @@
  * outputDir: Is the name of the file that will hold the ast structure 
  * baseName: The name of the file code is getting written to 
 */
-ast::ast(ExprTypes<Binary, Unary, Grouping, Literal>& expr): expr(this->expr) {
+ast::ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr): expr(this->expr) {
     ast::setTable(); // Get the look up table
     auto pair = table.at(user_choice); // pair->first is the extensions, pair->ssecond is the download links for the program
     try {
-        ast::generateAst(outputDir);
+        generateAst gA;
     }
     catch(ast::catcher& e) {
         std::cout << e.what();

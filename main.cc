@@ -1,11 +1,12 @@
 #include <scanner.h> // includes token.h, languages.h 
 #include <parser.h> // includes abstraction_syntax_tree.h, context_free_grammar.h, token.h, languages.h
+#include <interpreter.h> // includes: token.h, definitions.h, declarations.h, catch.h, runtimeerror.h  
 #include <filesystem>
 #include <system_error>
 #include <fstream>
 static bool hadError = false;
 static LanguageTokenTypes interpretLanguage;
-
+currentType<LanguageTokenTypes> ct;
 /*
  * (run): Is a standalone static void function that runs the user input 
  * Parameters:
@@ -15,8 +16,13 @@ static void run(std::string& source) {
     Scanner scanner(source); // Create a new scanner instance
     std::vector<Token> tokens = scanner.ScanTokens();
     ct.setTokenLanguage(interpretLanguage); // set the language
-    parser _parser(tokens);
-    _parser.parse();
+    parser parser_(tokens);
+    parser_.parse();
+    //TODO: Add threading here and thread the ast 
+    // ast aT(parser_.node);
+    //
+    // ----- (No threading is needed below this line)
+    interpreter interp(parser_.node, ct.getTokenLanguage());
     //expr = parser.parse();
     if (hadError) return;
 }
@@ -77,7 +83,7 @@ LanguageTokenTypes user_language(const std::string& choice) {
 /* 
  * This function will implement > at runtime 
  */
-static void runPrompt() {
+void runPrompt() {
      try {
          for (;;) { 
              std::cout << "> ";
@@ -97,9 +103,9 @@ static void report(int &line, std::string where, std::string& message) {
     hadError = true;
 }
 
-static void error(int& line, std::string& message) { report(line, "", message); }
+void error(int& line, std::string& message) { report(line, "", message); }
 
-static void runFile(const std::string& filePath) {
+void runFile(const std::string& filePath) {
     std::string source,line;
     if (std::filesystem::exists(filePath)) {
         std::ifstream file (std::filesystem::path(filePath).stem());

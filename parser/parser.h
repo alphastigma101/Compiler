@@ -91,13 +91,13 @@
 #include <abstraction_tree_syntax.h>
 namespace Parser {
     template<class Type>
-    class parseError {
+    class parseError: public Token {
         public:
             virtual ~parseError() = default;
             virtual std::string error(Token token, const std::string message) = 0;                   
-            virtual std::string report(int line, const std::string where, const std::string message) = 0;
+            virtual std::string report(int line, const std::string where, const std::string message) const throw() = 0;
     };
-    class parser: public parseError<parser>, public Token {
+    class parser: public parseError<parser> {
         /* ----------------------------------------------------------------------------------------------------------------------------
          * An object that represents a parser. 
          * To add more to the parser, you need to add the new rules to the existing grammar, and define it them inside the class field 
@@ -105,8 +105,8 @@ namespace Parser {
          * ----------------------------------------------------------------------------------------------------------------------------
          */
         public:
-            parser(std::vector<Token>& tokens): tokens(this->tokens), Token(){};
-            ~parser(){};
+            parser(std::vector<Token>& tokens): tokens(this->tokens) {};
+            ~parser() noexcept {};
             ExprTypes<Binary, Unary, Grouping, Literal>* expr;
             std::vector<std::tuple<int, std::pair<std::string, std::any>>> node;
             ExprTypes<Binary, Unary, Grouping, Literal>* parse();
@@ -154,7 +154,7 @@ namespace Parser {
                 if (token.getType() == TokenType::END_OF_FILE) { return report(token.getLine(), " at end", message);}
                 return report(token.getLine(), " at '" + token.getLexeme() + "'", message);
             };
-            inline std::string report(int line, const std::string where, const std::string message) override {
+            inline std::string report(int line, const std::string where, const std::string message) const throw() override {
                 std::string err = "[line " + std::to_string(line) + "] Error" + where +  ": " + message;
                 std::cout << "[line " <<  line << "] Error" << where << ": " + message;
                 return err;

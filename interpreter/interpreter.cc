@@ -3,7 +3,7 @@
  *
  * 
 */
-interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, LanguageTokenTypes& lang): expr(this->expr), currentLanguage(lang) {
+interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, const LanguageTokenTypes lang): expr(this->expr), currentLanguage(lang) {
     //try {
         for (int i = 0; i < expr.size(); i++) {
             auto temp = expr.at(i);

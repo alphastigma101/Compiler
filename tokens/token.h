@@ -102,7 +102,9 @@ enum TokenType {
 
 class Token: public MemberConv<Token>  {
     public:
-        Token();
+        // Default Constructor
+        Token() = default;
+        // Other Constructor
         Token(const TokenType type, const std::string lexeme, const std::string literal, const int line);
         TokenType getType();
         std::string getLexeme();

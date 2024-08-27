@@ -5,10 +5,12 @@
 #include <run_time_error.h>  
 #include <typeinfo>
 namespace BinaryOperations {
+    //class binaryOperations: public Check<binaryOperations>, public runtimeerror<binaryOperations>, public NonMemberConv<binaryOperations>, public catcher<binaryOperations> {
     class binaryOperations: public Check<binaryOperations>, public runtimeerror<binaryOperations>, public NonMemberConv<binaryOperations>, public catcher<binaryOperations> {
         public:
             friend class interpreter;
-            binaryOperations(){};
+            // Default constructor
+            binaryOperations(): runtimeerror() {};
             ~binaryOperations() noexcept = default;
             auto arithmeticOperations(auto& expr, auto& left, auto& right);
             bool isEqual(auto& a, auto& b);

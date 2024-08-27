@@ -95,6 +95,7 @@ exec_generator: $(OBJ_FILES_GENERATOR)
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
 
 # Clean up object files and binaries
+# Clean up object files and binaries
 clean:
-	rm -f $(OBJ_FILES_INTERPRETER) $(OBJ_FILES_GENERATOR) $(BINARIES)
-
+	rm -f $(patsubst %.cc,%.o,$(SRC_FILES_INTERPRETER) $(SRC_FILES_GENERATOR))
+	rm -f $(BINARIES)

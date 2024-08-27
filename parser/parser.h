@@ -101,7 +101,6 @@ namespace Parser {
         /* ----------------------------------------------------------------------------------------------------------------------------
          * An object that represents a parser. 
          * To add more to the parser, you need to add the new rules to the existing grammar, and define it them inside the class field 
-         * 
          * ----------------------------------------------------------------------------------------------------------------------------
          */
         public:

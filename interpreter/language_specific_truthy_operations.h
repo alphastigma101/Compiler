@@ -5,8 +5,8 @@ namespace TruthyOperations {
     class truthyOperations: public runtimeerror<truthyOperations>, public catcher<truthyOperations> {
         public:
             friend class interpreter;
-            truthyOperations(){};
-            ~truthyOperations() noexcept = default;
+            truthyOperations() = default;
+            ~truthyOperations() noexcept {};
         private:
             bool isTruthy(auto& object);
     };

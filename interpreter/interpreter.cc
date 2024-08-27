@@ -4,42 +4,38 @@
  * 
 */
 interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, const LanguageTokenTypes lang): expr(this->expr), currentLanguage(lang) {
-    //try {
+    try {
         for (int i = 0; i < expr.size(); i++) {
             auto temp = expr.at(i);
-            if (std::get<1>(temp).first == "Binary") { 
-                auto value = evaluate(std::get<1>(temp).second); 
-            }
-            //else if (std::get<1>(expr.at(i)).first == "Unary") { auto value = evaluate(expr.at(std::get<1>(expr.at(i)).second)); }
-            //else if (std::get<1>(it).first == "Grouping") { auto value = evaluate(expr.at(std::get<1>(expr.at(i)).second)); }
-            //else if (std::get<1>(it).first == "Literal") { auto value = evaluate(expr.at(std::get<1>(expr.at(i)).second)); }
+            if (std::get<1>(temp).first == "Binary") { auto value = evaluate(std::get<1>(temp).second); }
+            else if (std::get<1>(temp).first == "Unary") { auto value = evaluate(std::get<1>(temp).second); }
+            else if (std::get<1>(temp).first == "Grouping") { auto value = evaluate(std::get<1>(temp).second); }
+            else if (std::get<1>(temp).first == "Literal") { auto value = evaluate(std::get<1>(temp).second); }
             else {
-                //throw catcher("Unexpected behavior occurred!");
+                auto token = std::get<1>(temp).second;
+                throw catcher<interpreter>("Unexpected behavior occurred!");
             }
         }
-        //TODO: Add print debugging here                            
-    //} catch (catcher& e) {
-        //std::cout << e.what();
-    //}                              
+    } catch (catcher<interpreter>& e) {
+        //TODO: Add logging debugging here
+        std::cout << e.what();
+    }                              
 }
-/* -------------------------------------------------------------------------------------------------------------------------
- * visitUnaryExpr Description: 
-    Is a method that visits the unary abstract syntax tree
- * Arguments:
-    * Visitor: Is a generic type that must have a concrete type during run time and will visit the abstraction syntax tree
- * Returns:
-    A Unary abstraction tree syntax node
- * -------------------------------------------------------------------------------------------------------------------------   
+/* ---------------------------------------------------------------------------
+ * @brief A method that visits the unary abstract syntax tree
+ * @param right: Is a fancy pointer that will point to Expr<Unary> at run time.
+ * @return A Unary abstraction tree syntax node in the form of a string 
+ * ---------------------------------------------------------------------------
 */
-/*Unary interpreter::visitUnaryExpr(std::any& expr) {
+std::any interpreter::visitUnaryExpr(auto& expr) {
     auto right = evaluate(expr.right);
-    switch (expr.op.getType()) {
+    switch (right.op.getType()) {
         case TokenType::BANG:
             return !isTruthy(right);
         case TokenType::MINUS:
             switch(currentLanguage) {
-                case LanguageTokenType::Python:
-                    return uPython(LanguageTokenType::Python, right);
+                case LanguageTokenTypes::Python:
+                    return uPython(LanguageTokenTypes::Python, right);
                 case LanguageTokenTypes::JavaScript:
                     return uJavaScript(LanguageTokenTypes::JavaScript, right);
                 case LanguageTokenTypes::Ruby:
@@ -59,11 +55,11 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
                 case LanguageTokenTypes::Rust:
                     return uRust(LanguageTokenTypes::Rust, right);
                 case LanguageTokenTypes::CSharp:
-                    return uCSharp(LanguagesTypes::CSharp, right);
+                    return uCSharp(LanguageTokenTypes::CSharp, right);
                 case LanguageTokenTypes::FSharp:
                     return uFSharp(LanguageTokenTypes::FSharp, right);
                 case LanguageTokenTypes::ObjectiveC:
-                    return u-ObjectiveC(LanguageTokenTypes::ObjectiveC, right);
+                    return uObjectiveC(LanguageTokenTypes::ObjectiveC, right);
                 case LanguageTokenTypes::Scala:
                     return uScala(LanguageTokenTypes::Scala, right);
                 case LanguageTokenTypes::TypeScript:
@@ -93,11 +89,11 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
                 case LanguageTokenTypes::Haskell:
                     return uHaskell(LanguageTokenTypes::Haskell, right);
                 case LanguageTokenTypes::Erlang:
-                    return u-Erlang(LanguageTokenTypes::Erlang, right);
+                    return uErlang(LanguageTokenTypes::Erlang, right);
                 case LanguageTokenTypes::Clojure:
                     return uClojure(LanguageTokenTypes::Clojure, right);
                 case LanguageTokenTypes::StandardML:
-                    return u-StandardML(LanguageTokenTypes::StandardML, right);
+                    return uStandardML(LanguageTokenTypes::StandardML, right);
                 case LanguageTokenTypes::Elm:
                     return uElm(LanguageTokenTypes::Elm, right);
                 case LanguageTokenTypes::VHDLVerilog:
@@ -124,7 +120,7 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
                     return uRacket(LanguageTokenTypes::Racket, right);
                 case LanguageTokenTypes::Prolog:
                     return uProlog(LanguageTokenTypes::Prolog, right);
-                case LanguageTokenTypes::Smalltalk:
+                case LanguageTokenTypes::SmallTalk:
                     return uSmallTalk(LanguageTokenTypes::SmallTalk, right);
                 case LanguageTokenTypes::HTMLCSS:
                     return uHTMLCSS(LanguageTokenTypes::HTMLCSS, right);
@@ -137,24 +133,21 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
                 case LanguageTokenTypes::Custom:
                     return uCustom(LanguageTokenTypes::Custom, right);
                 default:
-                    throw std::runtime_error("Operand must be a number.");           
+                    throw runtimeerror<interpreter>(right.op.getType(), "Operand must be a number.");           
             }
-        }
-        throw std::runtime_error("Operand must be a number.");
+        default:
+            throw runtimeerror<interpreter>(right.op.getType(), "Operand must be a number.");
     }
     // Unreachable.
     return NULL;
-}*/
-/* --------------------------------------------------------------------------------------------------------------------
- * visitBinaryExpr Description: 
-    Is a method that visits the Binary abstraction syntax tree 
- * Arguments:
-    * Visitor: Is a generic type that must have a concrete type during run time and the tree it will visit at run time
- * Returns:
-    A Binary abstraction syntax tree node 
- * --------------------------------------------------------------------------------------------------------------------
+}
+/* ---------------------------------------------------------------------------
+ * @brief visits the Binary abstraction syntax tree 
+ * @param auto expr: Is a generic type that must have a concrete type during run time and the tree it will visit at run time
+ * @return A Binary abstraction syntax tree node in the form of a string
+ * ---------------------------------------------------------------------------
 */
-/*auto interpreter::visitBinaryExpr(std::any& expr) -> std::any {
+std::any interpreter::visitBinaryExpr(auto& expr) {
     // In go, := makes a object. It must be represented in c++ as = 
     auto left = evaluate(expr.left);
     auto right = evaluate(expr.right);
@@ -277,7 +270,7 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
             arithmeticOperations(currentLanguage, expr, left, right);
             break;
         case LanguageTokenTypes::Shell:
-            throw std::runtime_error("Unary minus not supported in Shell");
+            throw catcher<interpreter>("Unary minus not supported in Shell");
         case LanguageTokenTypes::LISPScheme:
             arithmeticOperations(currentLanguage, expr, left, right);
             break;
@@ -285,18 +278,18 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
             arithmeticOperations(currentLanguage, expr, left, right);
             break;
         case LanguageTokenTypes::Prolog:
-            throw std::runtime_error("Unary minus not supported in this context in Prolog");
-        case LanguageTokenTypes::Smalltalk:
+            throw catcher<interpreter>("Unary minus not supported in this context in Prolog");
+        case LanguageTokenTypes::SmallTalk:
             arithmeticOperations(currentLanguage, expr, left, right);
             break;
         case LanguageTokenTypes::HTMLCSS:
-           evaluateBinaryTokens(currentLanguage, expr, left, right);
+            //evaluateBinaryTokens(currentLanguage, expr, left, right);
             break;
         case LanguageTokenTypes::SQL:
             arithmeticOperations(currentLanguage, expr, left, right);
             break;
         case LanguageTokenTypes::LabVIEW:
-            throw std::runtime_error("Unary minus not applicable in this context");
+            throw catcher<interpreter>("Unary minus not applicable in this context");
         case LanguageTokenTypes::Eiffel:
             arithmeticOperations(currentLanguage, expr, left, right);
             break;
@@ -306,34 +299,8 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
             // This should be defined as a struct using templates for the objects to add flexibility 
             break;
         default:
-            throw RunTimeError("Operand must be a number.");           
+            throw catcher<interpreter>("Operand must be a number.");           
     }
     // Unreachable.
     return NULL;
-}*/
-/* ---------------------------------------------------------------------------------------------------------
- * isTruthy Description: 
-    Is a method that will return an concrete type if the language the user specifies supports truthy/falsy
- * Arguments:
-    * Type: Is a generic type that must have a concrete type during run time
- * Returns:
-    True if the object was successfully casted into a c++ supported type 
-    Otherwise, return false 
- * ---------------------------------------------------------------------------------------------------------
-*/
-/*bool interpreter::isTruthy(const std::any& object) {
-    switch(currentLanguage) {
-        case LanguageTokenTypes::Python:
-            if (std::any_cast<LanguageTokenTypes::Python::None>(&object) != nullptr) return false;
-            if (auto b = std::any_cast<LanguageTokenTypes::Python::Bool>(&object)) return *b;
-            break;
-        case LanguageTokenTypes::JavaScript:
-            if (std::any_cast<LanguageTokenTypes::JavaScript::Null>(&object) != nullptr) return false;
-            if (std::any_cast<LanguageTokenTypes::JavaScript::Undefined>(&object) != nullptr) return false;
-            if (auto b = std::any_cast<LanguageTokenTypes::JavaScript::Boolean>(&object)) return *b;
-            break;
-        //TODO: handle other languages here
-    }
-    return true;
-}*/
-
+}

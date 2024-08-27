@@ -1,17 +1,15 @@
 #ifndef _LANGUAGE_SPECIFIC_BINARY_OPERATIONS_H_
 #define _LANGUAGE_SPECIFIC_BINARY_OPERATIONS_H_
-#include <token.h>
 #include <catch.h>
 #include <run_time_error.h>  
 #include <typeinfo>
 namespace BinaryOperations {
-    //class binaryOperations: public Check<binaryOperations>, public runtimeerror<binaryOperations>, public NonMemberConv<binaryOperations>, public catcher<binaryOperations> {
     class binaryOperations: public Check<binaryOperations>, public runtimeerror<binaryOperations>, public NonMemberConv<binaryOperations>, public catcher<binaryOperations> {
         public:
             friend class interpreter;
             // Default constructor
-            binaryOperations(): runtimeerror() {};
-            ~binaryOperations() noexcept = default;
+            binaryOperations() = default;
+            ~binaryOperations() noexcept {};
             auto arithmeticOperations(auto& expr, auto& left, auto& right);
             bool isEqual(auto& a, auto& b);
         private:
@@ -49,15 +47,14 @@ namespace BinaryOperations {
                     else if (value.type() == typeid(float)) return std::any_cast<float>(value);
                     else if (value.type() == typeid(double)) return std::any_cast<double>(value);
                     else {
-                        throw catcher("Error when converting object into a representable type in c++!");
+                        throw catcher<binaryOperations>("Error when converting object into a representable type in c++!");
                     }
                 }
-                catch(catcher& e) {
+                catch(catcher<binaryOperations>& e) {
                     std::cout << e.what() << std::endl;
                 }
                 return NULL;
             };
-
     };
 };
 using namespace BinaryOperations;

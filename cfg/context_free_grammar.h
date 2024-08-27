@@ -19,7 +19,7 @@
 
 namespace ContextFreeGrammar {
     template<typename Derived>
-    class Expr  {
+    class Expr {
         /* ------------------------------------------------------------------------------------------
          * A representation of an abstraction classs which is also considered as a disoriented object
          * ------------------------(Additional Info Below)-------------------------------------------
@@ -28,7 +28,7 @@ namespace ContextFreeGrammar {
          * ------------------------------------------------------------------------------------------
          */
         public:
-            virtual ~Expr() noexcept = default;
+            virtual ~Expr() noexcept {};
             std::string accept(Expr& visitor) {
                 return static_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
             };
@@ -53,7 +53,7 @@ namespace ContextFreeGrammar {
          */
         public:
             Binary(const Expr& left, const Token& op, const Expr& right): left(this->left), op(this->op), right(this->right){};
-            ~Binary() {};
+            ~Binary() noexcept = default;
             inline std::string visit(Binary&& expr) {
                  std::string leftResult = expr.left->accept(*this);
                  std::string rightResult = expr.right->accept(*this);
@@ -68,7 +68,7 @@ namespace ContextFreeGrammar {
     class Unary: public Expr<Unary> {
         public:
             Unary(const Expr& right, const Token& op): right(this->right), op(this->op) {};
-            ~Unary(){};
+            ~Unary() noexcept = default;
             inline std::string visit(Unary&& expr) {
                 std::string rightResult = expr.right->accept(*this);
                 return " " + rightResult;

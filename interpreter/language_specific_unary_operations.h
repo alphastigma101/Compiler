@@ -7,7 +7,7 @@ namespace UnaryOperations {
         public:
             friend class interpreter;
             explicit unaryOperations() = default;
-            ~unaryOperations() noexcept = default;
+            ~unaryOperations() noexcept {};
             /* -----------------------------------------------------------------------------
              * isNumeric Description:
                 Is a helper function for (checkNumberOperands) and (checkNumberOperands)

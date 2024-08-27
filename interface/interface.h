@@ -1,7 +1,7 @@
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
 #include <definitions.h>
-
+#include <assembly_visitor_access.h>
 template<class Type>
 class NonMemberConv {
     // An abstract class used for converting object types that are not a member object of the class 

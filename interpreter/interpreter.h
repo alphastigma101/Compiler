@@ -17,11 +17,11 @@ namespace Interpreter {
         public:
             interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, const LanguageTokenTypes lang);
             ~interpreter() noexcept = default;
-            inline Literal visitLiteralExpr(Literal& expr) { return expr.getValue(); };
-            Unary visitUnaryExpr(Unary& expr);
-            Binary visitBinaryExpr(Binary& expr);
-            Grouping visitGroupingExpr(Grouping& expr);
-            char* toString(std::any& left, std::any& right) override {
+            inline std::any visitLiteralExpr(auto& expr) { return expr.getValue(); };
+            std::any visitUnaryExpr(auto& expr);
+            std::any visitBinaryExpr(auto& expr);
+            inline std::any visitGroupingExpr(auto& expr) { return evaluate(expr.expression); };
+            inline char* toString(std::any& left, std::any& right) override {
                 return NULL;
             };
         private:
@@ -29,31 +29,24 @@ namespace Interpreter {
             std::vector<std::tuple<int, std::pair<std::string, std::any>>> expr;
         protected:
             inline auto evaluate(auto& expr) -> std::any {
-                // Check if expr is an instance of Expr<Binary>
-                if (expr.type() == typeid(Expr<Binary>)) { 
+                const std::type_info& ti = typeid(expr);
+                if (ti == static_cast<const std::type_info&>(typeid(Expr<Binary>))) { 
                     auto binary = std::any_cast<Expr<Binary>&>(expr);
                     return binary.accept(binary);
                 }
-                // Check if expr is an instance of Expr<Unary>
-                else if (expr.type() == typeid(Expr<Unary>)) { 
+                else if (ti == static_cast<const std::type_info&>(typeid(Expr<Unary>))) { 
                     auto unary = std::any_cast<Expr<Unary>&>(expr);
                     return unary.accept(unary); 
                 }
-                // Check if expr is an instance of Expr<Grouping>
-                else if (expr.type() == typeid(Expr<Grouping>)) { 
+                else if (ti == static_cast<const std::type_info&>(typeid(Expr<Grouping>))) { 
                     auto grouping = std::any_cast<Expr<Grouping>&>(expr);
                     return grouping.accept(grouping); 
                 }
-                // Check if expr is an instance of Expr<Literal>
-                else if (expr.type() == typeid(Expr<Literal>)) { 
+                else if (ti == static_cast<const std::type_info&>(typeid(Expr<Literal>))) { 
                     auto literal = std::any_cast<Expr<Literal>&>(expr);
                     return literal.accept(literal); 
                 }
-                // If none of the above, throw an error or handle the unexpected type
-                else { 
-                    //throw catcher("Unexpected type in evaluate function");
-                    
-                }
+                else { throw catcher<interpreter>("Unexpected type in evaluate function"); }
                 return NULL;
             };
     };

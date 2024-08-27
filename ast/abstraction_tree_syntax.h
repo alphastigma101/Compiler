@@ -7,8 +7,7 @@ namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public std::filesystem::path, public catcher<Type> {
         /* ------------------------------------------------------------------------------------------
-         * (Generate Abstraction Syntax Tree) Description:
-            A diorienated class object isolating its behavior. It will output the expressions it visits inside a .txt file 
+         * @brief A disorienated class object isolating its behavior. It will write data to a file by getting the literals from each expression it visits. 
          * ------------------------------------------------------------------------------------------
          */
         public:
@@ -32,9 +31,10 @@ namespace AbstractionTreeSyntax {
             void writeFile();
             friend class ast;
         private:
-            std::string file_name, user_choice;
+            std::string file_name, user_choice; //TODO: I don't like this being here considering it is already declared in main.cc so it should not be needed here 
+                                                // And it needs to be wrapped in a directive
             std::string outputDir;
-            std::string nameOfFile = file_name; // language_types.h 
+            std::string nameOfFile = file_name;
     };
     class ast: public generateAst<ast> {
         /* --------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ namespace AbstractionTreeSyntax {
             ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr);
             ~ast() noexcept = default;
             inline void setTable() { this->table = initTable(); };
-            inline Table getTable() {return table;};
+            inline Table getTable() { return table; };
             friend class analyzeSemantics;
         private:
             Table table;
@@ -57,7 +57,7 @@ namespace AbstractionTreeSyntax {
         // This class performs the semantic analysis 
         public: 
             analyzeSemantics(ast &Ast);
-            ~analyzeSemantics();
+            ~analyzeSemantics() noexcept = default;
         private:
             ast Ast; // Use list initializer to initialize this value 
     };
@@ -65,12 +65,11 @@ namespace AbstractionTreeSyntax {
         // This class Translates AST to intermediate representation (IR)
         public:
             intermediateRepresentation(analyzeSemantics &as);
-            ~intermediateRepresentation();
+            ~intermediateRepresentation() noexcept = default;
             void generate();
         private:
             analyzeSemantics as;
     };
 };
-
 using namespace AbstractionTreeSyntax;
 #endif

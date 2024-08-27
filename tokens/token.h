@@ -1,7 +1,6 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 #include <interface.h>
-extern currentType<LanguageTokenTypes> ct;
 /*
  * This enum class object supports multiple languages
  * To add support for a custom programming language you would add the tokens here
@@ -24,7 +23,7 @@ enum TokenType {
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, PUBLIC, 
     PRIVATE, PROTECTED, IMPORT, PACKAGE, STATIC, FINAL, STD, 
-    CATCH, FN,
+    CATCH, FN, NUKE, 
     // Python Tokens
     DEF, ELIF, TRY, EXCEPT, FINALLY, WITH, AS,
     // JavaScript Tokens
@@ -104,6 +103,7 @@ class Token: public MemberConv<Token>  {
     public:
         // Default Constructor
         Token() = default;
+        ~Token() noexcept = default;
         // Other Constructor
         Token(const TokenType type, const std::string lexeme, const std::string literal, const int line);
         TokenType getType();

@@ -7,6 +7,7 @@
 static bool hadError = false;
 static LanguageTokenTypes interpretLanguage;
 currentType<LanguageTokenTypes> ct;
+std::string user_choice, file_name;
 /*
  * (run): Is a standalone static void function that runs the user input 
  * Parameters:
@@ -128,7 +129,6 @@ void runFile(const std::string& filePath) {
 
 // This is the driver code
 int main(int argc, char **argv) {
-    std::string user_choice, file_name;
     const Table table = initTable();
     if (argc > 2) {
         std::cout << "Supported languages" << std::endl;

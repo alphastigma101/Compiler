@@ -1,15 +1,33 @@
 #include <token.h>
-/*
- * (Token) is a default constructor is using list-initializing 
- */
+/* ---------------------------------------------------------------------------
+ * @brief Default constructor is using list-initializing 
+ * ---------------------------------------------------------------------------
+*/
 Token::Token(const TokenType type, const std::string lexeme, const std::string literal, const int line): type(this->type), lexeme(this->lexeme), literal(this->literal), line(this->line) {}
 
+/* ---------------------------------------------------------------------------
+ * @brief A getter method that gets the TokenType object
+ * @return TokenType type-id
+ * ---------------------------------------------------------------------------
+*/
+TokenType Token::getType() { return type; }
 
-TokenType Token::getType() { return type; } 
-
+/* --------------------------------------------------------------------------
+ * @brief A getter method to get the lexeme object
+ * @return string type-id
+ * --------------------------------------------------------------------------
+*/ 
 std::string Token::getLexeme() { return lexeme; }
-
+/* --------------------------------------------------------------------------
+ * @brief A getter method to get the literal object
+ * @return string type-id 
+ * --------------------------------------------------------------------------
+*/
 std::string Token::getLiteral() { return literal; }
-
+/* --------------------------------------------------------------------------
+ * @brief A getter method to get the literal object
+ * @return integer type-id 
+ * --------------------------------------------------------------------------
+*/
 int Token::getLine() { return line; }
 

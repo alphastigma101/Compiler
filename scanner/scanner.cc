@@ -3,10 +3,10 @@
 /* ---------------------------------------------------------------------------------------------
  * This is the default constructor which can be used to create an instance of the Scanner Class
  * Params:
-    *  std::string Source: the source line of code from a file or from the runprompt function
+    *  std::string source: the source line of code from a file or from the runprompt function
  * --------------------------------------------------------------------------------------------  
  */
-Scanner::Scanner(std::string& Source): Source(this->Source) {}
+Scanner::Scanner(const std::string source): source(this->source) {}
 
 /* ----------------------------------------------------------------------------------
  * (keywords) is a dictionary that holds in various keywords of programming languages 
@@ -41,7 +41,8 @@ const std::unordered_map<std::string, TokenType> Scanner::keywords = {
     {"def", TokenType::DEF},
     {"final", TokenType::FINAL},
     {"std", TokenType::STD},
-    {"var", TokenType::VAR}
+    {"var", TokenType::VAR},
+    {"nuke", TokenType::NUKE}
 };
 
 /* ------------------------------------------------------------------------------------------------------
@@ -108,40 +109,46 @@ void Scanner::scanToken() {
         case '\n':
                 line++;
                 break;
-        case '"': String(); break;
+        case '"': string_(); break;
         default: 
-               if (isDigit(c)) {number();} 
+               if (isDigit(c)) { number_();} 
                else if (isAlpha(c)) { identifier(); }
-               else { std::cout << line << "Unexpected character."; }
+               else { 
+                   std::cout << line << "Unexpected character."; 
+                   //throw catcher(line, "Unexcepted character");
+               } // TODO: make catcher class take in vardiac arguments so you can pass in the line number
                break;
     }
 }
-
+/* ---------------------------------------------------------------------------
+ * @brief Helper function that adds tokens to a container
+ * @param const TokenType type: represents enum literals
+ * ---------------------------------------------------------------------------
+*/
 void Scanner::addToken(const TokenType type) { addToken(type, ""); }
 
-/*
- * (addToken) is a method that is apart of the Scanner class 
- * Params:
-    * Tokentype type: Is a Lexical grammar
-    * const std::string literal: A representation of a primitive instance type 
- * This method only pushes to a vector 
+/* ---------------------------------------------------------------------------
+ * @brief A method that gets called by a data memeber function helper
+ * @param Tokentype type: Is a Lexical grammar
+ * @param const std::string literal: A representation of a primitive instance type 
+ * @return Nothing. This method only pushes to a vector. 
+ * ---------------------------------------------------------------------------
 */
 void Scanner::addToken(const TokenType type, const std::string literal) {
-    std::string text = Source.substr(start, current);
+    std::string text = source.substr(start, current);
     tokens.push_back(Token(type, text, literal, line));
 }
 
-/*
- * (identifier) is a method apart of the scanner class that searches for the keyword 
- * Params:
-    *  None
- *  This method uses a dictionary to see if the object type is inside the dictionary 
+/* ---------------------------------------------------------------------------
+ * @brief Searches for the keyword inside a string literal.
+ * @param None
+ * @return None. It uses a dictionary to see if the object type is inside the dictionary 
  *  If it is not in the dictionary, it will be converted into TokenType::IDENTIFIER
- *  It will always call in addToken
+ *  --------------------------------------------------------------------------
 */
 void Scanner::identifier() {
     while (isAlphaNumeric(peek())) advance();
-    std::string text = Source.substr(start, current);
+    std::string text = source.substr(start, current);
     auto it = keywords.find(text);
     TokenType type;
     if (it != keywords.end()) {
@@ -151,13 +158,14 @@ void Scanner::identifier() {
     }
     addToken(type);
 }
-/*
- *
- *
+/* --------------------------------------------------------------------------
+ * @brief It scans through the string literal and matches it with a enum type
+ * @param const char expected: A character literal that is matched with an enum type
+ * @return True if there is a match. Otherwise false
 */
 bool Scanner::match(const char expected) {
     if (isAtEnd()) return false;
-    if (Source.at(current) != expected) return false;
+    if (source.at(current) != expected) return false;
     current++;
     return true;
 }
@@ -166,33 +174,30 @@ bool Scanner::match(const char expected) {
  *
  *
 */
-void Scanner::String() {
+void Scanner::string_() {
     while (peek() != '"' && !isAtEnd()) {
         if (peek() == '\n') line++;
         advance();
     }
-    if (isAtEnd()) {
-        std::cout << line << "Unterminated string.";
-        return;
-    }
+    if (isAtEnd()) { throw catcher("Unterminated string."); }
     // The closing ".
     advance();
 
     // Trim the surrounding quotes.
-    std::string value = Source.substr(start + 1, current - 1);
+    std::string value = source.substr(start + 1, current - 1);
     addToken(TokenType::STRING, value);
 }
 /*
  *
  *
 */
-void Scanner::number() {    
+void Scanner::number_() {    
     while (isDigit(peek())) advance();
     // Look for a fractional part.
-    if (Scanner::peek() == '.' && isDigit(peekNext())) {
+    if (peek() == '.' && isDigit(peekNext())) {
         // Consume the "."
         advance();
         while (isDigit(peek())) advance();
     }
-    addToken(TokenType::NUMBER, Source.substr(start, current));
+    addToken(TokenType::NUMBER, source.substr(start, current));
 }

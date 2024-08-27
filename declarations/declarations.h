@@ -7,7 +7,7 @@
 #include <any>
 #include <iostream>
 #include <variant>
-#include <assembly_visitor_access.h>
+#include <languages.h>
 // Used in abstraction_syntax_tree.h
 extern std::string user_choice; // get the user choice of language from the begining 
 extern std::string file_name;
@@ -41,6 +41,9 @@ template<typename T>
 static void setTokenLanguage(const T& value);
 template<typename T>
 static T getTokenLanguage();
+extern currentType<LanguageTokenTypes> ct;
 
 
+// Needs to be used somewhere in generate_code.cc 
+extern languages type;
 #endif 

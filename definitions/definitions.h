@@ -1,7 +1,6 @@
 #ifndef _DEFINITIONS_H_
 #define _DEFINITIONS_H_
 #include <declarations.h>
-#include <languages.h>
 
 template<>
 struct currentType<LanguageTokenTypes> {

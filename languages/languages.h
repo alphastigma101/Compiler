@@ -80,5 +80,4 @@ namespace Languages {
     };
 };
 using namespace Languages;
-extern languages type;
 #endif

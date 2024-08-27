@@ -1,23 +1,21 @@
-#pragma once
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
-#include <unordered_map>                                                        
-#include <map>                                                                  
-#include <vector>                                                               
-#include <iostream> 
-
+#include <definitions.h>
 namespace Logging {
+    template<class T>
     class logging {
         public:
-            explicit logging(std::map<std::string, std::vector<std::string>>& old_logs): logs(old_logs) {};
+            logging() = default;
+            logging<T>(const logTable<std::map<std::string, std::vector<std::string>>>& old_logs, const std::string& text): logEntries(old_logs), text(this->text) {};
             ~logging() noexcept = default;
             static std::string getCurrentTimeString();
-            void rotate();
-            void update();
+            void rotate();             
+            void update();             
             bool write();
-            inline std::map<std::string, std::vector<std::string>> getLogs() { return logs; };
+            inline std::map<std::string, std::vector<std::string>> getLogs() { return logEntries; };
         private:
-            std::map<std::string, std::vector<std::string>> logs;
+            logTable<std::map<std::string, std::vector<std::string>>> logEntries;
+            std::string text;
     };  
 };
 using namespace Logging;

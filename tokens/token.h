@@ -110,15 +110,14 @@ class Token: public MemberConv<Token>  {
         std::string getLexeme();
         std::string getLiteral();
         int getLine();
+        inline std::any toString() override { 
+            std::string conv_type = std::any_cast<std::string>(&type);
+            return conv_type + " " + lexeme + " " + literal;
+        };
     private:
         TokenType type;
         std::string lexeme;
         std::string literal; 
         int line;
-        currentType<LanguageTokenTypes> ct;
-        inline std::any toString() override { 
-            std::string conv_type = std::any_cast<std::string>(&type);
-            return conv_type + " " + lexeme + " " + literal;
-        };
-};
+    };
 #endif

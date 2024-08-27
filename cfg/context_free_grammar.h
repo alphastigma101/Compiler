@@ -1,9 +1,8 @@
 #pragma once
 #ifndef _CONTEXT_FREE_GRAMMAR_H_
 #define _CONTEXT_FREE_GRAMMAR_H_
-#include <token.h>
+#include <run_time_error.h>
 #include <filesystem>
-#include <stdexcept>
 /*
  * A Context Free Grammar consists of a head and a body, which describes what it can generate.
  * The body's purest form will be a list of symbols and these symbols are:
@@ -19,7 +18,7 @@
 
 namespace ContextFreeGrammar {
     template<typename Derived>
-    class Expr {
+    class Expr: public logging<Derived>, runtimeerror<Derived> {
         /* ------------------------------------------------------------------------------------------
          * A representation of an abstraction classs which is also considered as a disoriented object
          * ------------------------(Additional Info Below)-------------------------------------------
@@ -28,13 +27,61 @@ namespace ContextFreeGrammar {
          * ------------------------------------------------------------------------------------------
          */
         public:
+            friend class Binary;
+            friend class Unary;
+            friend class Grouping;
+            friend class Literal;
             virtual ~Expr() noexcept {};
-            std::string accept(Expr& visitor) {
-                return static_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
+            /**
+             * @brief Accepts a visitor for processing this node.
+             *
+             * This method is part of the Visitor design pattern. It accepts a visitor instance that performs operations on this node.
+             *
+             * @details
+             * When you call `Binary_1->accept(visitor)`, the traversal starts with the node `Binary_1`.
+             * Inside `Binary_1::accept(visitor)`, the `visit(*this)` call is made. Here, `*this` refers to `Binary_1`.
+             *
+             * The method then recursively processes the left and right children:
+             * - **Recursive Call to `expr.left`**:
+             *   - `expr.left` points to `Binary_2`. So, `expr.left->accept(*this)` translates to `Binary_2->accept(visitor)`.
+             *   - Inside `Binary_2::accept(visitor)`, `visit(*this)` is called, where `*this` refers to `Binary_2`.
+             * - **Processing `Binary_2`**:
+             *   - Inside `Binary_2::accept(visitor)`, `visit(*this)` processes `Binary_2`.
+             *   - Since `Binary_2` has no children (both `left` and `right` are `nullptr`), the `visit` method returns an empty string for both `leftResult` and `rightResult`.
+             * - **Returning to `Binary_1`**:
+             *   - The result from `Binary_2` is returned to `Binary_1`, setting `leftResult` to this result.
+             *   - Similarly, `expr.right->accept(*this)` is called for `Binary_3`, following the same process.
+             * - **Processing `Binary_3`**:
+             *   - The process for `Binary_3` is similar: `visit(*this)` processes `Binary_3`, and since it has no children, empty strings are returned for `leftResult` and `rightResult`.
+             * - **Combining Results**:
+             *   - After processing both children, `Binary_1` combines the results from `Binary_2` and `Binary_3`, and returns the final result.
+             *
+             * @param visitor The visitor instance used to process this node.
+             *
+             * @return A `std::string` representing the result of processing this node and its children.
+             *
+             * @note Potential Issues:
+             * - **Dereferencing Null Pointers**: Ensure that child pointers (`left` and `right`) are checked for `nullptr` before dereferencing to avoid undefined behavior.
+             * - **Infinite Recursion**: If the tree structure is not properly maintained (e.g., cycles or incorrect pointers), it may lead to infinite recursion.
+             * - **Stack Overflow**: Because c++ uses a call stack. Regardless if the previous call is the same thing. It stil pushes the function call onto the stack with it's own local variables.
+             *      - It pushes main on the stack and then followed by other functions which are dynamically allocated using new. 
+             *      - Stack overflow can occur if the call stack exceeds the limited size which you could most likely increase for your compiler.
+             *
+             * The Visitor pattern is used to separate operations from the objects they operate on, allowing new operations to be added without modifying the objects.
+             */
+            inline std::string accept(Expr& visitor) {
+                try {
+                    return std::any_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
+                }
+                catch(...) {
+                    throw runtimeerror<Derived>(nullptr, std::any_cast<std::string>(visitor.left->op->toString()) + std::any_cast<std::string>(visitor.right->op->toString()));
+                }
             };
             Expr* right;
             Expr* left;
             Token* op;
+        private:
+            logTable<std::map<std::string, std::vector<std::string>>> logs_;
      };
     class Binary: public Expr<Binary> {
         /*
@@ -54,10 +101,24 @@ namespace ContextFreeGrammar {
         public:
             Binary(const Expr& left, const Token& op, const Expr& right): left(this->left), op(this->op), right(this->right){};
             ~Binary() noexcept = default;
+            /* ----------------------------------------------------------------------------------------------------------
+             * @brief visitor gets called finite amount of times and is placed on the call stack with it's own variables 
+             *
+             *
+             */
             inline std::string visit(Binary&& expr) {
-                 std::string leftResult = expr.left->accept(*this);
-                 std::string rightResult = expr.right->accept(*this);
-                 return " " + leftResult + " " + rightResult;
+                try {
+                    std::string leftResult = expr.left ? expr.left->accept(*this) : "";
+                    std::string rightResult = expr.right ? expr.right->accept(*this) : "";
+                    return " " + leftResult + " " + rightResult;
+                }
+                catch(runtimeerror<Binary>& e) {
+                    std::string temp = std::string("on line:" + std::to_string(expr.op.getLine()) + " " + e.what());
+                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    logging<Binary>update;
+                    logging<Binary>rotate;
+                }
+                return "\0";
             };
             inline Token getToken() { return op; };
         private:
@@ -70,8 +131,17 @@ namespace ContextFreeGrammar {
             Unary(const Expr& right, const Token& op): right(this->right), op(this->op) {};
             ~Unary() noexcept = default;
             inline std::string visit(Unary&& expr) {
-                std::string rightResult = expr.right->accept(*this);
-                return " " + rightResult;
+                try {
+                    std::string rightResult = expr.right->accept(*this);
+                    return " " + rightResult;
+                }
+                catch(runtimeerror<Unary>& e) {
+                    std::string temp = std::string("on line:" + std::to_string(expr.op.getLine()) + " " + e.what());
+                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    logging<Unary>update;
+                    logging<Unary>rotate;
+                }
+                return "\0";
             };
             inline Token getToken() { return op; };
         private:
@@ -83,9 +153,18 @@ namespace ContextFreeGrammar {
             Grouping(const Expr& expression): expression(this->expression){};
             ~Grouping() noexcept = default;
             inline std::string visit(Grouping&& expr) {
-                std::string leftResult = expr.left->accept(*this);
-                std::string rightResult = expr.right->accept(*this);
-                return "(" + leftResult + " " + rightResult + ")";
+                try {
+                    std::string leftResult = expr.left->accept(*this);
+                    std::string rightResult = expr.right->accept(*this);
+                    return "(" + leftResult + " " + rightResult + ")";
+                }
+                catch(runtimeerror<Grouping>& e) {
+                    std::string temp = std::string("on line:" + std::to_string(expr.op->getLine()) + " " + e.what());
+                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    logging<Grouping>update;
+                    logging<Grouping>rotate;
+                }
+                return "\0";
             };
         private:
             Expr* expression;
@@ -95,15 +174,15 @@ namespace ContextFreeGrammar {
             Literal(const auto& value): value(this->value){};
             ~Literal() noexcept = default;
             inline std::string visit(Literal&& expr) {
-                if (!expr.getValue().has_value()) return "nil";
                 try {
-                    // Cast the std::any to std::string
-                    auto val = std::any_cast<std::string>(expr.toString());
-                    return val;
-                } catch (const std::bad_any_cast& e) {
-                    //TODO: Logging needs to be implemented here
-                    //log[].push_back("error: " + std::string(e.what()));
-                    return "\0";
+                    std::string literal = std::any_cast<bool>(expr) ? expr.accept(*this) : "";
+                    return literal;
+                }
+                catch(runtimeerror<Literal>& e) {
+                    std::string temp = std::string("on line:" + std::to_string(expr.op->getLine()) + " " + e.what());
+                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    logging<Literal>update;
+                    logging<Literal>rotate;
                 }
                 return "\0";
             };
@@ -111,15 +190,18 @@ namespace ContextFreeGrammar {
                 try {
                     return std::any_cast<std::string>(value);
                 } 
-                catch (const std::bad_any_cast& e) {
-                    //TODO: Logging needs to be implemented here 
-                    return "error: " + std::string(e.what());
+                catch (std::bad_any_cast& e) {
+                    auto l = std::any_cast<Expr<Literal>>(value);
+                    std::string temp = std::to_string(l.op->getLine());
+                    logging(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
+                    logging<Literal>update;
+                    logging<Literal>rotate;
+                    return "error:" + std::string(e.what());
                 }
             };
             inline std::any getValue() { return value; }; 
         private:
             std::any value;
-
     };
 };
 using namespace ContextFreeGrammar;

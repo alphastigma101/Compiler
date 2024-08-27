@@ -1,6 +1,6 @@
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
-#include <definitions.h>
+#include <logging.h>
 #include <assembly_visitor_access.h>
 template<class Type>
 class NonMemberConv {

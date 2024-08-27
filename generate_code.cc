@@ -1,6 +1,5 @@
 #include <languages.h>
 
-
 static void other_langs(other_languages& o_t, std::string& choice) {
     if (choice == "HTMLCSS") {
         std::cout << "-----------------------" << std::endl;

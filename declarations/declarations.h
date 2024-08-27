@@ -2,11 +2,9 @@
 #define _DECLARATIONS_H_
 #include <tuple>
 #include <utility>
-#include <string>
 #include <memory>
-#include <any>
 #include <iostream>
-#include <variant>
+//#include <variant>
 #include <languages.h>
 // Used in abstraction_syntax_tree.h
 extern std::string user_choice; // get the user choice of language from the begining 
@@ -46,4 +44,12 @@ extern currentType<LanguageTokenTypes> ct;
 
 // Needs to be used somewhere in generate_code.cc 
 extern languages type;
+
+
+// Used by every concrete class 
+// Use grep -R 'logEntries' <root-path> replace root-path that will search through all the files that have logEntries 
+template<typename T>
+using logTable = T;
+extern logTable<std::map<std::string, std::vector<std::string>>> logEntries;  // More descriptive of its purpose
+
 #endif 

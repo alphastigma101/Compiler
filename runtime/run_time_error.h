@@ -3,13 +3,13 @@
 #include <token.h>
 namespace RunTimeError {
     template<class Type>
-    class runtimeerror: public Token {
+    class runtimeerror {
         public:
             // Constructor with token and message
-            explicit runtimeerror(const auto& token, const std::string& message): token_(token), message_(message) {};
+            explicit runtimeerror(const auto& type, const std::string& message): type(this->type), message_(message) {};
 
             // Default constructor
-            runtimeerror() : token_(), message_("Unspecified runtime error") {};
+            runtimeerror() : message_("Unspecified runtime error") {};
 
             // Virtual destructor
             virtual ~runtimeerror() = default;
@@ -18,9 +18,9 @@ namespace RunTimeError {
             virtual const char* what() const throw() { return message_.c_str(); };
 
             // Get the token associated with the error
-            const Token& getToken() const { return token_; };
+            const TokenType& getType() const { return type; };
         private:
-            Token token_;
+            TokenType type;
             std::string message_;
     };
 };

@@ -14,7 +14,8 @@
  * removing old entries based on some criteria (e.g., age). If the "logs" folder does not exist,
  * it creates the folder.
  */
-void logging::rotate() {
+template<class T>
+void logging<T>::rotate() {
     std::filesystem::path logDir = "logs";
 
     // Create logs directory if it doesn't exist
@@ -48,15 +49,11 @@ void logging::rotate() {
  * This method updates the logs object by adding new log entries. These entries represent
  * events such as crashes or errors that have occurred within the system.
  */
-void logging::update() {
+template<class T>
+void logging<T>::update() {
     std::string timestamp = getCurrentTimeString();
-    std::vector<std::string> newLogEntries = {
-        "Error: Null pointer exception",
-        "Warning: Low memory detected"
-    };
-
     // Insert the new log entries into the logs map under the current timestamp
-    logs[timestamp] = newLogEntries;
+    logEntries[timestamp].push_back(text);
 }
 
 /**
@@ -68,7 +65,8 @@ void logging::update() {
  * 
  * @return bool Returns true if the write operation is successful, false otherwise.
  */
-bool logging::write() {
+template<class T>
+bool logging<T>::write() {
     std::filesystem::path logDir = "logs";
     std::string filename = logDir.string() + "/" + getCurrentTimeString() + ".json";
     
@@ -80,7 +78,7 @@ bool logging::write() {
 
     // Write logs in JSON-like format
     ofs << "{\n";
-    for (const auto& [timestamp, entries] : logs) {
+    for (const auto& [timestamp, entries] : logEntries) {
         ofs << "  \"" << timestamp << "\": [\n";
         for (const auto& entry : entries) {
             ofs << "    \"" << entry << "\",\n";
@@ -98,7 +96,8 @@ bool logging::write() {
  * 
  * @return std::string The current time formatted as "YYYY-MM-DD HH:MM:SS".
  */
-std::string logging::getCurrentTimeString() {
+template<class T>
+std::string logging<T>::getCurrentTimeString() {
     // Get current time as time_point
     auto now = std::chrono::system_clock::now();
 

@@ -11,124 +11,125 @@
     Otherwise, return false
  * ---------------------------------------------------------------------------------------------------------
 */
-bool truthyOperations::isTruthy(const auto& object) {
-    switch(currentLanguage) {
-        case LanguageTypes::Python:
-            if (static_cast<LanguageTypes::Python::None>(&object) != nullptr) return false;
-            if (auto b = static_cast<LanguageTypes::Python::Bool>(&object)) return *b;
-            if (auto i = static_cast<LanguageTypes::Python::Int>(&object)) return *i != 0;
-            if (auto f = static_cast<LanguageTypes::Python::Float>(&object)) return *f != 0.0;
-            if (auto s = static_cast<LanguageTypes::Python::Str>(&object)) return !s->empty();
-            if (auto l = static_cast<LanguageTypes::Python::List>(&object)) return !l->empty();
-            if (auto d = static_cast<LanguageTypes::Python::Dict>(&object)) return !d->empty();
+bool truthyOperations::isTruthy(auto& object) {
+    const auto lang = ct.getTokenLanguage();
+    switch(lang) {
+        case LanguageTokenTypes::Python:
+            if (std::any_cast<LanguageTypes::Python::None>(object.getValue()) != nullptr) return false;
+            else if (auto b = std::any_cast<LanguageTypes::Python::Bool>(object.getValue())) return *b;
+            else if (auto i = std::any_cast<LanguageTypes::Python::Int>(object.getValue())) return *i != 0;
+            else if (auto f = std::any_cast<LanguageTypes::Python::Float>(object.getValue())) return *f != 0.0;
+            else if (auto s = std::any_cast<LanguageTypes::Python::Str>(object.getValue())) return !s->empty();
+            else if (auto l = std::any_cast<LanguageTypes::Python::List>(object.getValue())) return !l->empty();
+            else if (auto d = std::any_cast<LanguageTypes::Python::Dict>(object.getValue())) return !d->empty();
             return true;
-        case LanguageTypes::JavaScript:
-            if (static_cast<LanguageTypes::JavaScript::Null>(&object) != nullptr) return false;
-            if (static_cast<LanguageTypes::JavaScript::Undefined>(&object) != nullptr) return false;
-            if (auto b = static_cast<LanguageTypes::JavaScript::Boolean>(&object)) return *b;
-            if (auto n = static_cast<LanguageTypes::JavaScript::Number>(&object)) return *n != 0 && !std::isnan(*n);
-            if (auto s = static_cast<LanguageTypes::JavaScript::String>(&object)) return !s->empty();
+        case LanguageTokenTypes::JavaScript:
+            if (std::any_cast<LanguageTypes::JavaScript::Null>(object.getValue()) != nullptr) return false;
+            else if (std::any_cast<LanguageTypes::JavaScript::Undefined>(object.getValue()) != nullptr) return false;
+            else if (auto b = std::any_cast<LanguageTypes::JavaScript::Boolean>(object.getValue())) return *b;
+            else if (auto n = std::any_cast<LanguageTypes::JavaScript::Number>(object.getValue())) return *n != 0 && !std::isnan(*n);
+            else if (auto s = std::any_cast<LanguageTypes::JavaScript::String>(object.getValue())) return !s->empty();
             return true;
-        case LanguageTypes::Ruby:
-            if (static_cast<LanguageTypes::Ruby::Nil>(&object) != nullptr) return false;
-            if (auto b = static_cast<LanguageTypes::Ruby::TrueClass>(&object)) return true;
-            if (auto b = static_cast<LanguageTypes::Ruby::FalseClass>(&object)) return false;
+        case LanguageTokenTypes::Ruby:
+            if (std::any_cast<LanguageTypes::Ruby::Nil>(&object) != nullptr) return false;
+            else if (auto b = std::any_cast<LanguageTypes::Ruby::TrueClass>(object.getValue())) return true;
+            else if (auto b = std::any_cast<LanguageTypes::Ruby::FalseClass>(object.getValue())) return false;
             return true;
-        case LanguageTypes::C:
-        case LanguageTypes::CPP:
-            if (auto b = static_cast<LanguageTypes::CPP::Bool>(&object)) return *b;
-            if (auto i = static_cast<LanguageTypes::CPP::Int>(&object)) return *i != 0;
-            if (auto d = static_cast<LanguageTypes::CPP::Double>(&object)) return *d != 0.0;
-            if (auto p = static_cast<LanguageTypes::CPP::Nullptr>(&object)) return false;
+        case LanguageTokenTypes::C:
+        case LanguageTokenTypes::CPP:
+            if (auto b = std::any_cast<LanguageTypes::CPP::Bool>(object.getValue())) return *b;
+            else if (auto i = std::any_cast<LanguageTypes::CPP::Int>(object.getValue())) return *i != 0;
+            else if (auto d = std::any_cast<LanguageTypes::CPP::Double>(object.getValue())) return *d != 0.0;
+            else if (auto p = std::any_cast<LanguageTypes::CPP::Nullptr>(object.getValue())) return false;
             return true;
-        case LanguageTypes::Java:
-            if (static_cast<LanguageTypes::Java::Null>(&object) != nullptr) return false;
-            if (auto b = static_cast<LanguageTypes::Java::Boolean>(&object)) return *b;
+        case LanguageTokenTypes::Java:
+            if (std::any_cast<LanguageTypes::Java::Null>(object.getValue()) != nullptr) return false;
+            else if (auto b = std::any_cast<LanguageTypes::Java::Boolean>(object.getValue())) return *b;
             return true;
-        case LanguageTypes::Go:
-            if (auto b = static_cast<LanguageTypes::Go::Bool>(&object)) return *b;
+        case LanguageTokenTypes::Go:
+            if (auto b = std::any_cast<LanguageTypes::Go::Bool>(object.getValue())) return *b;
             return true;
-        case LanguageTypes::Kotlin:
-        case LanguageTypes::Swift:
-        case LanguageTypes::Rust:
-        case LanguageTypes::CSharp:
-        case LanguageTypes::FSharp:
-        case LanguageTypes::ObjectiveC:
-        case LanguageTypes::Scala:
-        case LanguageTypes::TypeScript:
-        case LanguageTypes::Dart:
-            if (static_cast<std::nullptr_t>(&object) != nullptr) return false;
-            if (auto b = static_cast<bool>(&object)) return *b;
+        case LanguageTokenTypes::Kotlin:
+        case LanguageTokenTypes::Swift:
+        case LanguageTokenTypes::Rust:
+        case LanguageTokenTypes::CSharp:
+        case LanguageTokenTypes::FSharp:
+        case LanguageTokenTypes::ObjectiveC:
+        case LanguageTokenTypes::Scala:
+        case LanguageTokenTypes::TypeScript:
+        case LanguageTokenTypes::Dart:
+            if (std::any_cast<std::nullptr_t>(object.getValue()) != nullptr) return false;
+            else if (auto b = std::any_cast<bool>(object.getValue())) return *b;
             return true;
-        case LanguageTypes::PHP:
-            if (static_cast<nullptr_t>(&object) != nullptr) return false;
-            if (auto b = static_cast<bool>(&object)) return *b;
-            if (auto i = static_cast<int>(&object)) return *i != 0;
-            if (auto f = static_cast<float>(&object)) return *f != 0.0f;
-            if (auto s = static_cast<std::string>(&object)) return !s->empty();
+        case LanguageTokenTypes::PHP:
+            if (std::any_cast<nullptr_t>(object.getValue()) != nullptr) return false;
+            else if (auto b = std::any_cast<bool>(object.getValue())) return *b;
+            else if (auto i = std::any_cast<int>(object.getValue())) return *i != 0;
+            else if (auto f = std::any_cast<float>(object.getValue())) return *f != 0.0f;
+            else if (auto s = std::any_cast<std::string>(object.getValue())) return !s->empty();
             return true;
-        case LanguageTypes::Perl:
-        case LanguageTypes::R:
-        case LanguageTypes::Lua:
-        case LanguageTypes::MATLAB:
-        case LanguageTypes::VBA:
-        case LanguageTypes::Groovy:
-        case LanguageTypes::Julia:
-        case LanguageTypes::PowerShell:
-        case LanguageTypes::VisualBasic:
-            if (static_cast<nullptr_t>(&object) != nullptr) return false;
-            if (auto b = static_cast<bool>(&object)) return *b;
-            if (auto n = static_cast<double>(&object)) return *n != 0.0;
-            if (auto s = static_cast<std::string>(&object)) return !s->empty();
+        case LanguageTokenTypes::Perl:
+        case LanguageTokenTypes::R:
+        case LanguageTokenTypes::Lua:
+        case LanguageTokenTypes::MATLAB:
+        case LanguageTokenTypes::VBA:
+        case LanguageTokenTypes::Groovy:
+        case LanguageTokenTypes::Julia:
+        case LanguageTokenTypes::PowerShell:
+        case LanguageTokenTypes::VisualBasic:
+            if (std::any_cast<nullptr_t>(object.getValue()) != nullptr) return false;
+            else if (auto b = std::any_cast<bool>(object.getValue())) return *b;
+            else if (auto n = std::any_cast<double>(object.getValue())) return *n != 0.0;
+            else if (auto s = std::any_cast<std::string>(object.getValue())) return !s->empty();
             return true;
-        case LanguageTypes::Haskell:
-        case LanguageTypes::Erlang:
-        case LanguageTypes::Clojure:
-        case LanguageTypes::StandardML:
-        case LanguageTypes::Elm:
-            if (auto b = static_cast<bool>(&object)) return *b;
+        case LanguageTokenTypes::Haskell:
+        case LanguageTokenTypes::Erlang:
+        case LanguageTokenTypes::Clojure:
+        case LanguageTokenTypes::StandardML:
+        case LanguageTokenTypes::Elm:
+            if (auto b = std::any_cast<bool>(object.getValue())) return *b;
             return true;
-        case LanguageTypes::VHDLVerilog:
-        case LanguageTypes::Fortran:
-        case LanguageTypes::COBOL:
-        case LanguageTypes::Pascal:
-        case LanguageTypes::Ada:
-        case LanguageTypes::Eiffel:
-            if (auto b = static_cast<bool>(&object)) return *b;
+        case LanguageTokenTypes::VHDLVerilog:
+        case LanguageTokenTypes::Fortran:
+        case LanguageTokenTypes::COBOL:
+        case LanguageTokenTypes::Pascal:
+        case LanguageTokenTypes::Ada:
+        case LanguageTokenTypes::Eiffel:
+            if (auto b = std::any_cast<bool>(object.getValue())) return *b;
             return true;
-        case LanguageTypes::AWK:
-        case LanguageTypes::TCL:
-            if (auto s = static_cast<std::string>(&object)) return !s->empty() && *s != "0";
-            if (auto n = static_cast<double>(&object)) return *n != 0.0;
+        case LanguageTokenTypes::AWK:
+        case LanguageTokenTypes::TCL:
+            if (auto s = std::any_cast<std::string>(object.getValue())) return !s->empty() && *s != "0";
+            else if (auto n = std::any_cast<double>(object.getValue())) return *n != 0.0;
             return true;
-        case LanguageTypes::Shell:
-            if (auto s = static_cast<std::string>(&object)) return !s->empty();
-            if (auto n = static_cast<int>(&object)) return *n != 0;
+        case LanguageTokenTypes::Shell:
+            if (auto s = std::any_cast<std::string>(object.getValue())) return !s->empty();
+            else if (auto n = std::any_cast<int>(object.getValue())) return *n != 0;
             return true;
-        case LanguageTypes::LISPScheme:
-        case LanguageTypes::Racket:
-            if (static_cast<nullptr_t>(&object) != nullptr) return false;
+        case LanguageTokenTypes::LISPScheme:
+        case LanguageTokenTypes::Racket:
+            if (std::any_cast<nullptr_t>(object.getValue()) != nullptr) return false;
             return true;
-        case LanguageTypes::Prolog:
-            if (auto b = static_cast<bool>(&object)) return *b;
+        case LanguageTokenTypes::Prolog:
+            if (auto b = std::any_cast<bool>(object.getValue())) return *b;
             return true;
-        case LanguageTypes::Smalltalk:
-            if (static_cast<nullptr_t>(&object) != nullptr) return false;
-            if (auto b = static_cast<bool>(&object)) return *b;
+        case LanguageTokenTypes::SmallTalk:
+            if (std::any_cast<nullptr_t>(object.getValue()) != nullptr) return false;
+            if (auto b = std::any_cast<bool>(object.getValue())) return *b;
             return true;
-        case LanguageTypes::HTMLCSS:
-        case LanguageTypes::SQL:
-        case LanguageTypes::LabVIEW:
+        case LanguageTokenTypes::HTMLCSS:
+        case LanguageTokenTypes::SQL:
+        case LanguageTokenTypes::LabVIEW:
             return NULL;
-        case LanguageTypes::Dlang:
-            if (static_cast<nullptr_t>(&object) != nullptr) return false;
-            if (auto b = static_cast<bool>(&object)) return *b;
-            if (auto i = static_cast<int>(&object)) return *i != 0;
-            if (auto f = static_cast<float>(&object)) return *f != 0.0f;
-            if (auto s = static_cast<std::string>(&object)) return !s->empty();
+        case LanguageTokenTypes::Dlang:
+            if (std::any_cast<nullptr_t>(object.getValue()) != nullptr) return false;
+            else if (auto b = std::any_cast<bool>(object.getValue())) return *b;
+            else if (auto i = std::any_cast<int>(object.getValue())) return *i != 0;
+            else if (auto f = std::any_cast<float>(object.getValue())) return *f != 0.0f;
+            else if (auto s = std::any_cast<std::string>(object.getValue())) return !s->empty();
             return true;
-
         default:
+            //TODO: Implement Custom language here
             return NULL;
     }
 }

@@ -348,9 +348,9 @@ int main(int argc, char** argv) {
         static_langs(s_t, to_print);
     }
     else {
-        for (auto &it: table) {
+        /*for (auto &it: Table) {
             std::cout << it->first << std::endl;
-        }
+        }*/
         std::cerr << "Usage: [Name of language to print]";
         exit(1);
     }

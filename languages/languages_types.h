@@ -10,8 +10,19 @@
 #include <functional>
 #include <set>
 #include <time.h>
-extern std::string user_choice; // get the user choice of language from the begining 
-extern std::string file_name; 
+
+enum LanguageTokenTypes {
+    C, CPP, Java, Python,
+    JavaScript, Ruby, Swift,
+    Go, Kotlin, Scala, TypeScript,
+    PHP, Perl, R, ObjectiveC, Haskell,
+    Rust, Dart, Lua, Shell, HTMLCSS,
+    SQL, MATLAB, VHDLVerilog, FSharp,
+    CSharp, VBA, Fortran, COBOL,Pascal, 
+    LISPScheme, Groovy,Erlang, Clojure, Dlang, 
+    Prolog, Ada, AWK, TCL, D, Julia, VisualBasic,
+    PowerShell, Racket, Elm, Eiffel, LabVIEW, SmallTalk, StandardML, Custom
+};
 namespace LanguageTypes {
     struct Python {
         using Any = std::any;
@@ -58,6 +69,17 @@ namespace LanguageTypes {
         using String = std::string;
     };
     struct CPP {
+        using Any = std::any;
+        using Nullptr = std::nullptr_t;
+        using Bool = bool;
+        using Char = char;
+        using Int = int;
+        using Long = long;
+        using Float = float;
+        using Double = double;
+        using String = std::string;
+    };
+    struct C {
         using Any = std::any;
         using Nullptr = std::nullptr_t;
         using Bool = bool;
@@ -162,33 +184,34 @@ namespace LanguageTypes {
     };
     struct VHDLVerilog {
         using bit = bool;
-        using integer = int32_t;
-        using real = double;
+        using Int = int32_t;
+        using Double = double;
         using string = std::string;
+        using Long = int64_t;
     };
     struct Fortran {
-        using logical = bool;
-        using integer = int32_t;
-        using real = float;
-        using doubleprecision = double;
-        using character = std::string;
+        using Bool = bool;
+        using Int = int32_t;
+        using Float = float;
+        using Double = double;
+        using String = std::string;
     };
     struct COBOL {
         using numeric = int64_t;
         using alphanumeric = std::string;
     };
     struct Pascal {
-        using boolean = bool;
-        using integer = int32_t;
-        using real = double;
-        using char_ = char;
-        using string = std::string;
+        using Bool = bool;
+        using Int = int32_t;
+        using Double = double;
+        using Char = char;
+        using String = std::string;
     };
     struct Ada {
-        using Boolean = bool;
-        using Integer = int32_t;
+        using Bool = bool;
+        using Int = int32_t;
         using Float = float;
-        using Character = char;
+        using Char = char;
         using String = std::string;
     };
     struct Scala {
@@ -230,13 +253,17 @@ namespace LanguageTypes {
         using Int = int64_t;
         using Float = double;
         using String = std::string;
-        using Array = std::map<std::string, Mixed>;
-        using Object = std::map<std::string, Mixed>;
+        using Array = std::map<std::any, Mixed>;
+        using Object = std::map<std::any, Mixed>;
     };
     struct Perl {
         using Scalar = std::any;
         using Array = std::vector<Scalar>;
         using Hash = std::map<std::string, Scalar>;
+        using Int = int;
+        using Double = double;
+        using Float = float;
+        using Long = int64_t;
     };
     struct R {
         using Any = std::any;
@@ -369,7 +396,7 @@ namespace LanguageTypes {
         using Vector = std::vector<Any>;
         using Hash = std::map<Any, Any>;
     };
-    struct Smalltalk {
+    struct SmallTalk {
         using Object = std::any;
         using Boolean = bool;
         using Integer = int64_t;
@@ -430,7 +457,7 @@ namespace LanguageTypes {
         using Boolean = bool;
         using Byte = uint8_t;
         using Short = int16_t;
-        using Integer = int32_t;
+        using Int = int32_t;
         using Long = int64_t;
         using Single = float;
         using Double = double;
@@ -462,9 +489,10 @@ namespace LanguageTypes {
         using ANY = std::any;
     };
     struct StandardML {
-        using int_ = int32_t;
-        using real = double;
+        using Int = int32_t;
+        using Double = double;
         using bool_ = bool;
+        using Long = int64_t;
         using char_ = char;
         using string = std::string;
         template<typename T> using list = std::vector<T>;
@@ -508,6 +536,36 @@ namespace LanguageTypes {
         template<typename...> using Ref = void;
         using ptr = Ptr<numeric, tokens>;
         using ref = Ref<std::reference_wrapper<numeric>, std::reference_wrapper<tokens>>;
+        struct hasSpecialRules {
+            // implement the rules here
+            // Example: If the language is NUKE. That means if any kind of syntax error occurs, it will spout random ASCII values and display TATICAL NUKE AT THE END 
+            // And destory itself. 
+            // Otherwise make the source code use the generic rules for a custom language
+            // TODO: Search and see if there are theories on generic rules when it comes to creating a custom language if not, make one 
+            // Phonetics and Phonology:
+            // - Decide on the sound inventory (consonants, vowels).
+            // - Establish phonotactic rules (how sounds can combine).
+
+            // Morphology:
+            // - Determine how words are formed (prefixes, suffixes, infixes).
+            // - Choose between isolating (few affixes) vs. agglutinative (many affixes) vs. fusional (affixes merge with roots).
+
+            // Syntax:
+            // - Define sentence structure (e.g., Subject-Verb-Object vs. Subject-Object-Verb).
+            // - Establish rules for question formation, negation, etc.
+
+            // Semantics:
+            // - Create a vocabulary and decide on word meanings.
+            // - Develop rules for word formation and compounding.
+
+            // Pragmatics:
+            // - Consider how context affects meaning.
+            // - Decide on politeness strategies and speech acts.
+
+            // Orthography:
+            // - Design a writing system (alphabetic, syllabic, logographic).
+
+        };
     };
 };
 using namespace LanguageTypes;

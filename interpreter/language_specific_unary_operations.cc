@@ -1,18 +1,23 @@
 #include <language_specific_unary_operations.h>
-
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------
  * checkNumberOperand Description: 
     Is a method that calls in isNumeric, the helper function
  * Arguments:
-    * Visitor expr: It is an object that represents the abstraction syntax, (ast) that is currently being used. In this case, it would be the Unary ast
-    * Visitor right: Is a generic type that must have a concrete type during run time, and will visit the unary abstract syntax tree right side (rh)
+    * auto expr: It is an object that represents the abstraction syntax, (ast) that is currently being used. In this case, it would be the Unary ast
+    * auto right: Is a generic type that must have a concrete type during run time, and will visit the unary abstract syntax tree right side (rh)
  * Returns:
     True if a and b are equal
     Otherwise, return false 
  * ----------------------------------------------------------------------------------------------------------------------------------------------------
 */
 bool unaryOperations::checkNumberOperand(auto& right) {
-    if (isNumeric(right) == true) return true;
+    //try {
+        if (isNumeric(right) == true) { return true; }
+        return false;
+    //}
+    //catch() {
+
+    //}
     return false;
 }
 
@@ -20,247 +25,270 @@ bool unaryOperations::checkNumberOperand(auto& right) {
  *
  *
 */
-Visitor unaryOperations::dynamicLanguages::u-Python(LanguageTypes& lang, Vistor& right) {
+auto unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes& lang, auto& right)  {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Python::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Python::Float>(&right))
-                return -(*val);
-
+            if (auto val = std::any_cast<Python::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Python::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uPython");
+            }
         }
     }
-    catch(u->catcher("Failed to convert a python type into a c++ type!")& e) { std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) { 
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
+
 /* ----------------------------------------------------------------------------
  * JavaScript Description:
     This method will convert a JavaScript type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::u-JavaScript(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uJavaScript(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::JavaScript::Number>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<JavaScript::Number>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uJavaScript");
+            }
         }
     }
-    catch(u->catcher("Failed to convert JavaScript type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Ruby Description:
     This method will convert a Ruby type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguges::u-Ruby(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uRuby(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Ruby::Integer>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Ruby::Float>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Ruby::Integer>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Ruby::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uRuby");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Ruby type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * C Description:
     This method will convert a C type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-C(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uC(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) { return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-    
+            // if statements go here
+            if (true) {}
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uC");
+            }
         }
     }
-    catch(u->catcher("Failed to convert C type into c++ type!")& e) {std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * CPP Description:
     This method will convert a C++ type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-CPP(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uCPP(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::CPP::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CPP::Double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<CPP::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<CPP::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uCPP");
+            }
         }
     }
-    catch(u->catcher("Failed to convert c++ type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Java Description:
     This method will convert a Java type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-Java(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uJava(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Java::Integer>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Java::Double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Java::Integer>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Java::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uJava");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Java type into c++ type!")& e) {std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Go Description:
     This method will convert a Go type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-Go(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uGo(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Go::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Go::Float64>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Go::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Go::Float64>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uGo");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Go type into c++ type!")& e) {std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Kotlin Description:
     This method will convert a Kotlin type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-Kotlin(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uKotlin(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Kotlin::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::Kotlin::Long)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Kotlin::Double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Kotlin::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Kotlin::Long>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Kotlin::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uKotlin");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Kotlin type into a c++ type!")& e) {std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Swift Description:
     This method will convert a Swift type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-Swift(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uSwift(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Swift::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Kotlin::Double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Swift::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Kotlin::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uSwift");
+            }
         }
     }
-    catch(u->catcher("Failed to convert swift type into a c++ type!")& e) { std::cout << e.what() << std::endl;}
+    catch(std::bad_any_cast& e) { 
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Rust Description:
     This method will convert a Rust type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-Rust(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uRust(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Rust::i8>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::Rust::i16)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::i32>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::i64>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::u8>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::u16>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::u32>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::u64>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::f32>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Rust::f64>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Rust::i8>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::i16>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::i32>(&right)) { return -(*val); } 
+            else if (auto val = std::any_cast<Rust::i64>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::u8>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::u16>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::u32>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::u64>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::f32>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::f64>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uRust");
+            }
         }
     }
-    catch(u->catcher("Failed to convert a rust type into a c++ type!")& e) {
+    catch(std::bad_any_cast& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -269,675 +297,924 @@ Visitor unaryOperations::staticLanguages::u-Rust(LanguageTypes& lang, Visitor& r
  * CSharp Description:
     This method will convert a CSharp type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-CSharp(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uCSharp(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) { return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::CSharp::byte>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CSharp::sbyte)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CSharp::short_>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CSharp::ushort>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::CSharp::int_)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CSharp::uint>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CSharp::long_>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::CSharp::ulong)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CSharp::float_>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::CSharp::double_>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::CSharp::decimal)((&right))
-                return -(*val);
+            if (auto val = std::any_cast<CSharp::byte>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::sbyte>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::short_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::ushort>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::int_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::uint>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::long_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::ulong>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::float_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::double_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<CSharp::decimal>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uCSharp");
+            }
         }
     }
-    catch(u->catcher("Failed to convert a csharp type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * FSharp Description:
     This method will convert a FSharp type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor LanguageTypes::staticLanguages::u-FSharp(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uFSharp(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::FSharp::int_>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::FSharp::float_)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::FSharp::double_>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<FSharp::int_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<FSharp::float_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<FSharp::double_>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uFSharp");
+            }
         }
     }
-    catch(u->catcher("Failed to convert FSharp type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * ObjectiveC Description:
     This method will convert a ObjectiveC type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-ObjectiveC(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uObjectiveC(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::ObjectiveC::NSInteger>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::ObjectiveC::NSUInteger)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::ObjectiveC::CGFloat>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<ObjectiveC::NSInteger>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<ObjectiveC::NSUInteger>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<ObjectiveC::CGFloat>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uObjectiveC");
+            }
         }
     }
-    catch(u->catcher("Failed to convert a ObjectiveC type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Scala Description:
     This method will convert a Scala type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-Scala(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uScala(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Scala::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::Scala::Long)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Scala::Float>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::Scala::Double)((&right))
-                return -(*val);
+            if (auto val = std::any_cast<Scala::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Scala::Long>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Scala::Float>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Scala::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uScala");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Scala type into c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * TypeScript Description:
     This method will convert a TypeScript type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::u-TypeScript(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uTypeScript(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
             // TODO: Need to add more support for typescript
-            if (auto val = static_cast<LanguageTypes::TypeScript::number>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<TypeScript::number>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uTypeScript");
+            }
         }
     }
-    catch(u->catcher("Failed to convert typescript type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Dart Description:
     This method will convert a Dart type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::staticLanguages::u-Dart(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::staticLanguages::uDart(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Dart::int_>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::Dart::double_)((&right))
-                return -(*val);
+            if (auto val = std::any_cast<Dart::int_>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Dart::double_>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uDart");
+            }
         }
     }
-    catch(u->catcher("Failed to convert dart type into c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * PHP Description:
     This method will convert a PHP type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::u-PHP(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uPHP(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::PHP::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::PHP::Float)((&right))
-                return -(*val);
+            if (auto val = std::any_cast<PHP::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<PHP::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uPHP");
+            }
         }
     }
-    catch(u->catcher("Failed to convert php type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * R Description:
     This method will convert a R type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::u-R(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uR(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::R::Integer>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::R::Double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<R::Integer>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<R::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uR");
+            }
         }
     }
-    catch(u->catcher("Failed to convert a R type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Lua Description:
     This method will convert a Lua type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::u-Lua(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uLua(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
-            if (auto val = static_cast<LanguageTypes::Lua::Number>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Lua::Number>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uLua");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Lua type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * MATLAB Description:
     This method will convert a MATLAB  type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::MATLAB(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uMATLAB(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
             // TODO: Add more support  
-            if (auto val = static_cast<LanguageTypes::MATLAB::Double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<MATLAB::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uMATLAB");
+            }
         }
     }
-    catch(u->catcher("Failed to convert MATLAB type into c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * VBA Description:
     This method will convert a VBA type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::VBA(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uVBA(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::VBA::Byte>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::VBA::Integer)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::VBA::Long>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::VBA::Single>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::VBA::Double)((&right))
-                return -(*val);
+            if (auto val = std::any_cast<LanguageTypes::VBA::Byte>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LanguageTypes::VBA::Integer>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LanguageTypes::VBA::Long>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LanguageTypes::VBA::Single>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LanguageTypes::VBA::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uVBA");
+            }
         }
     }
-    catch(u->catcher("Failed to convert VBA type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Groovy Description:
     This method will convert a Groovy type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::Groovy(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uGroovy(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Groovy::Integer>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::Groovy::Long)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Groovy::Double>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::Groovy::Float>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Groovy::Integer>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Groovy::Long>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Groovy::Double>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Groovy::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror("Unknown Type! in uGroovy");
+            }
         }
     }
-    catch(u->catcher("Failed to convert groovy type into a c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Julia Description:
     This method will convert a Julia type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::Julia(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uJulia(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::Julia::Int64>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::Julia::Float64)((&right))
-                return -(*val);
+            if (auto val = std::any_cast<Julia::Int64>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Julia::Float64>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uJulia");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Julia type into c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * PowerShell Description:
     This method will convert a PowerShell type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::dynamicLanguages::PowerShell(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uPowerShell(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = static_cast<LanguageTypes::PowerShell::Int>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<PowerShell::Int>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uPowerShell");
+            }
         }
     }
-    catch(u->catcher("Failed to powershell type into c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * VisualBasics Description:
     This method will convert a VisualBasics type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor LanguageTypes::dynamicLanguages::VisualBasic(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::dynamicLanguages::uVisualBasic(LanguageTokenTypes& lang, auto& right) {
     try {
-        if (checkNumberOperand(right) == false) {return NULL;}
+        if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            // TODO: This needs to be redone
-            if (auto val = static_cast<LanguageTypes::VisualBasic::Int>(&right))
-                return -(*val);
-            if (auto val = static_cast<LanguagesTypes::VisualBasic::Long)((&right))
-                return -(*val);
-            if (auto val = static_cast<LanguageTypes::VisualBasic::Double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<VisualBasic::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<VisualBasic::Long>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<VisualBasic::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uVisualBasic");
+            }
         }
     }
-    catch(u->catcher("Failed to convert VisualBasic type into c++ type!")& e) {}
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
     return NULL;
 }
 /* ----------------------------------------------------------------------------
  * Dlang Description:
     This method will convert a Dlang type into a C++ representation type
  * Arguments:
- * LanguageTypes& lang: and alias a enumerator
- * Visitor& right: Representing the right side of a ast
+ * LanguageTokenTypes& lang: and alias a enumerator
+ * auto& right: Representing the right side of a ast
  * Returns:
     NULL if an error occured.
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-Visitor unaryOperations::otherLanguages::Dlang(LanguageTypes& lang, Visitor& right) {
+auto unaryOperations::otherLanguages::uDlang(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uDlang");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::dynamicLanguages::uHaskell(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<Haskell::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Haskell::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uHaskell");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::otherLanguages::uErlang(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<Erlang::Number>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uErlang");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::dynamicLanguages::uClojure(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else if (auto val = std::any_cast<LanguageTypes::Clojure::Number>(&right)) { return -(*val); }
+        else {
+            throw runtimeerror("Unknown Type! in uClojure");
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::otherLanguages::uStandardML(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<StandardML::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<StandardML::Long>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<StandardML::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uStandardML");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::otherLanguages::uElm(LanguageTokenTypes& lang, auto& right) {
+    // TODO: needs to be redone
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uElm");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::staticLanguages::uVHDLVerilog(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            // TODO: This needs to be redone
+            if (auto val = std::any_cast<VHDLVerilog::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<VHDLVerilog::Long>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<VHDLVerilog::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uVHDLVerilog");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::staticLanguages::uFortran(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<Fortran::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Fortran::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uFortran");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::staticLanguages::uCOBOL(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<COBOL::numeric>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uCOBOL");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::staticLanguages::uPascal(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
-            if (auto val = static_cast<double>(&right))
-                return -(*val);
+            if (auto val = std::any_cast<Pascal::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Pascal::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uPascal");
+            }
         }
     }
-    catch(u->catcher("Failed to convert Dlang type into a c++ type!")& e) {}
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::dynamicLanguages::Haskell(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<LanguageTypes::Haskell::Int>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguageTypes::Haskell::Double>(&right))
-            return -(*val);
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::otherLanguages::Erlang(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        try {
-            if (auto val = static_cast<LanguageTypes::Erlang::Number>(&right))
-                return -(*val);
+auto unaryOperations::staticLanguages::uAda(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<Ada::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Ada::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror("Unknown Type! in uAda");
+            }
         }
-        catch() {
-            
-        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::dynamicLanguages::Clojure(LanguageTypes& lang, Visitor& right) {
-    if (auto val = static_cast<LanguageTypes::Clojure::Number>(&right))
-        return -(*val);
+auto unaryOperations::dynamicLanguages::uPerl(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<Perl::Int>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Perl::Long>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Perl::Double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uPerl");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::otherLanguages::StandardML(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
+auto unaryOperations::dynamicLanguages::uAWK(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (true) {}
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uAWK");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::otherLanguages::uTCL(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uTCL");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
+}
+/*
+ *
+*/
+auto unaryOperations::dynamicLanguages::uShell(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uShell");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+    return NULL;
 
-        // TODO: This needs to be redone
-        if (auto val = static_cast<LanguageTypes::StandardML::Int>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguagesTypes::StandardML::Long)((&right))
-            return -(*val);
-        if (auto val = static_cast<LanguageTypes::StandardML::Double>(&right))
-            return -(*val);
+}
+/*
+ *
+*/
+auto unaryOperations::dynamicLanguages::uLISPScheme(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {    
+            if (auto val = std::any_cast<LISPScheme::Number>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uLISPScheme");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::otherLanguages::Elm(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<double>(&right))
-            return -(*val);
+auto unaryOperations::dynamicLanguages::uRacket(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) {return NULL;}
+        else {
+            if (auto val = std::any_cast<double>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uRacket");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::staticLanguages::VHDLVerilog(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        // TODO: This needs to be redone
-        if (auto val = static_cast<LanguageTypes::VHDLVerilog::Int>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguagesTypes::VHDLVerilog::Long)((&right))
-            return -(*val);
-        if (auto val = static_cast<LanguageTypes::VHDLVerilog::Double>(&right))
-            return -(*val);
+auto unaryOperations::otherLanguages::uProlog(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (true) {}
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uProlog");
+            }
+        }
+
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::staticLanguages::Fortran(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<LanguageTypes::Fortran::interger>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguagesTypes::Fortran::real)((&right))
-            return -(*val);
+auto unaryOperations::dynamicLanguages::uSmallTalk(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<SmallTalk::Integer>(&right)) { return -(*val); } 
+            else if (auto val = std::any_cast<SmallTalk::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uSmallTalk");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
+    }
+}
+/*
+ *
+*/
+auto unaryOperations::otherLanguages::uHTMLCSS(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<HTMLCSS::Number>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uHTMLCSS");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::staticLanguages::COBOL(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<LanguageTypes::COBOL::numeric>(&right))
-            return -(*val);
+auto unaryOperations::otherLanguages::uSQL(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<SQL::Integer>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<SQL::Decimal>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<SQL::Float>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uSQL");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::staticLanguages::Pascal(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<LanguageTypes::Pascal::integer>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguagesTypes::Pascal::real)((&right))
-            return -(*val);
+auto unaryOperations::otherLanguages::uLabVIEW(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<LabVIEW::I8>(&right)) { return -(*val); } 
+            else if (auto val = std::any_cast<LabVIEW::I16>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LabVIEW::I32>(&right)) { return -(*val);  }
+            else if (auto val = std::any_cast<LabVIEW::I64>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LabVIEW::U8>(&right)) { return -(*val);  }
+            else if (auto val = std::any_cast<LabVIEW::U16>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LabVIEW::U32>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LabVIEW::U64>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LabVIEW::SGL>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LabVIEW::DBL>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<LabVIEW::EXT>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uLabView");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl; 
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::staticLanguages::Ada(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<LanguageTypes::Ada::integer>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguagesTypes::Ada::Float)((&right))
-            return -(*val);
+auto unaryOperations::staticLanguages::uEiffel(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (checkNumberOperand(right) == false) { return NULL; }
+        else {
+            if (auto val = std::any_cast<Eiffel::REAL>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Eiffel::INTEGER>(&right)) { return -(*val); }
+            else {
+                throw runtimeerror(right.getType(), "Unknown Type! in uEiffel");
+            }
+        }
+    }
+    catch(std::bad_any_cast& e) {
+        //TODO: Add Logging here
+        std::cout << e.what() << std::endl;
     }
     return NULL;
 }
 /*
  *
 */
-Visitor unaryOperations::dynamicLanguages::Perl(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        // TODO: This needs to be redone
-        if (auto val = static_cast<LanguageTypes::Perl::Int>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguagesTypes::Perl::Long)((&right))
-            return -(*val);
-        if (auto val = static_cast<LanguageTypes::Perl::Double>(&right))
-            return -(*val);
+auto unaryOperations::otherLanguages::uCustom(LanguageTokenTypes& lang, auto& right) {
+    try {
+        if (auto val = std::any_cast<Custom::numeric>(&right)) { return -(*val); }
+        else {
+            throw std::runtime_error(right.getType(), "Unsupported type for unary operation");
+        }
+        /*else if (right.isType<Custom::tokens>()) {
+            // Handle token types (char, std::string)
+            auto token = right.getValue<Custom::tokens>();
+            // Perform unary operation on token
+            // For example, convert to uppercase if it's a string
+        }
+        else if (right.isType<Custom::list>()) {
+            // Handle list type (std::vector<std::any>)
+            auto list = right.getValue<Custom::list>();
+            // Perform unary operation on list
+            // For example, reverse the list or apply operation to each element
+        }
+        else if (right.isType<Custom::dict>()) {
+            // Handle dictionary type (std::map<std::any, std::any>)
+            auto dict = right.getValue<Custom::dict>();
+            // Perform unary operation on dictionary
+            // For example, invert key-value pairs or apply operation to values
+        }
+        else if (right.isType<Custom::ptr>()) {
+            // Handle pointer types
+            auto ptr = right.getValue<Custom::ptr>();
+            // Perform unary operation on pointer
+            // For example, dereference and apply operation to pointed value
+        }
+        else if (right.isType<Custom::ref>()) {
+            // Handle reference types
+            auto ref = right.getValue<Custom::ref>();
+            // Perform unary operation on reference
+            // For example, modify the referred value
+        }
+        else {
+            // Handle unsupported types
+            throw std::runtime_error(right.getType(), "Unsupported type for unary operation");
+        }
+
+        // 2. Apply language-specific rules (if any)
+        if (lang.hasSpecialRules()) {
+            // Apply special rules based on the language
+            // This could modify the result of the operation
+        }*/
+    }
+    catch(std::bad_any_cast& e) {
+        std::cout << e.what() << std::endl;
     }
     return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::dynamicLanguages::u-AWK(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        //TODO: Add support for AWK
-    }
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::otherLanguages::u-TCL(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<double>(&right))
-            return -(*val);
-    }
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::dynamicLanguages::u-Shell(LanguageTypes& lang, Visitor& right) {
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::dynamicLanguges::u-LISPScheme(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {    
-        if (auto val = static_cast<LanguageTypes::LISPScheme::Double>(&right))
-            return -(*val);
-    }
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::dynamicLanguages::u-Racket(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<double>(&right))
-            return -(*val);
-    }
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::otherLanguages::u-Prolog(LanguageTypes& lang, Visitor& right) {
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::otherLanguages::u-Smalltalk(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<double>(&right))
-            return -(*val);
-    }
-}
-/*
- *
-*/
-Visitor unaryOperations::otherLanguages::u-HTMLCSS(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<LanguageTypes::HTMLCSS::Number>(&right))
-            return -(*val);
-    }
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::otherLanguages::u-SQL(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<LanguageTypes::SQL::Integer>(&right))
-            return -(*val);
-        if (auto val = static_cast<LanguagesTypes::SQL::Decimal)((&right))
-            return -(*val);
-        if (auto val = static_cast<LanguageTypes::SQL::Float>(&right))
-            return -(*val);
-    }
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::otherLanguages::u-LabVIEW(LanguageTypes& lang, Visitor& right) {
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::staticLanguages::u-Eiffel(LanguageTypes& lang, Visitor& right) {
-    if (checkNumberOperand(right) == false) {return NULL;}
-    else {
-        if (auto val = static_cast<double>(&right))
-            return -(*val);
-    }
-    return NULL;
-}
-/*
- *
-*/
-Visitor unaryOperations::otherLanguages::u-Custom(LanguageTypes& lang, Visitor& right) {
-    //TODO: This needs to be redone
-    // This should be defined as a struct using templates for the objects to add flexibility 
 }

@@ -1,89 +1,89 @@
 #ifndef _LANGUAGE_SPECIFIC_UNARY_OPERATIONS_H_
 #define _LANGUAGE_SPECIFIC_UNARY_OPERATIONS_H_ 
-#include <token.h>
-#include <typeinfo>
-#include <catch.h>
+#include <language_specific_binary_operations.h> 
 
-template<typename...> using VisitorType = void;
-using Visitor = VisitorType<std::any>;
-
-class unaryOperations: public Check<unaryOperations>, public catcher<unaryOperations> {
-    public:
-        /* -----------------------------------------------------------------------------
-         * isNumeric Description:
-            Is a helper function for (checkNumberOperands) and (checkNumberOperands)
-         * @param Type: Is a generic type that must have a concrete type during run time
-         * @return:
-            True if the object at runtime is type: int, int64_t, float, double, etc.
-            Otherwise, return false
-         * ----------------------------------------------------------------------------
-        */
-        inline bool isNumeric(const Visitor& value) override {
-            // TODO: Need to add more supported types here. refer to languages_types.h
-            return value.type() == typeid(int) ||
-            value.type() == typeid(int64_t) ||
-            value.type() == typeid(float) ||
-            value.type() == typeid(double);
-        };
-        struct staticLanguages {
-            Visitor u-C(LanguageTypes& lang, Visitor& right); // C
-            Visitor u-CPP(LanguageTypes& lang, Visitor& right); // C++
-            Visitor u-Java(LanguageTypes& lang, Visitor& right); // Java
-            Visitor u-Go(LanguageTypes& lang, Visitor& right); // Go
-            Visitor u-Kotlin(LanguageTypes& lang, Visitor& right); // Kotlin
-            Visitor u-Swift(LanguageTypes& lang, Visitor& right); // Swift
-            Visitor u-Rust(LanguageTypes& lang, Visitor& right); // Rust
-            Visitor u-CSharp(LanguageTypes& lang, Visitor& right); // C#
-            Visitor u-FSharp(LanguageTypes& lang, Visitor& right); // F#
-            Visitor u-ObjectiveC(LanguageTypes& lang, Visitor& right); // Objective-C
-            Visitor u-Scala(LanguageTypes& lang, Visitor& right); // Scala
-            Visitor u-Dart(LanguageTypes& lang, Visitor& right); // Dart
-            Visitor u-VHDLVerilog(LanguageTypes& lang, Visitor& right); // VHDL/Verilog
-            Visitor u-Fortran(LanguageTypes& lang, Visitor& right); // Fortran
-            Visitor u-COBOL(LanguageTypes& lang, Visitor& right); // COBOL
-            Visitor u-Pascal(LanguageTypes& lang, Visitor& right); // Pascal
-            Visitor u-Ada(LanguageTypes& lang, Visitor& right); // Ada
-            Visitor u-Eiffel(LanguageTypes& lang, Visitor& right); // Eiffel
-        };
-        struct dynamicLanguages {
-            Visitor u-Python(LanguageTypes& lang, Visitor& right); // Python
-            Visitor u-JavaScript(LanguageTypes& lang, Visitor& right); // JavaScript
-            Visitor u-Ruby(LanguageTypes& lang, Visitor& right); // Ruby
-            Visitor u-R(LanguageTypes& lang, Visitor& right); // R
-            Visitor u-PHP(LanguageTypes& lang, Visitor& right); // PHP
-            Visitor u-Lua(LanguageTypes& lang, Visitor& right); // Lua
-            Visitor u-MATLAB(LanguageTypes& lang, Visitor& right); // MATLAB
-            Visitor u-VBA(LanguageTypes& lang, Visitor& right); // VBA
-            Visitor u-Groovy(LanguageTypes& lang, Visitor& right); // Groovy
-            Visitor u-Julia(LanguageTypes& lang, Visitor& right); // Julia
-            Visitor u-PowerShell(LanguageTypes& lang, Visitor& right); // PowerShell
-            Visitor u-VisualBasic(LanguageTypes& lang, Visitor& right); // Visual Basic
-            Visitor u-Perl(LanguageTypes& lang, Visitor& right); // Perl
-            Visitor u-AWK(LanguageTypes& lang, Visitor& right); // AWK
-            Visitor u-Shell(LanguageTypes& lang, Visitor& right); // Shell scripting
-            Visitor u-LISPScheme(LanguageTypes& lang, Visitor& right); // Lisp/Scheme
-            Visitor u-Racket(LanguageTypes& lang, Visitor& right); // Racket
-            Visitor u-Clojure(LanguageTypes& lang, Visitor& right); // Clojure
-            Visitor u-Smalltalk(LanguageTypes& lang, Visitor& right); // Smalltalk
-            Visitor u-Haskell(LanguageTypes& lang, Visitor& right); // Haskell
-            Visitor u-TypeScript(LanguageTypes& lang, Visitor& right); // TypeScript
-        };
-        struct otherLanguages {
-            Visitor u-HTMLCSS(LanguageTypes& lang, Visitor& right); // HTML/CSS
-            Visitor u-SQL(LanguageTypes& lang, Visitor& right); // SQL
-            Visitor u-LabVIEW(LanguageTypes& lang, Visitor& right); // LabVIEW (visual programming)
-            Visitor u-StandardML(LanguageTypes& lang, Visitor& right); // Standard ML (Functional)
-            Visitor u-Elm(LanguageTypes& lang, Visitor& right); // Elm (Functional)
-            Visitor u-Custom(LanguageTypes& lang, Visitor& right); // Custom language
-            Visitor u-Dlang(LanguageTypes& lang, Visitor& right); // D
-            Visitor u-Prolog(LanguageTypes& lang, Visitor& right); // Prolog
-            Visitor u-TCL(LanguageTypes& lang, Visitor& right); // TCL
-            Visitor u-StandardML(LanguageTypes& lang, Visitor& right); // StandardML
-        };
-    private:
-        bool checkNumberOperand(auto& expr, auto& right);
-        unaryOperations *u;
-    protected:
-        inline bool isString(const Type& value) override { return value.type() == typeid(std::string);};
+namespace UnaryOperations {
+    class unaryOperations: public Check<unaryOperations>, public catcher<unaryOperations>, public runtimeerror<unaryOperations> {
+        public:
+            friend class interpreter;
+            explicit unaryOperations() = default;
+            ~unaryOperations() noexcept = default;
+            /* -----------------------------------------------------------------------------
+             * isNumeric Description:
+                Is a helper function for (checkNumberOperands) and (checkNumberOperands)
+             * @param Type: Is a generic type that must have a concrete type during run time
+             * @return:
+                True if the object at runtime is type: int, int64_t, float, double, etc.
+                Otherwise, return false
+             * ----------------------------------------------------------------------------
+            */
+            inline bool isNumeric(const std::any value) override {
+                // TODO: Need to add more supported types here. refer to languages_types.h
+                return value.type() == typeid(int) ||
+                value.type() == typeid(int64_t) ||
+                value.type() == typeid(float) ||
+                value.type() == typeid(double);
+            };
+            struct staticLanguages {
+                auto uC(LanguageTokenTypes& lang, auto& right); // C
+                auto uCPP(LanguageTokenTypes& lang, auto& right); // C++
+                auto uJava(LanguageTokenTypes& lang, auto& right); // Java
+                auto uGo(LanguageTokenTypes& lang, auto& right); // Go
+                auto uKotlin(LanguageTokenTypes& lang, auto& right); // Kotlin
+                auto uSwift(LanguageTokenTypes& lang, auto& right); // Swift
+                auto uRust(LanguageTokenTypes& lang, auto& right); // Rust
+                auto uCSharp(LanguageTokenTypes& lang, auto& right); // C#
+                auto uFSharp(LanguageTokenTypes& lang, auto& right); // F#
+                auto uObjectiveC(LanguageTokenTypes& lang, auto& right); // Objective-C
+                auto uScala(LanguageTokenTypes& lang, auto& right); // Scala
+                auto uDart(LanguageTokenTypes& lang, auto& right); // Dart
+                auto uVHDLVerilog(LanguageTokenTypes& lang, auto& right); // VHDL/Verilog
+                auto uFortran(LanguageTokenTypes& lang, auto& right); // Fortran
+                auto uCOBOL(LanguageTokenTypes& lang, auto& right); // COBOL
+                auto uPascal(LanguageTokenTypes& lang, auto& right); // Pascal
+                auto uAda(LanguageTokenTypes& lang, auto& right); // Ada
+                auto uEiffel(LanguageTokenTypes& lang, auto& right); // Eiffel
+            };
+            struct dynamicLanguages {
+                auto uPython(LanguageTokenTypes& lang, auto& right); // Python
+                auto uJavaScript(LanguageTokenTypes& lang, auto& right); // JavaScript
+                auto uRuby(LanguageTokenTypes& lang, auto& right); // Ruby
+                auto uR(LanguageTokenTypes& lang, auto& right); // R
+                auto uPHP(LanguageTokenTypes& lang, auto& right); // PHP
+                auto uLua(LanguageTokenTypes& lang, auto& right); // Lua
+                auto uMATLAB(LanguageTokenTypes& lang, auto& right); // MATLAB
+                auto uVBA(LanguageTokenTypes& lang, auto& right); // VBA
+                auto uGroovy(LanguageTokenTypes& lang, auto& right); // Groovy
+                auto uJulia(LanguageTokenTypes& lang, auto& right); // Julia
+                auto uPowerShell(LanguageTokenTypes& lang, auto& right); // PowerShell
+                auto uVisualBasic(LanguageTokenTypes& lang, auto& right); // Visual Basic
+                auto uPerl(LanguageTokenTypes& lang, auto& right); // Perl
+                auto uAWK(LanguageTokenTypes& lang, auto& right); // AWK
+                auto uShell(LanguageTokenTypes& lang, auto& right); // Shell scripting
+                auto uLISPScheme(LanguageTokenTypes& lang, auto& right); // Lisp/Scheme
+                auto uRacket(LanguageTokenTypes& lang, auto& right); // Racket
+                auto uClojure(LanguageTokenTypes& lang, auto& right); // Clojure
+                auto uSmallTalk(LanguageTokenTypes& lang, auto& right); // Smalltalk
+                auto uHaskell(LanguageTokenTypes& lang, auto& right); // Haskell
+                auto uTypeScript(LanguageTokenTypes& lang, auto& right); // TypeScript
+            };
+            struct otherLanguages {
+                auto uHTMLCSS(LanguageTokenTypes& lang, auto& right); // HTML/CSS
+                auto uSQL(LanguageTokenTypes& lang, auto& right); // SQL
+                auto uLabVIEW(LanguageTokenTypes& lang, auto& right); // LabVIEW (visual programming)
+                auto uStandardML(LanguageTokenTypes& lang, auto& right); // Standard ML (Functional)
+                auto uElm(LanguageTokenTypes& lang, auto& right); // Elm (Functional)
+                auto uCustom(LanguageTokenTypes& lang, auto& right); // Custom language
+                auto uDlang(LanguageTokenTypes& lang, auto& right); // D
+                auto uProlog(LanguageTokenTypes& lang, auto& right); // Prolog
+                auto uTCL(LanguageTokenTypes& lang, auto& right); // TCL
+                auto uErlang(LanguageTokenTypes& lang, auto& right); // Elrang
+            };
+        private:
+            static bool checkNumberOperand(auto& right);
+        protected:
+            inline bool isString(const std::any value) override { return value.type() == typeid(std::string);};
+    };
 };
+using namespace UnaryOperations;
 #endif

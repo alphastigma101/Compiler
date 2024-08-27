@@ -1,8 +1,7 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 #include <interface.h>
-#include <languages.h>
-
+extern currentType<LanguageTokenTypes> ct;
 /*
  * This enum class object supports multiple languages
  * To add support for a custom programming language you would add the tokens here
@@ -114,6 +113,7 @@ class Token: public MemberConv<Token>  {
         std::string lexeme;
         std::string literal; 
         int line;
+        currentType<LanguageTokenTypes> ct;
         inline std::any toString() override { 
             std::string conv_type = std::any_cast<std::string>(&type);
             return conv_type + " " + lexeme + " " + literal;

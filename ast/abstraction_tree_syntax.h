@@ -2,12 +2,7 @@
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
 #include <catch.h>
-template<typename T, typename U, typename V>
-inline astTree<T, U, V> compressedAstTree(T first, U second, V third) {
-    return std::make_tuple(first, std::make_pair(second, third));
-};
-template<typename B, typename U, typename G, typename L>
-ExprTypes<B, U, G, L>* expr = new std::variant<Binary, Unary, Grouping, Literal>(nullptr); // externally link expr
+
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public std::filesystem::path, public catcher<Type> {

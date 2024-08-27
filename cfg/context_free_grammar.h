@@ -35,7 +35,7 @@ namespace ContextFreeGrammar {
             Expr* right;
             Expr* left;
             Token* op;
-    };
+     };
     class Binary: public Expr<Binary> {
         /*
          * A class that represents a binary abstraction syntax tree
@@ -59,7 +59,7 @@ namespace ContextFreeGrammar {
                  std::string rightResult = expr.right->accept(*this);
                  return " " + leftResult + " " + rightResult;
             };
-            inline Token getToken() {return op;};
+            inline Token getToken() { return op; };
         private:
             Expr* left;
             Expr* right;
@@ -73,7 +73,7 @@ namespace ContextFreeGrammar {
                 std::string rightResult = expr.right->accept(*this);
                 return " " + rightResult;
             };
-            inline Token getToken() {return op;};
+            inline Token getToken() { return op; };
         private:
             Expr* right;
             Token op;
@@ -81,7 +81,7 @@ namespace ContextFreeGrammar {
     class Grouping: public Expr<Grouping> {
         public:
             Grouping(const Expr& expression): expression(this->expression){};
-            ~Grouping() noexcept {};
+            ~Grouping() noexcept = default;
             inline std::string visit(Grouping&& expr) {
                 std::string leftResult = expr.left->accept(*this);
                 std::string rightResult = expr.right->accept(*this);
@@ -93,7 +93,7 @@ namespace ContextFreeGrammar {
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
             Literal(const auto& value): value(this->value){};
-            ~Literal(){};
+            ~Literal() noexcept = default;
             inline std::string visit(Literal&& expr) {
                 if (!expr.getValue().has_value()) return "nil";
                 try {
@@ -116,9 +116,10 @@ namespace ContextFreeGrammar {
                     return "error: " + std::string(e.what());
                 }
             };
-            inline std::any getValue() {return value;};
+            inline std::any getValue() { return value; }; 
         private:
             std::any value;
+
     };
 };
 using namespace ContextFreeGrammar;

@@ -1,5 +1,4 @@
 #include <token.h>
-
 /*
  * (Token) is a default constructor is using list-initializing 
  */

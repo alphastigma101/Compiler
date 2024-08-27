@@ -1,37 +1,58 @@
 #ifndef _INTERPRETER_H_
 #define _INTERPRETER_H_
-#include <stdexcept> // runtime_error can be used
-#include <language_specific_unary_operations.h> // declares the Vistor template
-#include <language_specific_binary_operations.h>
 #include <language_specific_truthy_operations.h> 
+#include <abstraction_tree_syntax.h>
+/* ----------------------------------------------------------------------
+ * This is how the headers are formatted:
+ * expression     → literal
+               | unary
+               | binary
+               | grouping ;
+ * So that means binary will have to include the grouping header file 
+*/
 
 namespace Interpreter {
-    template<class Type>
-    class RunTimeError: public std::runtime_error {
-        // Class that represents a custom runtime_error object 
-        public:
-            explicit RuntimeError(Token& token, std::string& message): token(this->token), message(this->message){};
-            ~RunTimeError(){};
-        private:
-            Token token;
-            std::string message;
-    };
-    class interpreter: public unaryOperations, public binaryOperations, public isTruthyOperations, public RunTimeError<interpreter> {
+    class interpreter: public unaryOperations, public binaryOperations, public truthyOperations, public runtimeerror<interpreter>, public catcher<interpreter> {
         // A class object that visits Binary, Unary, Grouping, or Literal.
         public:
-            interpreter(std::vector<std::any>& expr, LanguageTypes& lang);
+            interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, LanguageTokenTypes& lang);
             ~interpreter() noexcept {};
-            inline auto visitLiteralExpr(std::any& expr) -> std::any {return expr.value;};
-            auto visitUnaryExpr(std::any& expr);
-            auto visitBinaryExpr(std::any& expr);
-            auto visitGroupingExpr(std::any& expr);
-            auto visitLiteralExpr(std::any& expr);
+            inline Literal visitLiteralExpr(Literal& expr) { return expr.getValue(); };
+            Unary visitUnaryExpr(Unary& expr);
+            Binary visitBinaryExpr(Binary& expr);
+            Grouping visitGroupingExpr(Grouping& expr);
         private:
-            std::vector<std::any> expr;
-            bool isTruthy(Visitor* object);
-            LanguageTypes currentLanguage;
+            LanguageTokenTypes currentLanguage;
+            std::vector<std::tuple<int, std::pair<std::string, std::any>>> expr;
         protected:
-            inline auto evaluate(std::any& expr) -> std::any {return expr.accept(*this);};
+            inline auto evaluate(auto& expr) -> std::any {
+                // Check if expr is an instance of Expr<Binary>
+                if (expr.type() == typeid(Expr<Binary>)) { 
+                    auto binary = std::any_cast<Expr<Binary>&>(expr);
+                    return binary.accept(binary);
+                }
+                // Check if expr is an instance of Expr<Unary>
+                else if (expr.type() == typeid(Expr<Unary>)) { 
+                    auto unary = std::any_cast<Expr<Unary>&>(expr);
+                    return unary.accept(unary); 
+                }
+                // Check if expr is an instance of Expr<Grouping>
+                else if (expr.type() == typeid(Expr<Grouping>)) { 
+                    auto grouping = std::any_cast<Expr<Grouping>&>(expr);
+                    return grouping.accept(grouping); 
+                }
+                // Check if expr is an instance of Expr<Literal>
+                else if (expr.type() == typeid(Expr<Literal>)) { 
+                    auto literal = std::any_cast<Expr<Literal>&>(expr);
+                    return literal.accept(literal); 
+                }
+                // If none of the above, throw an error or handle the unexpected type
+                else { 
+                    //throw catcher("Unexpected type in evaluate function");
+                    
+                }
+                return NULL;
+            };
     };
 };
 using namespace Interpreter;

@@ -13,26 +13,9 @@
 */
 void binaryOperations::checkNumberOperands(auto& expr, auto& left, auto& right) {
     if ((isNumeric(left) == true) && (isNumeric(right) == true)) return;
-    throw new RuntimeError(expr.op, "Operands must be numbers.");
+    throw new runtimeerror(expr.op.getType(), "Operands must be numbers.");
 }
 
-/* -----------------------------------------------------------------------------
- * isNumeric Description:
-    Is a helper function for (checkNumberOperands) and (checkNumberOperands)
- * Arguments:
-    * Type: Is a generic type that must have a concrete type during run time
- * Returns:
-    True if the object at runtime is type: int, int64_t, float, double, etc.
-    Otherwise, return false
- * ----------------------------------------------------------------------------
-*/
-bool binaryOperations::isNumeric(const Type& value) override {
-    // TODO: Need to add more supported types here. refer to languages_types.h
-    return value.type() == typeid(int) ||
-           value.type() == typeid(int64_t) ||
-           value.type() == typeid(float) ||
-           value.type() == typeid(double);
-}
 
 
 /* -----------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,52 +35,36 @@ bool binaryOperations::isEqual(auto& a, auto& b) {
     return a.equals(b);
 }
 
-/* ----------------------------
- *
- *
- *
- * ---------------------------
-*/
-Type binaryOperations::toNumeric(const Type& value) override {
-    // explicit casting syntax is keywords<objec type>(user defined object)
-    if (value.type() == typeid(int)) return static_cast<int>(value);
-    if (value.type() == typeid(int64_t)) return static_cast<int64_t>(value);
-    if (value.type() == typeid(float)) return static_cast<float>(value);
-    if (value.type() == typeid(double)) return static_cast<double>(value);
-    return NULL;
-}
-
-
 // return trailing type is a template called Binary 
-auto binaryOperations::arithmeticOperations(Binary* expr, Binary& left, Binary& right) -> Binary {
+auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right) -> auto {
     switch (expr->op->getType()) {
         case TokenType::PLUS:
             try {
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) + toNumeric(right); }
                 if ((isString(left) == true) && (isString(right) == true)) { return (std::string)left + (std::string)right; }
             }
-            catch(b->catcher("Something happened!")& e) {
-                
+            catch(catcher& e) {
+                std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;
         case TokenType::MINUS:
             try {if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) - toNumeric(right); }}
-            catch(b->catcher("Something happened!")& e) {
-
+            catch(catcher& e) {
+                std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;
         case TokenType::SLASH:
             try {if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) / toNumeric(right); }}
-            catch(b->catcher("Something happened!")& e) {
-
+            catch(catcher& e) {
+                std::cout << e.what() << std::endl;
             }
             break;
         case TokenType::STAR:
             try { if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) * toNumeric(right); }}
-            catch(b->catcher("Something happened!")& e) {
-
+            catch(catcher& e) {
+                std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;
@@ -106,8 +73,8 @@ auto binaryOperations::arithmeticOperations(Binary* expr, Binary& left, Binary& 
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) > toNumeric(right); }
             }
-            catch(b->catcher("Something happened!")& e) {
-
+            catch(catcher& e) {
+                std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;
@@ -115,16 +82,16 @@ auto binaryOperations::arithmeticOperations(Binary* expr, Binary& left, Binary& 
             try {
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) >= toNumeric(right); }
-            } catch(b->catcher("Something happened!")& e) {
-
+            } catch(catcher& e) {
+                std::cout << e.what() << std::endl;
                 return NULL;
             }
         case TokenType::LESS:
             try {
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) < toNumeric(right); }
-            } catch(b->catcher("Something happened!")& e) {
-
+            } catch(catcher& e) {
+                std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;
@@ -133,8 +100,8 @@ auto binaryOperations::arithmeticOperations(Binary* expr, Binary& left, Binary& 
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) <= toNumeric(right); }
             }
-            catch(b->catcher("Something happened!")& e) {
-            
+            catch(catcher& e) {
+                std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;

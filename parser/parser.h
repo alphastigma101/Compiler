@@ -108,6 +108,8 @@ namespace Parser {
             parser(std::vector<Token>& tokens): tokens(this->tokens), Token(){};
             ~parser(){};
             ExprTypes<Binary, Unary, Grouping, Literal>* expr;
+            std::vector<std::tuple<int, std::pair<std::string, std::any>>> node;
+            ExprTypes<Binary, Unary, Grouping, Literal>* parse();
         protected:
             // Current rules that were made from a grammar 
             ExprTypes<Binary, Unary, Grouping, Literal>* equality();
@@ -115,7 +117,6 @@ namespace Parser {
             ExprTypes<Binary, Unary, Grouping, Literal>* expression();
             ExprTypes<Binary, Unary, Grouping, Literal>* term();
             ExprTypes<Binary, Unary, Grouping, Literal>* factor();
-            ExprTypes<Binary, Unary, Grouping, Literal>* parse();
             ExprTypes<Binary, Unary, Grouping, Literal>* unary();
             ExprTypes<Binary, Unary, Grouping, Literal>* primary();     
         private:
@@ -147,7 +148,7 @@ namespace Parser {
                 }
             };
             int current = 0;
-            int node = 0;
+            int idx = 0;
             std::vector<Token> tokens;
             inline std::string error(Token token, const std::string message) override {
                 if (token.getType() == TokenType::END_OF_FILE) { return report(token.getLine(), " at end", message);}

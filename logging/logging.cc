@@ -1,37 +1,104 @@
 #include <logging.h>
-#include <string>
+#include <chrono>
+#include <ctime>
+#include <sstream>
+#include <fstream>
+#include <iomanip>
+#include <filesystem>
 
-/*
- * (rotate) Description: 
-    Search through the folder called logs and iterate through each .json file removing old entries. if folder logs does not exists then create it
+/**
+ * @brief Rotate the logs by removing old entries from the logs directory.
  * 
- * 
-*/
+ * Description:
+ * This method searches through the folder called "logs" and iterates through each .json file,
+ * removing old entries based on some criteria (e.g., age). If the "logs" folder does not exist,
+ * it creates the folder.
+ */
 void logging::rotate() {
+    std::filesystem::path logDir = "logs";
 
+    // Create logs directory if it doesn't exist
+    if (!std::filesystem::exists(logDir)) {
+        std::filesystem::create_directory(logDir);
+    }
+
+    // Iterate through each file in the logs directory
+    for (const auto& entry : std::filesystem::directory_iterator(logDir)) {
+        if (entry.is_regular_file() && entry.path().extension() == ".json") {
+            // Process the JSON file, for example, by checking the last modification date
+            auto lastWriteTime = std::filesystem::last_write_time(entry.path());
+            // Convert std::filesystem::file_time_type to std::chrono::system_clock::time_point
+            auto ftime = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+                    lastWriteTime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now()
+            );
+            auto age = std::chrono::system_clock::now() - ftime;
+
+            // Define the age threshold, e.g., 30 days
+            if (age > std::chrono::hours(24 * 30)) {
+                std::filesystem::remove(entry.path()); // Remove old logs
+            }
+        }
+    }
 }
 
-/*
- * (update) Description:
-    Update the object logs by adding new entries aka other crashes that occured somewhere 
-*/
+/**
+ * @brief Update the logs object by adding new entries.
+ * 
+ * Description:
+ * This method updates the logs object by adding new log entries. These entries represent
+ * events such as crashes or errors that have occurred within the system.
+ */
 void logging::update() {
+    std::string timestamp = getCurrentTimeString();
+    std::vector<std::string> newLogEntries = {
+        "Error: Null pointer exception",
+        "Warning: Low memory detected"
+    };
 
-
-
+    // Insert the new log entries into the logs map under the current timestamp
+    logs[timestamp] = newLogEntries;
 }
 
-/*
- * (write) Description:
-    Write the object logs data to a .json file 
-*/
+/**
+ * @brief Write the logs data to a .json file.
+ * 
+ * Description:
+ * This method writes the contents of the logs object to a .json file in the "logs" directory.
+ * The filename is based on the current timestamp.
+ * 
+ * @return bool Returns true if the write operation is successful, false otherwise.
+ */
 bool logging::write() {
+    std::filesystem::path logDir = "logs";
+    std::string filename = logDir.string() + "/" + getCurrentTimeString() + ".json";
+    
+    std::ofstream ofs(filename);
+    if (!ofs.is_open()) {
+        std::cerr << "Failed to open file for writing: " << filename << std::endl;
+        return false;
+    }
 
+    // Write logs in JSON-like format
+    ofs << "{\n";
+    for (const auto& [timestamp, entries] : logs) {
+        ofs << "  \"" << timestamp << "\": [\n";
+        for (const auto& entry : entries) {
+            ofs << "    \"" << entry << "\",\n";
+        }
+        ofs << "  ],\n";
+    }
+    ofs << "}\n";
 
-    return false;
+    ofs.close();
+    return true;
 }
 
-auto logging::getCurrentTimeString() -> std::string {
+/**
+ * @brief Get the current time as a formatted string.
+ * 
+ * @return std::string The current time formatted as "YYYY-MM-DD HH:MM:SS".
+ */
+std::string logging::getCurrentTimeString() {
     // Get current time as time_point
     auto now = std::chrono::system_clock::now();
 
@@ -48,3 +115,4 @@ auto logging::getCurrentTimeString() -> std::string {
     // Return the formatted time as a string
     return oss.str();
 }
+

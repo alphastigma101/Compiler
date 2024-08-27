@@ -4,73 +4,74 @@
 #include <system_error>
 #include <fstream>
 static bool hadError = false;
-static std::any interpretLanguage;
+static LanguageTokenTypes interpretLanguage;
 
 /*
  * (run): Is a standalone static void function that runs the user input 
  * Parameters:
  * source: is a file that contains data of possibly of a language 
  */
-static void run(const std::string& source) {
+static void run(std::string& source) {
     Scanner scanner(source); // Create a new scanner instance
-    d.setCode(source); // set the code 
     std::vector<Token> tokens = scanner.ScanTokens();
-    Parser parser = new Parser(tokens);
-    Expr expression = parser.parse();
+    ct.setTokenLanguage(interpretLanguage); // set the language
+    parser _parser(tokens);
+    _parser.parse();
+    //expr = parser.parse();
     if (hadError) return;
 }
 
 
-LanguageTypes user_language(std::string& choice) {
-    if (choice == "Python") return LanguageTypes::Python;
-    else if (choice == "JavaScript") return LanguageTypes::JavaScript;
-    else if (choice == "Ruby") return LanguageTypes::Ruby;
-    else if (choice == "C") return LanguageTypes::C;
-    else if (choice == "CPP" || choice == "C++") return LanguageTypes::CPP;
-    else if (choice == "Java") return LanguageTypes::Java;
-    else if (choice == "Go") return LanguageTypes::Go;
-    else if (choice == "Kotlin") return LanguageTypes::Kotlin;
-    else if (choice == "Swift") return LanguageTypes::Swift;
-    else if (choice == "Rust") return LanguageTypes::Rust;
-    else if (choice == "Haskell") return LanguageTypes::Haskell;
-    else if (choice == "CSharp" || choice == "C#") return LanguageTypes::CSharp;
-    else if (choice == "FSharp" || choice == "F#") return LanguageTypes::FSharp;
-    else if (choice == "ObjectiveC" || choice == "Objective-C") return LanguageTypes::ObjectiveC;
-    else if (choice == "VHDLVerilog" || choice == "VHDL/Verilog") return LanguageTypes::VHDLVerilog;
-    else if (choice == "Fortran") return LanguageTypes::Fortran;
-    else if (choice == "COBOL") return LanguageTypes::COBOL;
-    else if (choice == "Pascal") return LanguageTypes::Pascal;
-    else if (choice == "Ada") return LanguageTypes::Ada;
-    else if (choice == "Scala") return LanguageTypes::Scala;
-    else if (choice == "TypeScript") return LanguageTypes::TypeScript;
-    else if (choice == "Dart") return LanguageTypes::Dart;
-    else if (choice == "PHP") return LanguageTypes::PHP;
-    else if (choice == "Perl") return LanguageTypes::Perl;
-    else if (choice == "R") return LanguageTypes::R;
-    else if (choice == "Lua") return LanguageTypes::Lua;
-    else if (choice == "Shell" || choice == "Bash") return LanguageTypes::Shell;
-    else if (choice == "MATLAB") return LanguageTypes::MATLAB;
-    else if (choice == "VBA") return LanguageTypes::VBA;
-    else if (choice == "LISPScheme" || choice == "LISP" || choice == "Scheme") return LanguageTypes::LISPScheme;
-    else if (choice == "Groovy") return LanguageTypes::Groovy;
-    else if (choice == "Erlang") return LanguageTypes::Erlang;
-    else if (choice == "Clojure") return LanguageTypes::Clojure;
-    else if (choice == "Prolog") return LanguageTypes::Prolog;
-    else if (choice == "AWK") return LanguageTypes::AWK;
-    else if (choice == "TCL") return LanguageTypes::TCL;
-    else if (choice == "Julia") return LanguageTypes::Julia;
-    else if (choice == "PowerShell") return LanguageTypes::PowerShell;
-    else if (choice == "Racket") return LanguageTypes::Racket;
-    else if (choice == "Smalltalk") return LanguageTypes::Smalltalk;
-    else if (choice == "HTMLCSS" || choice == "HTML/CSS") return LanguageTypes::HTMLCSS;
-    else if (choice == "SQL") return LanguageTypes::SQL;
-    else if (choice == "LabVIEW") return LanguageTypes::LabVIEW;
-    else if (choice == "VisualBasic" || choice == "VB") return LanguageTypes::VisualBasic;
-    else if (choice == "Elm") return LanguageTypes::Elm;
-    else if (choice == "Eiffel") return LanguageTypes::Eiffel;
-    else if (choice == "StandardML" || choice == "SML") return LanguageTypes::StandardML;
-    else if (choice == "Dlang" || choice == "D") return LanguageTypes::Dlang;
-    else return NULL;
+LanguageTokenTypes user_language(const std::string& choice) {
+    if (choice == "Python") return LanguageTokenTypes::Python;
+    else if (choice == "JavaScript") return LanguageTokenTypes::JavaScript;
+    else if (choice == "Ruby") return LanguageTokenTypes::Ruby;
+    else if (choice == "C") return LanguageTokenTypes::C;
+    else if (choice == "CPP" || choice == "C++") return LanguageTokenTypes::CPP;
+    else if (choice == "Java") return LanguageTokenTypes::Java;
+    else if (choice == "Go") return LanguageTokenTypes::Go;
+    else if (choice == "Kotlin") return LanguageTokenTypes::Kotlin;
+    else if (choice == "Swift") return LanguageTokenTypes::Swift;
+    else if (choice == "Rust") return LanguageTokenTypes::Rust;
+    else if (choice == "Haskell") return LanguageTokenTypes::Haskell;
+    else if (choice == "CSharp" || choice == "C#") return LanguageTokenTypes::CSharp;
+    else if (choice == "FSharp" || choice == "F#") return LanguageTokenTypes::FSharp;
+    else if (choice == "ObjectiveC" || choice == "Objective-C") return LanguageTokenTypes::ObjectiveC;
+    else if (choice == "VHDLVerilog" || choice == "VHDL/Verilog") return LanguageTokenTypes::VHDLVerilog;
+    else if (choice == "Fortran") return LanguageTokenTypes::Fortran;
+    else if (choice == "COBOL") return LanguageTokenTypes::COBOL;
+    else if (choice == "Pascal") return LanguageTokenTypes::Pascal;
+    else if (choice == "Ada") return LanguageTokenTypes::Ada;
+    else if (choice == "Scala") return LanguageTokenTypes::Scala;
+    else if (choice == "TypeScript") return LanguageTokenTypes::TypeScript;
+    else if (choice == "Dart") return LanguageTokenTypes::Dart;
+    else if (choice == "PHP") return LanguageTokenTypes::PHP;
+    else if (choice == "Perl") return LanguageTokenTypes::Perl;
+    else if (choice == "R") return LanguageTokenTypes::R;
+    else if (choice == "Lua") return LanguageTokenTypes::Lua;
+    else if (choice == "Shell" || choice == "Bash") return LanguageTokenTypes::Shell;
+    else if (choice == "MATLAB") return LanguageTokenTypes::MATLAB;
+    else if (choice == "VBA") return LanguageTokenTypes::VBA;
+    else if (choice == "LISPScheme" || choice == "LISP" || choice == "Scheme") return LanguageTokenTypes::LISPScheme;
+    else if (choice == "Groovy") return LanguageTokenTypes::Groovy;
+    else if (choice == "Erlang") return LanguageTokenTypes::Erlang;
+    else if (choice == "Clojure") return LanguageTokenTypes::Clojure;
+    else if (choice == "Prolog") return LanguageTokenTypes::Prolog;
+    else if (choice == "AWK") return LanguageTokenTypes::AWK;
+    else if (choice == "TCL") return LanguageTokenTypes::TCL;
+    else if (choice == "Julia") return LanguageTokenTypes::Julia;
+    else if (choice == "PowerShell") return LanguageTokenTypes::PowerShell;
+    else if (choice == "Racket") return LanguageTokenTypes::Racket;
+    else if (choice == "Smalltalk") return LanguageTokenTypes::SmallTalk;
+    else if (choice == "HTMLCSS" || choice == "HTML/CSS") return LanguageTokenTypes::HTMLCSS;
+    else if (choice == "SQL") return LanguageTokenTypes::SQL;
+    else if (choice == "LabVIEW") return LanguageTokenTypes::LabVIEW;
+    else if (choice == "VisualBasic" || choice == "VB") return LanguageTokenTypes::VisualBasic;
+    else if (choice == "Elm") return LanguageTokenTypes::Elm;
+    else if (choice == "Eiffel") return LanguageTokenTypes::Eiffel;
+    else if (choice == "StandardML" || choice == "SML") return LanguageTokenTypes::StandardML;
+    else if (choice == "Dlang" || choice == "D") return LanguageTokenTypes::Dlang;
+    else return LanguageTokenTypes::Custom;
 }
 
 /* 
@@ -91,7 +92,7 @@ static void runPrompt() {
     }
 }
 
-static void report(int &line, std::string& where, std::string& message) {
+static void report(int &line, std::string where, std::string& message) {
     std::cout << "[line " <<  line << "] Error" << where << ": " + message;
     hadError = true;
 }
@@ -125,16 +126,13 @@ int main(int argc, char **argv) {
     const Table table = initTable();
     if (argc > 2) {
         std::cout << "Supported languages" << std::endl;
-        for (const &it: table) { std::cout << it->first << std::endl; }
+        for (const std::pair<const std::string, std::pair<std::vector<std::string>, std::vector<std::string>>>& it : table) { std::cout << it.first << std::endl; }
         std::cerr << "Usage: [script] [language]";
         exit(1); 
     }
     else if (argc == 2) {
         interpretLanguage = user_language((std::string)argv[2]);
-        if (interpretLanguage != NULL) {
-            user_choice = (std::string)argv[2]; // user_choice comes from language_types.h
-        }
-        else {throw std::runtime_error("Invalid Language!");}
+        user_choice = (std::string)argv[2]; // user_choice comes from language_types.h
         file_name = (std::string)argv[1];
         runFile((std::string)argv[1]);
     } 

@@ -34,3 +34,7 @@
 # Folders to exclude
 debugging/
 logs/
+
+# Executables to exclude
+exec_generator
+exec_interpreter

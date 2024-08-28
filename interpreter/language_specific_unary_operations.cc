@@ -57,7 +57,7 @@ auto unaryOperations::dynamicLanguages::uJavaScript(LanguageTokenTypes& lang, au
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<JavaScript::Number>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<JavaScript::Float>(&right)) { return -(*val); }
             else {
                 throw runtimeerror(right.getType(), "Unknown Type! in uJavaScript");
             }
@@ -83,7 +83,7 @@ auto unaryOperations::dynamicLanguages::uRuby(LanguageTokenTypes& lang, auto& ri
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<Ruby::Integer>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Ruby::Int>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Ruby::Float>(&right)) { return -(*val); }
             else {
                 throw runtimeerror(right.getType(), "Unknown Type! in uRuby");
@@ -164,7 +164,7 @@ auto unaryOperations::staticLanguages::uJava(LanguageTokenTypes& lang, auto& rig
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<Java::Integer>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Java::Int>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Java::Double>(&right)) { return -(*val); }
             else {
                 throw runtimeerror(right.getType(), "Unknown Type! in uJava");
@@ -192,7 +192,7 @@ auto unaryOperations::staticLanguages::uGo(LanguageTokenTypes& lang, auto& right
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
             if (auto val = std::any_cast<Go::Int>(&right)) { return -(*val); }
-            if (auto val = std::any_cast<Go::Float64>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Go::Float>(&right)) { return -(*val); }
             else {
                 throw runtimeerror(right.getType(), "Unknown Type! in uGo");
             }
@@ -219,7 +219,7 @@ auto unaryOperations::staticLanguages::uKotlin(LanguageTokenTypes& lang, auto& r
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
             if (auto val = std::any_cast<Kotlin::Int>(&right)) { return -(*val); }
-            if (auto val = std::any_cast<Kotlin::Long>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<Kotlin::Float>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Kotlin::Double>(&right)) { return -(*val); }
             else {
                 throw runtimeerror(right.getType(), "Unknown Type! in uKotlin");
@@ -281,8 +281,8 @@ auto unaryOperations::staticLanguages::uRust(LanguageTokenTypes& lang, auto& rig
             else if (auto val = std::any_cast<Rust::u16>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<Rust::u32>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<Rust::u64>(&right)) { return -(*val); }
-            else if (auto val = std::any_cast<Rust::f32>(&right)) { return -(*val); }
-            else if (auto val = std::any_cast<Rust::f64>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::Float>(&right)) { return -(*val); }
+            else if (auto val = std::any_cast<Rust::Double>(&right)) { return -(*val); }
             else {
                 throw runtimeerror(right.getType(), "Unknown Type! in uRust");
             }

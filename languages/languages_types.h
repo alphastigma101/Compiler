@@ -9,7 +9,19 @@
 #include <complex>
 #include <functional>
 #include <set>
+#include <chrono>
+#include <regex>
 #include <time.h>
+#include <tuple>
+#include <memory>
+#include <unordered_set>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <map>
+#include <list>
+#include <deque>
+#include <future>
 
 enum LanguageTokenTypes {
     C, CPP, Java, Python,
@@ -28,63 +40,138 @@ namespace LanguageTypes {
         using Any = std::any;
         using None = std::nullptr_t;
         using Bool = bool;
-        using Int = int64_t;
-        using Float = double;
-        using Str = std::string;
-        using List = std::vector<Any>;
-        using Dict = std::map<Any, Any>;
+        using Int = int;
+        using Float = float;
+        using Double = double;
+        using String = std::string;
+        template<typename T> using List = std::vector<T>;
+        template<typename K, typename V> using Dict = std::map<K, V>;
+        template<typename... Args> using Tuple = std::tuple<Args...>;
+        template<typename T> using Set = std::set<T>;
+        template<typename T> using FrozenSet = std::set<T>; // sets are already immutable
+        //template<typename T> using MemoryView = std::span<T>; // C++20 feature
+        using NoneType = void;
     };
     struct Ruby {
         using Any = std::any;
         using Nil = std::nullptr_t;
+        using Bool = bool;
+        using Int = int;
+        //using Set = ...;
         using TrueClass = bool;
         using FalseClass = bool;
-        using Integer = int64_t;
-        using Float = double;
+        //using NilClass = ;
+        using Symbol = std::string;
+        //using Range = ...;
+        //using Enumerator = ...;
+        using Float = float;
+        using Double = double;
         using String = std::string;
-        using Array = std::vector<Any>;
-        using Hash = std::map<Any, Any>;
+        template<typename T> using Array = std::vector<T>;
+        template<typename K, typename V> using Hash = std::map<K, V>;
     };
     struct JavaScript {
-        using Any = std::any;
         using Undefined = std::monostate;
         using Null = std::nullptr_t;
-        using Boolean = bool;
-        using Number = double;
+        using Bool = bool;
+        using Int = int;
+        //using Symbol = ...;
+        template<typename T> using Function = std::function<T>;
+        //using Error = ...;
+        template<typename K, typename V> using Map = std::map<K, V>;
+        template<typename T> using Set = std::set<T>;
+        template<typename K, typename V> using WeakMap = std::unordered_map<K, std::weak_ptr<V>>;
+        template<typename V> using WeakSet =  std::unordered_set<std::weak_ptr<V>, std::owner_less<std::weak_ptr<V>>>;
+        using Date = std::chrono::system_clock::time_point;
+        using RegExp = std::regex;
+        template<typename T> using Promise = std::promise<T>;
+        //using Proxy = ...;
+        //using Reflect = ...;
+        using Double = double;
+        using Float = float;
         using String = std::string;
-        using Array = std::vector<Any>;
-        using Object = std::map<std::string, Any>;
+        using Array = std::vector<std::any>;
+        using Object = std::any;
     };
     struct Java {
         using Object = std::any;
         using Null = std::nullptr_t;
-        using Boolean = bool;
-        using Byte = int8_t;
-        using Short = int16_t;
-        using Integer = int32_t;
-        using Long = int64_t;
+        using Bool = bool;
+        using Int = int;
+        using i8 = int8_t;
+        using i16 = int16_t;
+        using i32 = int32_t;
+        using i64 = int64_t;
+        using c32 = char32_t;
+        using c16 = char16_t;
+        using c8 = unsigned char;
         using Float = float;
         using Double = double;
-        using Char = char16_t;
+        template<typename T> using Queue = std::queue<T>;
+        template<typename T> using Deque = std::deque<T>;
+        //using Stream = ...;
+        //using Optional = ...;
+        //using Date = ...;
+        //using Time = ...;
         using String = std::string;
     };
     struct CPP {
         using Any = std::any;
+        using Void = void;
+        //template<typename T> using Class = class T;
+        //template<typename T> using Struct = struct T;
+        //:w
+        //template<typename T> using Union = union T;
         using Nullptr = std::nullptr_t;
         using Bool = bool;
         using Char = char;
         using Int = int;
+        using i8 = int8_t;
+        using i16 = int16_t;
+        using i32 = int32_t;
+        using i64 = int64_t;
+        using c32 = char32_t;
+        using c16 = char16_t;
+        using c8 = unsigned char;
         using Long = long;
         using Float = float;
         using Double = double;
         using String = std::string;
+        using wChar = wchar_t;
+        using Short = short;
+        using SizeT = std::size_t;
+        using Unsigned = unsigned;
+        using Signed = signed;
+        template<typename... Args> using Vector = std::vector<Args...>;
+        template<typename K, typename V> using Map = std::map<K, V>;
+        template<typename T, size_t N> using Array = std::array<T, N>;
+        template<typename T> using Deque = std::deque<T>;
+        template<typename T> using Set = std::set<T>;
+        template<typename K, typename V> using UnorderedMap = std::unordered_map<K, V>;
+        template<typename T> using UnorderedSet = std::unordered_set<T>;
+        template<typename T> using Queue = std::queue<T>;
+        template<typename T> using Stack = std::stack<T>;
+        template<typename T, typename U> using Pair = std::pair<T, U>;
+        template<typename... Args> using Tuple = std::tuple<Args...>;
+        template<typename T> using UniquePtr = std::unique_ptr<T>;
+        template<typename T> using SharedPtr = std::shared_ptr<T>;
+        template<typename T> using WeakPtr = std::weak_ptr<T>;
     };
     struct C {
         using Any = std::any;
         using Nullptr = std::nullptr_t;
+        //using Struct = struct;
+        //using Union = union;
         using Bool = bool;
-        using Char = char;
         using Int = int;
+        using i8 = int8_t;
+        using i16 = int16_t;
+        using i32 = int32_t;
+        using i64 = int64_t;
+        using Char = char;
+        using c32 = char32_t;
+        using c16 = char16_t;
+        using c8 = unsigned char;
         using Long = long;
         using Float = float;
         using Double = double;
@@ -93,8 +180,17 @@ namespace LanguageTypes {
      struct Go {
         using Any = std::any;
         using Bool = bool;
-        using Int = int64_t;
-        using Float64 = double;
+        using Int = int;
+        using i8 = int8_t;
+        using i16 = int16_t;
+        using i32 = int32_t;
+        using i64 = int64_t;
+        using Char = char;
+        using c32 = char32_t;
+        using c16 = char16_t;
+        using c8 = unsigned char;
+        using Float = float;
+        using Double = double;
         using String = std::string;
         using Slice = std::vector<Any>;
         using Map = std::map<Any, Any>;
@@ -103,11 +199,17 @@ namespace LanguageTypes {
         using Any = std::any;
         using Unit = void;
         using Boolean = bool;
-        using Int = int32_t;
-        using Long = int64_t;
+        using Int = int;
+        using i8 = int8_t;
+        using i16 = int16_t;
+        using i32 = int32_t;
+        using i64 = int64_t;
+        using Char = char;
+        using c32 = char32_t;
+        using c16 = char16_t;
+        using c8 = unsigned char;
         using Float = float;
         using Double = double;
-        using Char = char16_t;
         using String = std::string;
         template<typename T> using List = std::vector<T>;
         template<typename K, typename V> using Map = std::map<K, V>;
@@ -115,7 +217,16 @@ namespace LanguageTypes {
     struct Swift {
         using Any = std::any;
         using Bool = bool;
-        using Int = int64_t;
+        using Int = int;
+        using i8 = int8_t;
+        using i16 = int16_t;
+        using i32 = int32_t;
+        using i64 = int64_t;
+        using Char = char;
+        using c32 = char32_t;
+        using c16 = char16_t;
+        using c8 = unsigned char;
+        using Float = float;
         using Double = double;
         using String = std::string;
         template<typename T> using Optional = std::optional<T>;
@@ -132,8 +243,8 @@ namespace LanguageTypes {
         using u16 = uint16_t;
         using u32 = uint32_t;
         using u64 = uint64_t;
-        using f32 = float;
-        using f64 = double;
+        using Float = float;
+        using Double = double;
         using String = std::string;
         template<typename T> using Vec = std::vector<T>;
         template<typename K, typename V> using HashMap = std::map<K, V>;

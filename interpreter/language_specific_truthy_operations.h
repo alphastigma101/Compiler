@@ -9,6 +9,7 @@ namespace TruthyOperations {
             ~truthyOperations() noexcept {};
         private:
             bool isTruthy(auto& object);
+            logTable<std::map<std::string, std::vector<std::string>>> logs_;
     };
 };
 using namespace TruthyOperations;

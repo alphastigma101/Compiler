@@ -19,15 +19,15 @@ bool truthyOperations::isTruthy(auto& object) {
             else if (auto b = std::any_cast<LanguageTypes::Python::Bool>(object.getValue())) return *b;
             else if (auto i = std::any_cast<LanguageTypes::Python::Int>(object.getValue())) return *i != 0;
             else if (auto f = std::any_cast<LanguageTypes::Python::Float>(object.getValue())) return *f != 0.0;
-            else if (auto s = std::any_cast<LanguageTypes::Python::Str>(object.getValue())) return !s->empty();
+            else if (auto s = std::any_cast<LanguageTypes::Python::String>(object.getValue())) return !s->empty();
             else if (auto l = std::any_cast<LanguageTypes::Python::List>(object.getValue())) return !l->empty();
             else if (auto d = std::any_cast<LanguageTypes::Python::Dict>(object.getValue())) return !d->empty();
             return true;
         case LanguageTokenTypes::JavaScript:
             if (std::any_cast<LanguageTypes::JavaScript::Null>(object.getValue()) != nullptr) return false;
             else if (std::any_cast<LanguageTypes::JavaScript::Undefined>(object.getValue()) != nullptr) return false;
-            else if (auto b = std::any_cast<LanguageTypes::JavaScript::Boolean>(object.getValue())) return *b;
-            else if (auto n = std::any_cast<LanguageTypes::JavaScript::Number>(object.getValue())) return *n != 0 && !std::isnan(*n);
+            else if (auto b = std::any_cast<LanguageTypes::JavaScript::Bool>(object.getValue())) return *b;
+            else if (auto n = std::any_cast<LanguageTypes::JavaScript::Float>(object.getValue())) return *n != 0 && !std::isnan(*n);
             else if (auto s = std::any_cast<LanguageTypes::JavaScript::String>(object.getValue())) return !s->empty();
             return true;
         case LanguageTokenTypes::Ruby:
@@ -44,7 +44,7 @@ bool truthyOperations::isTruthy(auto& object) {
             return true;
         case LanguageTokenTypes::Java:
             if (std::any_cast<LanguageTypes::Java::Null>(object.getValue()) != nullptr) return false;
-            else if (auto b = std::any_cast<LanguageTypes::Java::Boolean>(object.getValue())) return *b;
+            else if (auto b = std::any_cast<LanguageTypes::Java::Bool>(object.getValue())) return *b;
             return true;
         case LanguageTokenTypes::Go:
             if (auto b = std::any_cast<LanguageTypes::Go::Bool>(object.getValue())) return *b;

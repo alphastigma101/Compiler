@@ -3,7 +3,7 @@
 #include <language_specific_binary_operations.h> 
 
 namespace UnaryOperations {
-    class unaryOperations: public Check<unaryOperations>, public catcher<unaryOperations>, public runtimeerror<unaryOperations> {
+    class unaryOperations: public Check<unaryOperations>, public runtimeerror<unaryOperations> {
         public:
             friend class interpreter;
             explicit unaryOperations() = default;
@@ -18,7 +18,6 @@ namespace UnaryOperations {
              * ----------------------------------------------------------------------------
             */
             inline bool isNumeric(const std::any value) override {
-                // TODO: Need to add more supported types here. refer to languages_types.h
                 return value.type() == typeid(int) ||
                 value.type() == typeid(int64_t) ||
                 value.type() == typeid(float) ||
@@ -81,6 +80,7 @@ namespace UnaryOperations {
             };
         private:
             static bool checkNumberOperand(auto& right);
+            logTable<std::map<std::string, std::vector<std::string>>> logs_;
         protected:
             inline bool isString(const std::any value) override { return value.type() == typeid(std::string);};
     };

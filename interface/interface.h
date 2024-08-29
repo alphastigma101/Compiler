@@ -6,7 +6,7 @@ template<class Type>
 class NonMemberConv {
     // An abstract class used for converting object types that are not a member object of the class 
     public:
-        virtual ~NonMemberConv() noexcept = default;
+        ~NonMemberConv() noexcept = default;
         virtual std::any toNumeric(std::any& value) = 0;
         virtual char* toString(std::any& left, std::any& right) = 0; // TODO: Type signature needs to be changed to std::string which means everything that defines it also needs to be updated
 };

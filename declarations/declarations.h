@@ -1,10 +1,6 @@
 #ifndef _DECLARATIONS_H_
 #define _DECLARATIONS_H_
-#include <tuple>
 #include <utility>
-#include <memory>
-#include <iostream>
-//#include <variant>
 #include <languages.h>
 // Used in abstraction_syntax_tree.h
 extern std::string user_choice; // get the user choice of language from the begining 

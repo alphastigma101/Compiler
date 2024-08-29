@@ -94,9 +94,9 @@ namespace Parser {
     class parseError: public Token {
         public:
             friend class parser;
-            virtual ~parseError() = default;
-            virtual std::string error(Token token, const std::string message) = 0;                   
-            virtual std::string report(int line, const std::string where, const std::string message) const throw() = 0;
+            ~parseError() = default;
+            inline std::string error(Token token, const std::string message);                   
+            inline std::string report(int line, const std::string where, const std::string message) const throw();
         private:
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
     };
@@ -152,7 +152,7 @@ namespace Parser {
             int current = 0;
             int idx = 0;
             std::vector<Token> tokens;
-            inline std::string error(Token token, const std::string message) override {
+            inline std::string error(Token token, const std::string message) {
                 if (token.getType() == TokenType::END_OF_FILE) { return report(token.getLine(), " at end", message);}
                     std::string temp = std::to_string(token.getLine());
                     logging(logs_, temp + " at '" + token.getLexeme() + "'" + message); // Keep the logs updated throughout the whole codebase
@@ -160,7 +160,7 @@ namespace Parser {
                     logging<parser>rotate;
                     return report(token.getLine(), " at '" + token.getLexeme() + "'", message);
             };
-            inline std::string report(int line, const std::string where, const std::string message) const throw() override {
+            inline std::string report(int line, const std::string where, const std::string message) const throw() {
                 std::string err = "[line " + std::to_string(line) + "] Error" + where +  ": " + message;
                 std::cout << "[line " <<  line << "] Error" << where << ": " + message;
                 logging(logs_, err); // Keep the logs updated throughout the whole codebase

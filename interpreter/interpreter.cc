@@ -1,23 +1,86 @@
 #include <interpreter.h>
 /*
  *
+ *
+*/ 
+template<typename T>
+static std::shared_ptr<T> currentExpression;
+void interpreter::setExpr(const std::any& visitor) {
+    if (visitor.type() == typeid(Binary)) {
+        auto binary = std::any_cast<Binary>(visitor);
+        currentExpression<Binary> = std::make_shared<Binary>(binary);
+        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Binary>->getToken().getLine()) +  " at '" + currentExpression<Binary>->getToken().getLexeme());
+        logging<interpreter>update;
+        logging<interpreter>rotate;
+        throw runtimeerror<interpreter>(
+                                        currentExpression<Binary>->getToken().getType(), 
+                                        "Line" + std::to_string(currentExpression<Binary>->getToken().getLine()) + " at '" + currentExpression<Binary>->getToken().getLexeme());
+    } else if (visitor.type() == typeid(Unary)) {
+        auto unary = std::any_cast<Unary>(visitor);
+        currentExpression<Unary> = std::make_shared<Unary>(unary);
+        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Unary>->getToken().getLine()) +  " at '" + currentExpression<Unary>->getToken().getLexeme());
+        logging<interpreter>update;
+        logging<interpreter>rotate;
+        throw runtimeerror<interpreter>(
+                                        currentExpression<Unary>->getToken().getType(), 
+                                        "Line" + std::to_string(currentExpression<Unary>->getToken().getLine()) + " at '" + currentExpression<Unary>->getToken().getLexeme());
+    } else if (visitor.type() == typeid(Grouping)) {
+        auto grouping = std::any_cast<Grouping>(visitor);
+        currentExpression<Grouping> = std::make_shared<Grouping>(grouping);
+        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Grouping>->getExpr()->op->getLine()) +  " at '" + currentExpression<Grouping>->getExpr()->op->getLexeme());
+        logging<interpreter>update;
+        logging<interpreter>rotate;
+        throw runtimeerror<interpreter>(
+                                        currentExpression<Grouping>->getExpr()->op->getType(), 
+                                        "Line" + std::to_string(currentExpression<Grouping>->getExpr()->op->getLine()) + " at '" + currentExpression<Grouping>->getExpr()->op->getLexeme());
+    } else if (visitor.type() == typeid(Literal)) {
+        auto literal = std::any_cast<Literal>(visitor);
+        currentExpression<Literal> = std::make_shared<Literal>(literal);
+        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Literal>->getToken()->getLine()) +  " at '" + currentExpression<Literal>->getToken()->getLexeme());
+        logging<interpreter>update;
+        logging<interpreter>rotate;
+        throw runtimeerror<interpreter>(
+                                        currentExpression<Literal>->getToken()->getType(), 
+                                        "Line" + std::to_string(currentExpression<Binary>->getToken().getLine()) + " at '" + currentExpression<Literal>->getToken()->getLexeme());
+    }
+    return;
+}
+/*
+ *
  * 
 */
 interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, const LanguageTokenTypes lang): expr(this->expr), currentLanguage(lang) {
     try {
         for (int i = 0; i < expr.size(); i++) {
             auto temp = expr.at(i);
-            if (std::get<1>(temp).first == "Binary") { auto value = evaluate(std::get<1>(temp).second); }
-            else if (std::get<1>(temp).first == "Unary") { auto value = evaluate(std::get<1>(temp).second); }
-            else if (std::get<1>(temp).first == "Grouping") { auto value = evaluate(std::get<1>(temp).second); }
-            else if (std::get<1>(temp).first == "Literal") { auto value = evaluate(std::get<1>(temp).second); }
+            if (std::get<1>(temp).first == "Binary") { 
+                auto value = evaluate(std::get<1>(temp).second); 
+            }
+            else if (std::get<1>(temp).first == "Unary") { 
+                auto value = evaluate(std::get<1>(temp).second); 
+            }
+            else if (std::get<1>(temp).first == "Grouping") { 
+                auto value = evaluate(std::get<1>(temp).second); 
+            }
+            else if (std::get<1>(temp).first == "Literal") { 
+                auto value = evaluate(std::get<1>(temp).second); 
+            }
             else {
-                auto token = std::get<1>(temp).second;
-                throw catcher<interpreter>("Unexpected behavior occurred!");
+                try {
+                    setExpr(std::get<1>(temp).second);                    
+                }
+                catch(runtimeerror<interpreter>& e) {
+                    logging<interpreter>(logs_, e.what());
+                    logging<interpreter>update;
+                    logging<interpreter>rotate;
+                    std::cout << e.what();
+                }
             }
         }
-    } catch (catcher<interpreter>& e) {
-        //TODO: Add logging debugging here
+    } catch (runtimeerror<interpreter>& e) {
+        logging<interpreter>(logs_, e.what());
+        logging<interpreter>update;
+        logging<interpreter>rotate;
         std::cout << e.what();
     }                              
 }

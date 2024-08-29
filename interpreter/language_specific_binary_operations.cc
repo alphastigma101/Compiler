@@ -43,27 +43,27 @@ auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right)
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) + toNumeric(right); }
                 if ((isString(left) == true) && (isString(right) == true)) { return (std::string)left + (std::string)right; }
             }
-            catch(catcher& e) {
+            catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;
         case TokenType::MINUS:
             try {if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) - toNumeric(right); }}
-            catch(catcher& e) {
+            catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
                 return NULL;
             }
             break;
         case TokenType::SLASH:
             try {if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) / toNumeric(right); }}
-            catch(catcher& e) {
+            catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
             }
             break;
         case TokenType::STAR:
             try { if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) * toNumeric(right); }}
-            catch(catcher& e) {
+            catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
                 return NULL;
             }
@@ -73,7 +73,7 @@ auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right)
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) > toNumeric(right); }
             }
-            catch(catcher& e) {
+            catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
                 return NULL;
             }
@@ -82,7 +82,7 @@ auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right)
             try {
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) >= toNumeric(right); }
-            } catch(catcher& e) {
+            } catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
                 return NULL;
             }
@@ -90,7 +90,7 @@ auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right)
             try {
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) < toNumeric(right); }
-            } catch(catcher& e) {
+            } catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
                 return NULL;
             }
@@ -100,7 +100,7 @@ auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right)
                 checkNumberOperands(expr->op, left, right);
                 if ((isNumeric(left) == true) && (isNumeric(right) == true)) { return toNumeric(left) <= toNumeric(right); }
             }
-            catch(catcher& e) {
+            catch(runtimeerror& e) {
                 std::cout << e.what() << std::endl;
                 return NULL;
             }

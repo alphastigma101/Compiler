@@ -1,6 +1,4 @@
 #include <parser.h>
-#include <stdexcept> // runtime_error can be used
-// TODO: Make parser inherit runtimeerror and remove the header on line 2
 /* -------------------------------------------------------------------
  * (equality) Description:
     This method represents the binary section in the grammar in parser.h. It uses variant which is known as a union type safe. 
@@ -9,9 +7,10 @@
  *
 */
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
+    // TODO: For each function, use Binary and add the tokens and the line 
     expr = comparison(); // recrusion left !=
     while (match(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)) {
-        const Token op = previous();
+        const Token op = previous(); // TODO: Need to copy op to *op Expr object
         ExprTypes<Binary, Unary, Grouping, Literal>* right = comparison(); // recrusion right ==
         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
             if (auto* binary = std::get_if<Binary>(e)) {
@@ -19,11 +18,11 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
             } else { throw std::runtime_error("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>>(*(getExpr(right).right)));
+        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
         expr->emplace<0>(B);
         node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(right);
+        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
@@ -42,11 +41,11 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::comparison() {
             } else { throw std::runtime_error("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>>(*(getExpr(expr).right)));
+        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(expr).right)));
         expr->emplace<0>(B);
         node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(right);
+        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
@@ -65,11 +64,11 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::term() {
             } else { throw std::runtime_error("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>>(*(getExpr(right).right)));
+        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
         expr->emplace<0>(B);
         node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(right);
+        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
@@ -88,11 +87,11 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::factor() {
             } else { throw std::runtime_error("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>>(*(getExpr(right).right)));
+        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
         expr->emplace<0>(B);
         node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(right);
+        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
@@ -110,11 +109,11 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::unary() {
             } else { throw std::runtime_error("Expected Unary expression");}
         };
         //TODO: Threading is going to be needed here 
-        Unary U(static_cast<Expr<Unary>>(*(getExpr(expr).right)), op);
+        Unary U(static_cast<Expr<Unary>&>(*(getExpr(expr).right)), op);
         expr->emplace<1>(U);
         node.push_back(compressedAstTree(idx, std::string("Unary: "), *getExpr));
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(expr); // TODO: If an bug occurs here then expr is wrong thing to explicity initalize
+        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*expr); 
         return expr;
     }
     return primary();
@@ -135,7 +134,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
         };
         node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(res);
+        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
         auto Expr = expr;
         return expr;
     }
@@ -150,7 +149,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
          };
          node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
          idx++;
-         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(res);
+         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
          return expr;
     }
     if (match(TokenType::NIL)) {
@@ -165,7 +164,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
         };
          node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
          idx++;
-         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(res);
+         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
          return expr;
     }
     if (match(TokenType::NUMBER, TokenType::STRING)) {
@@ -179,7 +178,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
         };
        node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
        idx++;
-       ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(res);
+       ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
        return expr;
     }
     if (match(TokenType::LEFT_PAREN)) {

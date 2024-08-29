@@ -2,6 +2,7 @@
 #ifndef _CONTEXT_FREE_GRAMMAR_H_
 #define _CONTEXT_FREE_GRAMMAR_H_
 #include <run_time_error.h>
+#include <catch.h>
 #include <filesystem>
 /*
  * A Context Free Grammar consists of a head and a body, which describes what it can generate.
@@ -18,7 +19,7 @@
 
 namespace ContextFreeGrammar {
     template<typename Derived>
-    class Expr: public logging<Derived>, runtimeerror<Derived> {
+    class Expr: public logging<Derived>, public runtimeerror<Derived>, public catcher<Derived> {
         /* ------------------------------------------------------------------------------------------
          * A representation of an abstraction classs which is also considered as a disoriented object
          * ------------------------(Additional Info Below)-------------------------------------------
@@ -31,7 +32,7 @@ namespace ContextFreeGrammar {
             friend class Unary;
             friend class Grouping;
             friend class Literal;
-            virtual ~Expr() noexcept {};
+            ~Expr() noexcept {};
             /**
              * @brief Accepts a visitor for processing this node.
              *
@@ -71,6 +72,11 @@ namespace ContextFreeGrammar {
              */
             inline std::string accept(Expr& visitor) {
                 try {
+                    // Derived* points to whatever class was passed. Casts from std::any to Derived 
+                    // If a bug occurs here, then potential cases as to why are:
+                    // the correct class was not passed 
+                    // this referencing the abstract class 
+                    // so basically, it is going from reference (this) to pointy (Derived*) which is why the ->visit works 
                     return std::any_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
                 }
                 catch(...) {
@@ -99,7 +105,19 @@ namespace ContextFreeGrammar {
          * Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            Binary(const Expr& left, const Token& op, const Expr& right): left(this->left), op(this->op), right(this->right){};
+            // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
+            Binary(Expr<Binary>& left_, const Token& op_, Expr<Binary>& right_): left(&left_), right(&right_)  {
+                try {
+                    // TODO: Swap to smart pointers instead of raw pointers
+                    // Initialize the Address of the pointers
+                    this->left = left;
+                    op = op_;
+                    this->op = op;
+                }
+                catch(...) {
+                    throw catcher<Binary>("Undefined behavior occurred in Class Binary!");
+                }
+            };
             ~Binary() noexcept = default;
             /* ----------------------------------------------------------------------------------------------------------
              * @brief visitor gets called finite amount of times and is placed on the call stack with it's own variables 
@@ -128,7 +146,16 @@ namespace ContextFreeGrammar {
     };
     class Unary: public Expr<Unary> {
         public:
-            Unary(const Expr& right, const Token& op): right(this->right), op(this->op) {};
+            Unary(Expr& right_, const Token& op_): right(&right_) {
+                try {
+                    this->right = right;
+                    op = op_;
+                    this->op = op_;
+                }
+                catch(...) {
+                    throw catcher<Unary>("Undefined behavior occurred in Class Unary!");
+                }
+            };
             ~Unary() noexcept = default;
             inline std::string visit(Unary&& expr) {
                 try {
@@ -150,7 +177,10 @@ namespace ContextFreeGrammar {
     };
     class Grouping: public Expr<Grouping> {
         public:
-            Grouping(const Expr& expression): expression(this->expression){};
+            explicit Grouping(const Expr& expression) {
+                this->expression->left = expression.left;
+                this->expression->right = expression.right;
+            };
             ~Grouping() noexcept = default;
             inline std::string visit(Grouping&& expr) {
                 try {
@@ -166,13 +196,21 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
+        inline Expr* getExpr() { return expression; }
         private:
             Expr* expression;
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
-            Literal(const auto& value): value(this->value){};
-            ~Literal() noexcept = default;
+            explicit Literal(const auto& value): value(this->value) {
+                try {
+                    this->op = op;
+                }
+                catch(...) {
+                    throw catcher<Literal>("Undefined behavior occurred in Class Literal!");
+                }
+            };
+            ~Literal() = default;
             inline std::string visit(Literal&& expr) {
                 try {
                     std::string literal = std::any_cast<bool>(expr) ? expr.accept(*this) : "";
@@ -191,7 +229,7 @@ namespace ContextFreeGrammar {
                     return std::any_cast<std::string>(value);
                 } 
                 catch (std::bad_any_cast& e) {
-                    auto l = std::any_cast<Expr<Literal>>(value);
+                    auto l = std::any_cast<Literal>(value);
                     std::string temp = std::to_string(l.op->getLine());
                     logging(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
                     logging<Literal>update;
@@ -199,9 +237,11 @@ namespace ContextFreeGrammar {
                     return "error:" + std::string(e.what());
                 }
             };
-            inline std::any getValue() { return value; }; 
+            inline std::any getValue() { return value; };
+            inline Token* getToken() { return op; };
         private:
             std::any value;
+            Token* op;
     };
 };
 using namespace ContextFreeGrammar;

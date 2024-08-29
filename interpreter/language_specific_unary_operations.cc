@@ -3,7 +3,6 @@
  * checkNumberOperand Description: 
     Is a method that calls in isNumeric, the helper function
  * Arguments:
-    * auto expr: It is an object that represents the abstraction syntax, (ast) that is currently being used. In this case, it would be the Unary ast
     * auto right: Is a generic type that must have a concrete type during run time, and will visit the unary abstract syntax tree right side (rh)
  * Returns:
     True if a and b are equal
@@ -11,13 +10,13 @@
  * ----------------------------------------------------------------------------------------------------------------------------------------------------
 */
 bool unaryOperations::checkNumberOperand(auto& right) {
-    //try {
+    try {
         if (isNumeric(right) == true) { return true; }
         return false;
-    //}
-    //catch() {
-
-    //}
+    }
+    catch(...) {
+        throw runtimeerror(right.getType(), "Failed to check the number operands!");
+    }
     return false;
 }
 
@@ -31,12 +30,11 @@ auto unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes& lang, auto& 
         else {
             if (auto val = std::any_cast<Python::Int>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Python::Float>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uPython");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uPython"); }
         }
     }
-    catch(std::bad_any_cast& e) { 
+    catch(runtimeerror& e) { 
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -58,12 +56,11 @@ auto unaryOperations::dynamicLanguages::uJavaScript(LanguageTokenTypes& lang, au
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
             if (auto val = std::any_cast<JavaScript::Float>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uJavaScript");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uJavaScript"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -90,7 +87,8 @@ auto unaryOperations::dynamicLanguages::uRuby(LanguageTokenTypes& lang, auto& ri
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -117,7 +115,8 @@ auto unaryOperations::staticLanguages::uC(LanguageTokenTypes& lang, auto& right)
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -139,12 +138,11 @@ auto unaryOperations::staticLanguages::uCPP(LanguageTokenTypes& lang, auto& righ
         else {
             if (auto val = std::any_cast<CPP::Int>(&right)) { return -(*val); }
             if (auto val = std::any_cast<CPP::Double>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uCPP");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uCPP"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -166,12 +164,11 @@ auto unaryOperations::staticLanguages::uJava(LanguageTokenTypes& lang, auto& rig
         else {
             if (auto val = std::any_cast<Java::Int>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Java::Double>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uJava");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uJava"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -193,12 +190,11 @@ auto unaryOperations::staticLanguages::uGo(LanguageTokenTypes& lang, auto& right
         else {
             if (auto val = std::any_cast<Go::Int>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Go::Float>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uGo");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uGo"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -221,12 +217,11 @@ auto unaryOperations::staticLanguages::uKotlin(LanguageTokenTypes& lang, auto& r
             if (auto val = std::any_cast<Kotlin::Int>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Kotlin::Float>(&right)) { return -(*val); }
             if (auto val = std::any_cast<Kotlin::Double>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uKotlin");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uKotlin"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -247,13 +242,12 @@ auto unaryOperations::staticLanguages::uSwift(LanguageTokenTypes& lang, auto& ri
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
             if (auto val = std::any_cast<Swift::Int>(&right)) { return -(*val); }
-            else if (auto val = std::any_cast<Kotlin::Double>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uSwift");
-            }
+            else if (auto val = std::any_cast<Kotlin::Double>(&right)) { return -(*val);  }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uSwift"); }
         }
     }
-    catch(std::bad_any_cast& e) { 
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -282,13 +276,12 @@ auto unaryOperations::staticLanguages::uRust(LanguageTokenTypes& lang, auto& rig
             else if (auto val = std::any_cast<Rust::u32>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<Rust::u64>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<Rust::Float>(&right)) { return -(*val); }
-            else if (auto val = std::any_cast<Rust::Double>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uRust");
-            }
+            else if (auto val = std::any_cast<Rust::Double>(&right)) {  return -(*val); }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uRust"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -319,12 +312,11 @@ auto unaryOperations::staticLanguages::uCSharp(LanguageTokenTypes& lang, auto& r
             else if (auto val = std::any_cast<CSharp::float_>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<CSharp::double_>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<CSharp::decimal>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uCSharp");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uCSharp"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -347,12 +339,11 @@ auto unaryOperations::staticLanguages::uFSharp(LanguageTokenTypes& lang, auto& r
             if (auto val = std::any_cast<FSharp::int_>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<FSharp::float_>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<FSharp::double_>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uFSharp");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uFSharp"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
+        //TODO: Logging needs to go here
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -375,12 +366,10 @@ auto unaryOperations::staticLanguages::uObjectiveC(LanguageTokenTypes& lang, aut
             if (auto val = std::any_cast<ObjectiveC::NSInteger>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<ObjectiveC::NSUInteger>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<ObjectiveC::CGFloat>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uObjectiveC");
-            }
+            else { throw runtimeerror(right.getType(), "Unknown Type! in uObjectiveC"); }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -404,12 +393,10 @@ auto unaryOperations::staticLanguages::uScala(LanguageTokenTypes& lang, auto& ri
             else if (auto val = std::any_cast<Scala::Long>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<Scala::Float>(&right)) { return -(*val); }
             else if (auto val = std::any_cast<Scala::Double>(&right)) { return -(*val); }
-            else {
-                throw runtimeerror(right.getType(), "Unknown Type! in uScala");
-            }
+            else {throw runtimeerror(right.getType(), "Unknown Type! in uScala");}
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -436,7 +423,7 @@ auto unaryOperations::dynamicLanguages::uTypeScript(LanguageTokenTypes& lang, au
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -463,7 +450,7 @@ auto unaryOperations::staticLanguages::uDart(LanguageTokenTypes& lang, auto& rig
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -490,7 +477,7 @@ auto unaryOperations::dynamicLanguages::uPHP(LanguageTokenTypes& lang, auto& rig
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -517,7 +504,7 @@ auto unaryOperations::dynamicLanguages::uR(LanguageTokenTypes& lang, auto& right
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -543,7 +530,7 @@ auto unaryOperations::dynamicLanguages::uLua(LanguageTokenTypes& lang, auto& rig
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -570,7 +557,7 @@ auto unaryOperations::dynamicLanguages::uMATLAB(LanguageTokenTypes& lang, auto& 
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -600,7 +587,7 @@ auto unaryOperations::dynamicLanguages::uVBA(LanguageTokenTypes& lang, auto& rig
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -629,7 +616,7 @@ auto unaryOperations::dynamicLanguages::uGroovy(LanguageTokenTypes& lang, auto& 
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -656,7 +643,7 @@ auto unaryOperations::dynamicLanguages::uJulia(LanguageTokenTypes& lang, auto& r
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -682,7 +669,7 @@ auto unaryOperations::dynamicLanguages::uPowerShell(LanguageTokenTypes& lang, au
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -710,7 +697,7 @@ auto unaryOperations::dynamicLanguages::uVisualBasic(LanguageTokenTypes& lang, a
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -736,7 +723,7 @@ auto unaryOperations::otherLanguages::uDlang(LanguageTokenTypes& lang, auto& rig
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -755,7 +742,7 @@ auto unaryOperations::dynamicLanguages::uHaskell(LanguageTokenTypes& lang, auto&
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -773,7 +760,7 @@ auto unaryOperations::otherLanguages::uErlang(LanguageTokenTypes& lang, auto& ri
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -789,7 +776,7 @@ auto unaryOperations::dynamicLanguages::uClojure(LanguageTokenTypes& lang, auto&
             throw runtimeerror("Unknown Type! in uClojure");
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -809,7 +796,7 @@ auto unaryOperations::otherLanguages::uStandardML(LanguageTokenTypes& lang, auto
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -828,7 +815,7 @@ auto unaryOperations::otherLanguages::uElm(LanguageTokenTypes& lang, auto& right
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -849,7 +836,7 @@ auto unaryOperations::staticLanguages::uVHDLVerilog(LanguageTokenTypes& lang, au
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -868,7 +855,7 @@ auto unaryOperations::staticLanguages::uFortran(LanguageTokenTypes& lang, auto& 
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -886,7 +873,7 @@ auto unaryOperations::staticLanguages::uCOBOL(LanguageTokenTypes& lang, auto& ri
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -905,7 +892,7 @@ auto unaryOperations::staticLanguages::uPascal(LanguageTokenTypes& lang, auto& r
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -924,7 +911,7 @@ auto unaryOperations::staticLanguages::uAda(LanguageTokenTypes& lang, auto& righ
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -944,7 +931,7 @@ auto unaryOperations::dynamicLanguages::uPerl(LanguageTokenTypes& lang, auto& ri
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -962,7 +949,7 @@ auto unaryOperations::dynamicLanguages::uAWK(LanguageTokenTypes& lang, auto& rig
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -980,7 +967,7 @@ auto unaryOperations::otherLanguages::uTCL(LanguageTokenTypes& lang, auto& right
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -998,7 +985,7 @@ auto unaryOperations::dynamicLanguages::uShell(LanguageTokenTypes& lang, auto& r
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -1017,7 +1004,7 @@ auto unaryOperations::dynamicLanguages::uLISPScheme(LanguageTokenTypes& lang, au
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -1035,7 +1022,7 @@ auto unaryOperations::dynamicLanguages::uRacket(LanguageTokenTypes& lang, auto& 
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -1054,7 +1041,7 @@ auto unaryOperations::otherLanguages::uProlog(LanguageTokenTypes& lang, auto& ri
         }
 
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -1073,7 +1060,7 @@ auto unaryOperations::dynamicLanguages::uSmallTalk(LanguageTokenTypes& lang, aut
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
 }
@@ -1090,7 +1077,7 @@ auto unaryOperations::otherLanguages::uHTMLCSS(LanguageTokenTypes& lang, auto& r
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -1110,7 +1097,7 @@ auto unaryOperations::otherLanguages::uSQL(LanguageTokenTypes& lang, auto& right
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;
@@ -1138,7 +1125,7 @@ auto unaryOperations::otherLanguages::uLabVIEW(LanguageTokenTypes& lang, auto& r
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl; 
     }
     return NULL;
@@ -1157,7 +1144,7 @@ auto unaryOperations::staticLanguages::uEiffel(LanguageTokenTypes& lang, auto& r
             }
         }
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         //TODO: Add Logging here
         std::cout << e.what() << std::endl;
     }
@@ -1213,7 +1200,7 @@ auto unaryOperations::otherLanguages::uCustom(LanguageTokenTypes& lang, auto& ri
             // This could modify the result of the operation
         }*/
     }
-    catch(std::bad_any_cast& e) {
+    catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
     return NULL;

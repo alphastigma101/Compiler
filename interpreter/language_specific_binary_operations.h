@@ -1,10 +1,10 @@
 #ifndef _LANGUAGE_SPECIFIC_BINARY_OPERATIONS_H_
 #define _LANGUAGE_SPECIFIC_BINARY_OPERATIONS_H_
 #include <catch.h>
-#include <run_time_error.h>  
+#include <run_time_error.h>
 #include <typeinfo>
 namespace BinaryOperations {
-    class binaryOperations: public Check<binaryOperations>, public runtimeerror<binaryOperations>, public NonMemberConv<binaryOperations>, public catcher<binaryOperations> {
+    class binaryOperations: public Check<binaryOperations>, public catcher<binaryOperations>, public NonMemberConv<binaryOperations>, public runtimeerror<binaryOperations> {
         public:
             friend class interpreter;
             // Default constructor
@@ -14,6 +14,7 @@ namespace BinaryOperations {
             bool isEqual(auto& a, auto& b);
         private:
             void checkNumberOperands(auto& expr, auto& left, auto& right);
+            logTable<std::map<std::string, std::vector<std::string>>> logs_;
         protected:
             inline bool isString(const std::any value) override { return value.type() == typeid(std::string);};
             /* -----------------------------------------------------------------------------

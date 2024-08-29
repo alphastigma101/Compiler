@@ -1,4 +1,3 @@
-#pragma once
 #ifndef _CONTEXT_FREE_GRAMMAR_H_
 #define _CONTEXT_FREE_GRAMMAR_H_
 #include <run_time_error.h>

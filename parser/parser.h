@@ -91,7 +91,7 @@
 #include <abstraction_tree_syntax.h>
 namespace Parser {
     template<class Type>
-    class parseError: public Token {
+    class parseError: public catcher<Type> {
         public:
             friend class parser;
             ~parseError() = default;
@@ -107,7 +107,7 @@ namespace Parser {
          * ----------------------------------------------------------------------------------------------------------------------------
          */
         public:
-            parser(std::vector<Token>& tokens): tokens(this->tokens) {};
+            parser(std::vector<Token>& tokens): tokens(this->tokens){};
             ~parser() noexcept {};
             ExprTypes<Binary, Unary, Grouping, Literal>* expr;
             std::vector<std::tuple<int, std::pair<std::string, std::any>>> node;

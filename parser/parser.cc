@@ -15,7 +15,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
             if (auto* binary = std::get_if<Binary>(e)) {
                 return std::move(*binary);
-            } else { throw std::runtime_error("Expected Binary expression");}
+            } else { throw catcher<parser>("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
@@ -38,7 +38,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::comparison() {
         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
             if (auto* binary = std::get_if<Binary>(e)) {
                 return std::move(*binary);
-            } else { throw std::runtime_error("Expected Binary expression");}
+            } else { throw catcher<parser>("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(expr).right)));
@@ -61,7 +61,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::term() {
       auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
           if (auto* binary = std::get_if<Binary>(e)) {
                 return std::move(*binary);
-            } else { throw std::runtime_error("Expected Binary expression");}
+            } else { throw catcher<parser>("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
@@ -84,7 +84,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::factor() {
         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
             if (auto* binary = std::get_if<Binary>(e)) {
                 return std::move(*binary);
-            } else { throw std::runtime_error("Expected Binary expression");}
+            } else { throw catcher<parser>("Expected Binary expression");}
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
@@ -106,7 +106,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::unary() {
         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Unary> {
             if (auto* unary = std::get_if<Unary>(e)) {
                 return std::move(*unary);
-            } else { throw std::runtime_error("Expected Unary expression");}
+            } else { throw catcher<parser>("Expected Unary expression");}
         };
         //TODO: Threading is going to be needed here 
         Unary U(static_cast<Expr<Unary>&>(*(getExpr(expr).right)), op);
@@ -130,7 +130,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
             if (auto* literal = std::get_if<Literal>(e)) {
                 return std::move(*literal);
-            } else { throw std::runtime_error("Expected Literal expression");}
+            } else { throw catcher<parser>("Expected Literal expression");}
         };
         node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
         idx++;
@@ -145,7 +145,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
          auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
             if (auto* literal = std::get_if<Literal>(e)) {
                 return std::move(*literal);
-            } else { throw std::runtime_error("Expected Literal expression");}
+            } else { throw catcher<parser>("Expected Literal expression");}
          };
          node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
          idx++;
@@ -156,11 +156,10 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
          Literal l(NULL);
          auto res = expr;
          res->emplace<3>(l);
-         // TODO: Could be a bug here would inspect with debugger. All in this scope
          auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
             if (auto* literal = std::get_if<Literal>(e)) {
                 return std::move(*literal);
-            } else { throw std::runtime_error("Expected Literal expression");}
+            } else { throw catcher<parser>("Expected Literal expression");}
         };
          node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
          idx++;
@@ -174,7 +173,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
        auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
             if (auto* literal = std::get_if<Literal>(e)) {
                 return std::move(*literal);
-            } else { throw std::runtime_error("Expected Literal expression");}
+            } else { throw catcher<parser>("Expected Literal expression");}
         };
        node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
        idx++;
@@ -186,7 +185,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
       auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Grouping> {
             if (auto* grouping = std::get_if<Grouping>(e)) {
                 return std::move(*grouping);
-            } else { throw std::runtime_error("Expected Grouping expression");}
+            } else { throw catcher<parser>("Expected Grouping expression");}
         };
         //TODO: Threading is going to be needed here 
         Grouping G(static_cast<Expr<Grouping>>(getExpr(expr)));

@@ -1,7 +1,6 @@
 #ifndef _CONTEXT_FREE_GRAMMAR_H_
 #define _CONTEXT_FREE_GRAMMAR_H_
 #include <run_time_error.h>
-#include <catch.h>
 #include <filesystem>
 /*
  * A Context Free Grammar consists of a head and a body, which describes what it can generate.
@@ -108,7 +107,8 @@ namespace ContextFreeGrammar {
             Binary(Expr<Binary>& left_, const Token& op_, Expr<Binary>& right_): left(&left_), right(&right_)  {
                 try {
                     // TODO: Swap to smart pointers instead of raw pointers
-                    // Initialize the Address of the pointers
+                    // Also move the enum types to another file called token_types.h inside tokens folder
+                    // Also swap out std::any_cast to static_cast in the correct spots. Some of them still need to stay 
                     this->left = left;
                     op = op_;
                     this->op = op;

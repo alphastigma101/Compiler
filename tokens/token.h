@@ -1,6 +1,7 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 #include <interface.h>
+#include <catch.h>
 /*
  * This enum class object supports multiple languages
  * To add support for a custom programming language you would add the tokens here

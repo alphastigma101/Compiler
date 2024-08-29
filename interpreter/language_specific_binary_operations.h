@@ -1,6 +1,5 @@
 #ifndef _LANGUAGE_SPECIFIC_BINARY_OPERATIONS_H_
 #define _LANGUAGE_SPECIFIC_BINARY_OPERATIONS_H_
-#include <catch.h>
 #include <run_time_error.h>
 #include <typeinfo>
 namespace BinaryOperations {

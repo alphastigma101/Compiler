@@ -1,6 +1,5 @@
 #ifndef _SCANNER_H_
 #define _SCANNER_H_
-#include <catch.h>
 #include <token.h>
 class Scanner: public catcher<Scanner> {
     public:

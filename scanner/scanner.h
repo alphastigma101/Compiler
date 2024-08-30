@@ -6,6 +6,7 @@ class Scanner: public catcher<Scanner> {
         Scanner(const std::string source);
         ~Scanner() noexcept = default;
         std::vector<Token> ScanTokens();
+        inline std::string getSource() { return source; };
     protected:
         void number_();          
         void string_(); 

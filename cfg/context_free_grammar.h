@@ -78,7 +78,8 @@ namespace ContextFreeGrammar {
                     return std::any_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
                 }
                 catch(...) {
-                    throw runtimeerror<Derived>(nullptr, std::any_cast<std::string>(visitor.left->op->toString()) + std::any_cast<std::string>(visitor.right->op->toString()));
+                    runtimeerror<Derived> r(nullptr, std::any_cast<std::string>(visitor.left->op->toString()) + std::any_cast<std::string>(visitor.right->op->toString()));
+                    throw r;
                 }
             };
             Expr* right;
@@ -114,7 +115,8 @@ namespace ContextFreeGrammar {
                     this->op = op;
                 }
                 catch(...) {
-                    throw catcher<Binary>("Undefined behavior occurred in Class Binary!");
+                    catcher<Binary> cb("Undefined behavior occurred in Class Binary!");
+                    throw cb;
                 }
             };
             ~Binary() noexcept = default;
@@ -131,9 +133,10 @@ namespace ContextFreeGrammar {
                 }
                 catch(runtimeerror<Binary>& e) {
                     std::string temp = std::string("on line:" + std::to_string(expr.op.getLine()) + " " + e.what());
-                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    logging<Binary>update;
-                    logging<Binary>rotate;
+                    logging<Binary> logs(logs_, temp); 
+                    logs.update();
+                    logs.write();
+                    logs.rotate();
                 }
                 return "\0";
             };
@@ -152,7 +155,8 @@ namespace ContextFreeGrammar {
                     this->op = op_;
                 }
                 catch(...) {
-                    throw catcher<Unary>("Undefined behavior occurred in Class Unary!");
+                    catcher<Unary> cu("Undefined behavior occurred in Class Unary!");
+                    throw cu;
                 }
             };
             ~Unary() noexcept = default;
@@ -163,9 +167,10 @@ namespace ContextFreeGrammar {
                 }
                 catch(runtimeerror<Unary>& e) {
                     std::string temp = std::string("on line:" + std::to_string(expr.op.getLine()) + " " + e.what());
-                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    logging<Unary>update;
-                    logging<Unary>rotate;
+                    logging<Unary> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    logs.update();
+                    logs.write();
+                    logs.rotate();
                 }
                 return "\0";
             };
@@ -189,9 +194,10 @@ namespace ContextFreeGrammar {
                 }
                 catch(runtimeerror<Grouping>& e) {
                     std::string temp = std::string("on line:" + std::to_string(expr.op->getLine()) + " " + e.what());
-                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    logging<Grouping>update;
-                    logging<Grouping>rotate;
+                    logging<Grouping> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    logs.update();
+                    logs.write();
+                    logs.rotate();
                 }
                 return "\0";
             };
@@ -206,7 +212,8 @@ namespace ContextFreeGrammar {
                     this->op = op;
                 }
                 catch(...) {
-                    throw catcher<Literal>("Undefined behavior occurred in Class Literal!");
+                    catcher<Literal> cl("Undefined behavior occurred in Class Literal!");
+                    throw cl;
                 }
             };
             ~Literal() = default;
@@ -217,9 +224,10 @@ namespace ContextFreeGrammar {
                 }
                 catch(runtimeerror<Literal>& e) {
                     std::string temp = std::string("on line:" + std::to_string(expr.op->getLine()) + " " + e.what());
-                    logging(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    logging<Literal>update;
-                    logging<Literal>rotate;
+                    logging<Literal> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    logs.update();
+                    logs.write();
+                    logs.rotate();
                 }
                 return "\0";
             };
@@ -230,9 +238,10 @@ namespace ContextFreeGrammar {
                 catch (std::bad_any_cast& e) {
                     auto l = std::any_cast<Literal>(value);
                     std::string temp = std::to_string(l.op->getLine());
-                    logging(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
-                    logging<Literal>update;
-                    logging<Literal>rotate;
+                    logging<Literal> logs(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
+                    logs.update();
+                    logs.write();
+                    logging.rotate();
                     return "error:" + std::string(e.what());
                 }
             };

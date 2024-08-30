@@ -1,3 +1,4 @@
+#pragma once
 #include <logging.h>
 #include <chrono>
 #include <ctime>
@@ -5,6 +6,8 @@
 #include <fstream>
 #include <iomanip>
 #include <filesystem>
+template<typename T>
+std::string logging<T>::text;
 
 /**
  * @brief Rotate the logs by removing old entries from the logs directory.
@@ -17,7 +20,7 @@
 template<class T>
 void logging<T>::rotate() {
     std::filesystem::path logDir = "logs";
-
+    std::cout << "Executing the rotation!" << std::endl;
     // Create logs directory if it doesn't exist
     if (!std::filesystem::exists(logDir)) {
         std::filesystem::create_directory(logDir);
@@ -53,7 +56,8 @@ template<class T>
 void logging<T>::update() {
     std::string timestamp = getCurrentTimeString();
     // Insert the new log entries into the logs map under the current timestamp
-    logEntries[timestamp].push_back(text);
+    std::string text_ = getText();
+    logEntries[timestamp].push_back(text_);
 }
 
 /**

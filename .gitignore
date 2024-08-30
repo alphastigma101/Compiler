@@ -32,7 +32,6 @@
 *.app
 
 # Folders to exclude
-debugging/
 logs/
 
 # Executables to exclude

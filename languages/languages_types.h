@@ -1,7 +1,6 @@
 #pragma once
 #ifndef _LANGUAGE_TYPES_H_
 #define _LANGUAGE_TYPES_H_
-#include <lookup_language.h>
 #include <any>
 #include <cstdint>
 #include <optional>
@@ -14,27 +13,18 @@
 #include <time.h>
 #include <tuple>
 #include <memory>
-#include <unordered_set>
 #include <unordered_map>
+#include <map>
+#include <unordered_set>
 #include <queue>
 #include <stack>
-#include <map>
 #include <list>
 #include <deque>
 #include <future>
-
-enum LanguageTokenTypes {
-    C, CPP, Java, Python,
-    JavaScript, Ruby, Swift,
-    Go, Kotlin, Scala, TypeScript,
-    PHP, Perl, R, ObjectiveC, Haskell,
-    Rust, Dart, Lua, Shell, HTMLCSS,
-    SQL, MATLAB, VHDLVerilog, FSharp,
-    CSharp, VBA, Fortran, COBOL,Pascal, 
-    LISPScheme, Groovy,Erlang, Clojure, Dlang, 
-    Prolog, Ada, AWK, TCL, D, Julia, VisualBasic,
-    PowerShell, Racket, Elm, Eiffel, LabVIEW, SmallTalk, StandardML, Custom
-};
+#include <iostream>
+/**                                                                                                                
+ * This header file is designed to be used in conjunction with `enum_types.h` at the end. This separation helps to better organize the code and its definitions.
+*/
 namespace LanguageTypes {
     struct Python {
         using Any = std::any;
@@ -680,4 +670,5 @@ namespace LanguageTypes {
     };
 };
 using namespace LanguageTypes;
+#include <enum_types.h>
 #endif

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "parser.h" // Include the header file for your parser class
-
+#include "parser.h" 
+// TODO optional: Use google test's input parameter generator to test input values
 class ParserTest : public ::testing::Test {
 protected:
     void SetUp() override {

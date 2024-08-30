@@ -1,4 +1,5 @@
 #include <abstraction_tree_syntax.h>
+#include <lookup_language.h>
 /*
  * (ast): The default constructor that calls in generateAst to start creating the .txt file 
  * Arguments:

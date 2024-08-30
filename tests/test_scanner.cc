@@ -1,4 +1,4 @@
-#include "scanner.h"
+#include <scanner.h>
 #include <gtest/gtest.h>
 
 class ScannerTest : public testing::Test {
@@ -33,7 +33,7 @@ TEST_F(ScannerTest, SingleCharacterTokens) {
         
     ASSERT_EQ(tokens.size(), 10);
     EXPECT_EQ(std::to_string(tokens[0].getType()), std::to_string(TokenType::LEFT_PAREN));
-    /*EXPECT_EQ(tokens[1].getType(), TokenType::RIGHT_PAREN);
+    EXPECT_EQ(tokens[1].getType(), TokenType::RIGHT_PAREN);
     EXPECT_EQ(tokens[2].getType(), TokenType::LEFT_BRACE);
     EXPECT_EQ(tokens[3].getType(), TokenType::RIGHT_BRACE);
     EXPECT_EQ(tokens[4].getType(), TokenType::COMMA);
@@ -41,7 +41,7 @@ TEST_F(ScannerTest, SingleCharacterTokens) {
     EXPECT_EQ(tokens[6].getType(), TokenType::MINUS);
     EXPECT_EQ(tokens[7].getType(), TokenType::PLUS);
     EXPECT_EQ(tokens[8].getType(), TokenType::SEMICOLON);
-    EXPECT_EQ(tokens[9].getType(), TokenType::END_OF_FILE);*/
+    EXPECT_EQ(tokens[9].getType(), TokenType::END_OF_FILE);
 }
 
 // Test scanning of double-character tokens

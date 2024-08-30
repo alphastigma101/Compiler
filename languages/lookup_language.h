@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _LOOKUP_TABLE_H_
 #define _LOOKUP_TABLE_H_
 #include <string>

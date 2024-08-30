@@ -10,7 +10,7 @@ void debugSingleCharacterTokens() {
     Scanner scanner(source_);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }    
 }
 
@@ -19,7 +19,7 @@ void debugDoubleCharacterTokens() {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }
     return;
 }
@@ -29,7 +29,7 @@ void debugKeywords() {
     Scanner scanner(source_);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }
     return;
 }
@@ -40,7 +40,7 @@ void debugIdentifiers() {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }
     return;
 }
@@ -51,7 +51,7 @@ void debugNumbers() {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }    
     return;
 }
@@ -62,7 +62,7 @@ void debugStrings() {
     Scanner scanner(source_);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }
     return;
 }
@@ -73,7 +73,7 @@ void debugComments() {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }    
 }
 
@@ -81,8 +81,9 @@ void debugComments() {
 void debugUnterminatedString() {
     std::string source_ = "\"This string never ends";
     Scanner scanner(source_);
+    std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
     }
     return;
 }
@@ -93,7 +94,8 @@ void debugComplexCase() {
     Scanner scanner(source);
     std::vector<Token> tokens = scanner.ScanTokens();
     for (int i = 0; i < tokens.size(); i++) {
-        std::cout << tokens.at(i) << std::endl;
+        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
+        //std::cout << tokens.at(i).toString() << std::endl;
     }    
 }
 
@@ -109,5 +111,5 @@ int main(void) {
     debugComments();
     debugUnterminatedString();
     debugComplexCase();    
-    return 0
+    return 0;
 }

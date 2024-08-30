@@ -6,7 +6,7 @@
     *  std::string source: the source line of code from a file or from the runprompt function
  * --------------------------------------------------------------------------------------------  
  */
-Scanner::Scanner(const std::string source): source(this->source) {}
+Scanner::Scanner(const std::string source): source(source) {}
 
 /* ----------------------------------------------------------------------------------
  * (keywords) is a dictionary that holds in various keywords of programming languages 

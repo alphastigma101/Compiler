@@ -1,11 +1,11 @@
 #!bin/bash 
 
-INCLUDE="-I ../logging/ -I ../asm/ -I ../catch/ -I ../tokens/ -I ../languages/ -I ../interface/ -I ../ast/ -I ../cfg/ -I 
+INCLUDE=" -I ../types/ -I ../logging/ -I ../asm/ -I ../catch/ -I ../tokens/ -I ../languages/ -I ../interface/ -I ../ast/ -I ../cfg/ -I 
              ../declarations/ -I ../definitions/ -I ../runtime/ -I ../interpreter/ -I ../scanner/ -I ../parser/"
 LDFLAFS=" -L $HOME/Public-Projects/logging -lgtest -lgtest_main -pthread"
 
 #echo "creating debugging object files and executables"
-#g++ -g -w -std=c++17 -fconcepts $INCLUDE  -c ../logging/logging.cc -o logging.o 
+g++ -g -w -std=c++17 -fconcepts $INCLUDE  -c ../logging/logging.cc -o logging.o 
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c debug_logging.cc -o debug_logging.o
 #g++ -g debug_logging.o logging.o -o exec_debug_logging
 #echo "Creating test object files and executables"
@@ -23,22 +23,22 @@ g++ -g -std=c++17 -fconcepts $INCLUDE -c ../languages/languages.cc -o languages.
 #g++ -g -std=c++17 test_languages.o languages.o -o test_languages $LDFLAFS
 
 
-echo "Creating debugging object files and executables for token"
+#echo "Creating debugging object files and executables for token"
 g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tokens/token.cc -o token.o
-g++ -g -std=c++17 $INCLUDE -c debug_tokens.cc -o debug_tokens.o
-g++ -g -std=c++17 token.o languages.o logging.o -o exec_debug_tokens
-g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_token.cc -o test_token.o 
-g++ -g -std=c++17 test_token.o token.o languages.o logging.o -o test_tokens $LDFLAFS
+#g++ -g -std=c++17 $INCLUDE -c debug_tokens.cc -o debug_tokens.o
+#g++ -g -std=c++17 token.o debug_tokens.o languages.o logging.o -o exec_debug_tokens
+#g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_token.cc -o test_token.o 
+#g++ -g -std=c++17 test_token.o token.o languages.o logging.o -o test_tokens $LDFLAFS
 
 
 
 
-#echo "Creating debuging object files and executables for scanner"
-#g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
-#g++ -g -std=c++17 $INCLUDE ../scanner/scanner.cc -o debug_scanner.o
-#g++ -g -std=c++17 token.o languages.o logging.o debug_scanner.o -o exec_debug_scanner
-#g++ -g -std=c++17 $INCLUDE ../tests/test_scanner.cc -o test_scanner.o
-#g++ -g -std=c++17 token.o languages.o test_scanner.o logging.o -o test_scanner $LDFLAFS
+echo "Creating debuging object files and executables for scanner"
+g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
+g++ -g -std=c++17 $INCLUDE -c debug_scanner.cc -o debug_scanner.o
+g++ -g -std=c++17 token.o scanner.o languages.o logging.o debug_scanner.o -o exec_debug_scanner 
+g++ -g -std=c++17 $INCLUDE token.o languages.o logging.o scanner.o ../tests/test_scanner.cc -o test_scanner $LDFLAFS
+#g++ -g -std=c++17 test_scanner.o token.o scanner.o languages.o logging.o -o test_scanner $LDFLAFS
 
 
 #g++ -g -std=c++17 -fconcepts -I logging/ -I asm/ -I catch/ -I tokens/ -I languages/ -I interface/ -I ast/ -I cfg/ -I declarations/ -I definitions/ -I runtime/ -I interpreter/ -I scanner/ -I parser/ -c languages/languages.cc -o languages/languages.o

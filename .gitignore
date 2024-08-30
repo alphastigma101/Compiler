@@ -35,7 +35,9 @@
 logs/
 debugging/logs/
 debugging/*.o
-debugging/exec_*
-debugging/test_*
+debugging/exec_debug_tokens
+debugging/exec_debug_scanner
+debugging/test_tokens
+debugging/test_scanner
 # Executables to exclude
 exec_*

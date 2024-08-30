@@ -4,7 +4,7 @@ CXXFLAGS := -g -std=c++17 -fconcepts
 LDFLAGS :=  -L $(HOME)/Public-Projects/tests -lgtest -lgtest_main -pthread
 
 # Include directories
-INCLUDES := -I logging/ -I asm/ -I catch/ -I tokens/ \
+INCLUDES := -I ../types/ -I logging/ -I asm/ -I catch/ -I tokens/ \
             -I languages/ -I interface/ -I ast/ -I cfg/ \
             -I declarations/ -I definitions/ -I runtime/ -I interpreter/ \
             -I scanner/ -I parser/

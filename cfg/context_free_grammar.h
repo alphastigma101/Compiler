@@ -207,7 +207,7 @@ namespace ContextFreeGrammar {
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
-            explicit Literal(const auto& value): value(this->value) {
+            explicit Literal(const auto& value): value(value) {
                 try {
                     this->op = op;
                 }

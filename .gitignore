@@ -33,7 +33,9 @@
 
 # Folders to exclude
 logs/
-
+debugging/logs/
+debugging/*.o
+debugging/exec_*
+debugging/test_*
 # Executables to exclude
-exec_generator
-exec_interpreter
+exec_*

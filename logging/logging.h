@@ -22,6 +22,9 @@ namespace Logging {
         private:
             logTable<std::map<std::string, std::vector<std::string>>> currentEntries;
             static std::string text;
+            static void create(std::string& filename);
+            static std::string read();
+
     };  
 };
 using namespace Logging;

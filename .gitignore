@@ -39,5 +39,7 @@ debugging/exec_debug_tokens
 debugging/exec_debug_scanner
 debugging/test_tokens
 debugging/test_scanner
+debugging/.gdb_history
+debugging/db_scanner.txt
 # Executables to exclude
 exec_*

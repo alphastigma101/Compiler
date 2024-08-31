@@ -1,16 +1,16 @@
 #include <parser.h>
-/* -------------------------------------------------------------------
- * (equality) Description:
-    This method represents the binary section in the grammar in parser.h. It uses variant which is known as a union type safe. 
+/** ---------------------------------------------------------------------------------------------------------------------------------------
+ * @brief ........
+ *
+ * @detials This method represents the binary section in the grammar in parser.h. It uses variant which is known as a union type safe. 
     It will recrusive call itself functioning just like the grammar in parser.h
- *
- *
+ * ---------------------------------------------------------------------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
     // TODO: For each function, use Binary and add the tokens and the line 
     expr = comparison(); // recrusion left !=
     while (match(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)) {
-        const Token op = previous(); // TODO: Need to copy op to *op Expr object
+        const Token op = previous();
         ExprTypes<Binary, Unary, Grouping, Literal>* right = comparison(); // recrusion right ==
         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
             if (auto* binary = std::get_if<Binary>(e)) {
@@ -20,15 +20,18 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
         expr->emplace<0>(B);
-        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
+        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr)); // TODO: For every getExpr, it needs to be converted with std::make_any<Binary>(*getExpr);
         idx++;
         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
-/*
+/** --------------------------------------------------------------------------
+ * @brief ....
  *
- *
+ * @detials ...
+ * 
+ * --------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::comparison() {
     expr = term();
@@ -49,7 +52,8 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::comparison() {
     }
     return expr;
 }
-/*
+/** ---------------------------------------------------------------------------
+ * @brief ....
  *
  *
 */

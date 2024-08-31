@@ -241,7 +241,7 @@ namespace ContextFreeGrammar {
                     logging<Literal> logs(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
-                    logging.rotate();
+                    logs.rotate();
                     return "error:" + std::string(e.what());
                 }
             };

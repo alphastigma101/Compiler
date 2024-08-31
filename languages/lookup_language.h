@@ -108,22 +108,5 @@ const std::unordered_map<std::string, std::vector<std::string>> languageExtensio
         {"Standard ML (SML)", {".sml", ".ml"}}
     };
 
-typedef std::string Key;
-typedef std::vector<std::string> Extension;
-typedef std::vector<std::string> LanguageLinks;
-typedef std::map<Key, std::pair<Extension, LanguageLinks>> Table;
-const inline Table initTable() {
-    Table languageTable;
-    for (auto it = languageExtensions.begin(); it != languageExtensions.end(); ++it) {
-        const Key& key = it->first;
-        const Extension& extension = it->second;
-        auto downloadIt = downloads.begin();
-        if (downloadIt != downloads.end()) {
-            LanguageLinks&& Links{downloadIt->second};
-            languageTable[key] = std::make_pair(extension, Links);
-        }
-    }
-    return languageTable;
-}; 
 
 #endif 

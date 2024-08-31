@@ -44,6 +44,7 @@ namespace AbstractionTreeSyntax {
          * -------------------------------------------------------------------------------------------
          */
         public:
+            ast() = default; // Use the default constructor to call in the other constructor 
             ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr);
             ~ast() noexcept = default;
             inline void setTable() { this->table = initTable(); };

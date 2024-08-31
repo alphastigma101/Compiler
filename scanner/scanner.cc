@@ -183,6 +183,8 @@ void Scanner::string_() {
 
     // Trim the surrounding quotes.
     std::string value = source.substr(start + 1, current - start - 2);
+    //std::string value = source;
+    //value.erase(std::remove( value.begin(), value.end(), '\"' ),value.end());
     addToken(TokenType::STRING, value);
 }
 /*

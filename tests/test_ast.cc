@@ -1,18 +1,18 @@
 #include <abstraction_tree_syntax.h>
 #include <gtest/gtest.h>
 #include <filesystem>
-#include <tuple>
+//#include <tuple>
 
 // Test fixture for AbstractionTreeSyntax classes
-class AbstractionTreeSyntaxTest : public ::testing::Test {
-protected:
-    void SetUp() override {
-        // Set up any necessary test environment
-    }
+class AbstractionTreeSyntaxTest : public testing::Test {
+    protected:
+        void SetUp() override {
+            // Set up any necessary test environment
+        }
 
-    void TearDown() override {
-        // Clean up after each test
-    }
+        void TearDown() override {
+            // Clean up after each test
+        }
 };
 
 // Test compressedAstTree function

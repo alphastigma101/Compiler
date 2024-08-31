@@ -32,4 +32,10 @@ std::string Token::getLiteral() { return literal; }
  * --------------------------------------------------------------------------
 */
 int Token::getLine() { return line; }
+/*---------------------------------------------------------------------------
+ * @brief get the token type in string representation form
+ * @return string
+ * --------------------------------------------------------------------------
+*/
+std::string Token::getTypeStr() { return tokenTypeToString(); }
 

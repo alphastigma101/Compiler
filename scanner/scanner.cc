@@ -57,7 +57,7 @@ std::vector<Token> Scanner::ScanTokens() {
         start = current;
         scanToken();
     }
-    tokens.push_back(Token(TokenType::END_OF_FILE, "", nullptr, line));
+    tokens.push_back(Token(TokenType::END_OF_FILE, static_cast<const std::string>(std::string("EOF")), static_cast<const std::string>(std::string("EOF")), line));
     return tokens;
 
 }
@@ -114,9 +114,8 @@ void Scanner::scanToken() {
                if (isDigit(c)) { number_();} 
                else if (isAlpha(c)) { identifier(); }
                else { 
-                   std::cout << line << "Unexpected character."; 
-                   //throw catcher(line, "Unexcepted character");
-               } // TODO: make catcher class take in vardiac arguments so you can pass in the line number
+                   //throw runtimeerror<Scaner>(line, "Unexcepted character");
+               }                
                break;
     }
 }
@@ -135,7 +134,7 @@ void Scanner::addToken(const TokenType type) { addToken(type, ""); }
  * ---------------------------------------------------------------------------
 */
 void Scanner::addToken(const TokenType type, const std::string literal) {
-    std::string text = source.substr(start, current);
+    std::string text = source.substr(start, current - start);
     tokens.push_back(Token(type, text, literal, line));
 }
 
@@ -148,7 +147,7 @@ void Scanner::addToken(const TokenType type, const std::string literal) {
 */
 void Scanner::identifier() {
     while (isAlphaNumeric(peek())) advance();
-    std::string text = source.substr(start, current);
+    std::string text = source.substr(start, current - start);
     auto it = keywords.find(text);
     TokenType type;
     if (it != keywords.end()) {
@@ -169,7 +168,6 @@ bool Scanner::match(const char expected) {
     current++;
     return true;
 }
-
 /*
  *
  *
@@ -179,12 +177,12 @@ void Scanner::string_() {
         if (peek() == '\n') line++;
         advance();
     }
-    if (isAtEnd()) { throw catcher("Unterminated string."); }
+    if (isAtEnd()) { throw catcher<Scanner>("Unterminated string."); }
     // The closing ".
     advance();
 
     // Trim the surrounding quotes.
-    std::string value = source.substr(start + 1, current - 1);
+    std::string value = source.substr(start + 1, current - start - 2);
     addToken(TokenType::STRING, value);
 }
 /*
@@ -199,5 +197,5 @@ void Scanner::number_() {
         advance();
         while (isDigit(peek())) advance();
     }
-    addToken(TokenType::NUMBER, source.substr(start, current));
+    addToken(TokenType::NUMBER, source.substr(start, current - start));
 }

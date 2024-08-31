@@ -95,7 +95,7 @@ enum TokenType {
     QUERY, MUTATION, SUBSCRIPTION, UNION, 
     SCALAR, FRAGMENT,
     ON, BOOLEAN, LIST, NON_NULL,
-    SPREAD, AT, EXCLAMATION, BRACES, PARENS, END_OF_FILE = EOF
+    SPREAD, AT, EXCLAMATION, BRACES, PARENS, END_OF_FILE
 };
 
 enum LanguageTokenTypes {
@@ -289,7 +289,7 @@ static const std::unordered_map<TokenType, std::string> tokenTypeStrings = {
     {TokenType::EXCLAMATION, "EXCLAMATION"},
     {TokenType::BRACES, "BRACES"},
     {TokenType::PARENS, "PARENS"},
-    {TokenType::END_OF_FILE, "END_OF_FILE"}
+    {TokenType::END_OF_FILE, "EOF"}
 };
 
 

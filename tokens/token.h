@@ -15,6 +15,7 @@ class Token: public MemberConv<Token>, catcher<Token>  {
         // Other Constructor
         explicit Token(const TokenType type, const std::string lexeme, const std::string literal, const int line);
         TokenType getType();
+        std::string getTypeStr();
         std::string getLexeme();
         std::string getLiteral();
         int getLine();

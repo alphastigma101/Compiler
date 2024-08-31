@@ -61,9 +61,7 @@ void debugStrings() {
     std::string source_ = "\"Hello, World!\" \"Another string\"";
     Scanner scanner(source_);
     std::vector<Token> tokens = scanner.ScanTokens();
-    for (int i = 0; i < tokens.size(); i++) {
-        std::cout << std::any_cast<std::string>(tokens.at(i).toString()) << std::endl;
-    }
+    std::cout << tokens[0].getLexeme() << std::endl;
     return;
 }
 
@@ -101,15 +99,15 @@ void debugComplexCase() {
 
 // Driver Code
 int main(void) {
-    debugConstructor();
-    debugSingleCharacterTokens();
-    debugDoubleCharacterTokens();
-    debugKeywords();
-    debugIdentifiers();
-    debugNumbers();
+    //debugConstructor();
+    //debugSingleCharacterTokens();
+    //debugDoubleCharacterTokens();
+    //debugKeywords();
+    //debugIdentifiers();
+    //debugNumbers();
     debugStrings();
-    debugComments();
-    debugUnterminatedString();
-    debugComplexCase();    
+    //debugComments();
+    //debugUnterminatedString();
+    //debugComplexCase();    
     return 0;
 }

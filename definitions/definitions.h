@@ -48,7 +48,7 @@ const inline Table initTable(const std::unordered_map<std::string, std::vector<s
         const Extension& extension = it->second;
         auto downloadIt = downloads.begin();
         if (downloadIt != downloads.end()) {
-            LanguageLinks&& Links{downloadIt->second};
+            const LanguageLinks& Links{downloadIt->second};
             languageTable[key] = std::make_pair(extension, Links);
         }
     }

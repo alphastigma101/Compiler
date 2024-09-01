@@ -1,5 +1,5 @@
 #include <interpreter.h>
-#include <lookup_language.h>
+#include <languages_types.h>
 /*
  *
  *
@@ -71,18 +71,18 @@ interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std:
                     setExpr(std::get<1>(temp).second);                    
                 }
                 catch(runtimeerror<interpreter>& e) {
-                    logging<interpreter>(logs_, e.what());
-                    logging<interpreter>update;
-                    logging<interpreter>rotate;
-                    std::cout << e.what();
+                    std::cout << "Logs have been updated!" << std::endl;
+                    logging<interpreter> logs(logs_, e.what());
+                    logs.update();
+                    logs.rotate();
                 }
             }
         }
     } catch (runtimeerror<interpreter>& e) {
-        logging<interpreter>(logs_, e.what());
-        logging<interpreter>update;
-        logging<interpreter>rotate;
-        std::cout << e.what();
+        std::cout << "Logs have been updated!" << std::endl;
+        logging<interpreter> logs(logs_, e.what());
+        logs.update();
+        logs.rotate();
     }                              
 }
 /* ---------------------------------------------------------------------------

@@ -9,14 +9,11 @@
 */
 extern std::string user_choice; // get the user choice of language from the begining 
 extern std::string file_name;
+std::string file_name, user_choice;
 /**---------------------------------------------------------------------------
  * @brief Used in abstranction_tree_syntax.h
  * ---------------------------------------------------------------------------
 */
-template<typename B, typename U, typename G, typename L>
-using ExprTypes = std::variant<B, U, G, L>;
-template<typename B, typename U, typename G, typename L>
-extern ExprTypes<B, U, G, L>* expr;
 template<typename T, typename U, typename V>
 using astTree = std::tuple<T, std::pair<U, V>>;
 extern template struct std::tuple<int, std::pair<std::string, std::any>>;

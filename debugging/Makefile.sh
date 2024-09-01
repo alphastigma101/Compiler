@@ -30,15 +30,15 @@ g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tokens/token.cc -o token.o
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_token.cc -o test_token.o 
 #g++ -g -std=c++17 test_token.o token.o languages.o logging.o -o test_tokens $LDFLAFS
 
-echo "Creating debuging object files and executables for scanner"
-g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
-g++ -g -std=c++17 $INCLUDE -c debug_scanner.cc -o debug_scanner.o
-g++ -g -std=c++17 token.o scanner.o languages.o logging.o debug_scanner.o -o exec_debug_scanner 
-g++ -g -std=c++17 $INCLUDE -c ../tests/test_scanner.cc -o test_scanner.o
-g++ -g -std=c++17 test_scanner.o token.o scanner.o languages.o logging.o -o test_scanner $LDFLAFS
+#echo "Creating debuging object files and executables for scanner"
+#g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
+#g++ -g -std=c++17 $INCLUDE -c debug_scanner.cc -o debug_scanner.o
+#g++ -g -std=c++17 token.o scanner.o languages.o logging.o debug_scanner.o -o exec_debug_scanner 
+#g++ -g -std=c++17 $INCLUDE -c ../tests/test_scanner.cc -o test_scanner.o
+#g++ -g -std=c++17 test_scanner.o token.o scanner.o languages.o logging.o -o test_scanner $LDFLAFS
 
 echo "Creating debugging object files and executables for ast"
-g++ -g -std=c++17 -fconcepts $INCLUDE -c ../ast/abstraction_tree_syntax.cc -o abstraction_tree_syntax.o 
+g++ -g -w -std=c++17 -fconcepts $INCLUDE -c ../ast/abstraction_tree_syntax.cc -o abstraction_tree_syntax.o 
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../debugging/debug_ast.cc -o debug_abstraction_tree_syntax.o
 #g++ -g -std=c++17 -fconcepts abstraction_tree_syntax.o languages.o token.o logging.o debug_abstraction_tree_syntax.o -o exec_debug_abstraction_tree_syntax
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_ast.cc -o test_abstraction_tree_syntax.o

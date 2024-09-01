@@ -1,4 +1,7 @@
+#pragma once
 #include <parser.h>
+ExprTypes<Binary, Unary, Grouping, Literal>* expr;
+
 /** ---------------------------------------------------------------------------------------------------------------------------------------
  * @brief ........
  *
@@ -19,8 +22,7 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
-        expr->emplace<0>(B);
-        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr)); // TODO: For every getExpr, it needs to be converted with std::make_any<Binary>(*getExpr);
+        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
         idx++;
         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
@@ -45,18 +47,20 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::comparison() {
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(expr).right)));
-        expr->emplace<0>(B);
         node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
         idx++;
         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
-/** ---------------------------------------------------------------------------
+/** --------------------------------------------------------------------------
  * @brief ....
  *
- *
+ * @detials ...
+ * 
+ * --------------------------------------------------------------------------
 */
+
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::term() {
     expr = factor();
     while (match(TokenType::MINUS, TokenType::PLUS)) {
@@ -69,17 +73,20 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::term() {
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
-        expr->emplace<0>(B);
         node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
         idx++;
         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
-/*
+/** --------------------------------------------------------------------------
+ * @brief ....
  *
- *
+ * @detials ...
+ * 
+ * --------------------------------------------------------------------------
 */
+
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::factor() {
     expr = unary();
     while (match(TokenType::SLASH, TokenType::STAR)) {
@@ -94,15 +101,18 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::factor() {
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
         expr->emplace<0>(B);
         node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
-        idx++;
         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }
     return expr;
 }
-/*
+/** --------------------------------------------------------------------------
+ * @brief ....
  *
- *
+ * @detials ...
+ * 
+ * --------------------------------------------------------------------------
 */
+
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::unary() {
     if (match(TokenType::BANG, TokenType::MINUS)) {
         const Token op = previous();
@@ -116,15 +126,17 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::unary() {
         Unary U(static_cast<Expr<Unary>&>(*(getExpr(expr).right)), op);
         expr->emplace<1>(U);
         node.push_back(compressedAstTree(idx, std::string("Unary: "), *getExpr));
-        idx++;
         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*expr); 
         return expr;
     }
     return primary();
 }
-/*
+/** --------------------------------------------------------------------------
+ * @brief ....
  *
- *
+ * @detials ...
+ * 
+ * --------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
     if (match(TokenType::FALSE)) {
@@ -159,7 +171,6 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
     if (match(TokenType::NIL)) {
          Literal l(NULL);
          auto res = expr;
-         res->emplace<3>(l);
          auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
             if (auto* literal = std::get_if<Literal>(e)) {
                 return std::move(*literal);
@@ -173,7 +184,6 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
     if (match(TokenType::NUMBER, TokenType::STRING)) {
        Literal l(previous().getLiteral());
        auto res = expr;
-       res->emplace<3>(l);
        auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
             if (auto* literal = std::get_if<Literal>(e)) {
                 return std::move(*literal);
@@ -193,7 +203,6 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
         };
         //TODO: Threading is going to be needed here 
         Grouping G(static_cast<Expr<Grouping>>(getExpr(expr)));
-        expr->emplace<2>(G);
         node.push_back(compressedAstTree(idx, std::string("Grouping: "), *expr));
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
         idx++;
@@ -201,16 +210,23 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
     }
     throw error(peek(), "Expect expression.");
 }
-/*
+
+/** --------------------------------------------------------------------------
+ * @brief ....
  *
- *
+ * @detials ...
+ * 
+ * --------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::expression() {
     return equality();
 }
-/*
+/** --------------------------------------------------------------------------
+ * @brief ....
  *
- *
+ * @detials ...
+ * 
+ * --------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal>* parser::parse() {
     try { return expression();} 

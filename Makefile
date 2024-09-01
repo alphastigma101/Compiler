@@ -186,8 +186,8 @@ exec_debug_scanner: $(OBJ_FILES_DEBUG_SCANNER)
 	$(CXX) $(CXXFLAGS) $(INCLUDES)  $^ -o $@
 
 # Build exec_debug_ast
-exec_debug_scanner: $(OBJ_FILES_DEBUG_AST)
-	$(CXX) $(CXXFLAGS) $(INCLUDES)  $^ -o $@
+exec_debug_ast: $(OBJ_FILES_DEBUG_AST)
+	$(CXX) -w $(CXXFLAGS) $(INCLUDES)  $^ -o $@
 
 # Build exec_debug_parser
 exec_debug_parser: $(OBJ_FILES_DEBUG_PARSER)

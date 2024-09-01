@@ -1,40 +1,47 @@
+#pragma once
 #ifndef _ABSTRACTION_TREE_SYNTAX_H_
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
 #include <catch.h>
-
 namespace AbstractionTreeSyntax {
     template<class Type>
-    class generateAst: public std::filesystem::path, public catcher<Type> {
+    class generateAst: public catcher<Type> {
         /* ------------------------------------------------------------------------------------------
          * @brief A disorienated class object isolating its behavior. It will write data to a file by getting the literals from each expression it visits. 
          * ------------------------------------------------------------------------------------------
          */
         public:
             explicit generateAst() {
-                path pp = path(getenv("Public-Projects"));
-                path outputDir = pp;
+                std::filesystem::path pp = std::filesystem::path(getenv("Public-Projects"));
                 // Check if the path exists and is in user space
-                if (std::filesystem::exists(outputDir) && std::filesystem::equivalent(outputDir.root_path(), pp.root_path())) {
+                if (std::filesystem::exists(pp)) {
                     auto hasPermission = [&](std::filesystem::perms perm) {
-                        auto perms = std::filesystem::status(outputDir).permissions();
+                        auto perms = std::filesystem::status(pp).permissions();
                         return (perms & perm) == perm;
                     };
                     // Check if we have write permissions
                     if (hasPermission(std::filesystem::perms::owner_write) && hasPermission(std::filesystem::perms::owner_read)) {
                         // Set the outputDir
-                        this->outputDir = outputDir;
-                    } else { throw catcher<Type>("Failed to set the default path to write the ast to aka the file!");}
+                        outputDir_ = pp;
+                    } else { 
+                        catcher<Type> c("Failed to set the default path to write the ast to aka the file!");
+                        throw c;
+                    }
                 }
             };
             virtual ~generateAst() noexcept = default;
-            void writeFile();
+            static void tree_();
             friend class ast;
-        private:
-            std::string file_name, user_choice; //TODO: I don't like this being here considering it is already declared in main.cc so it should not be needed here 
-                                                // And it needs to be wrapped in a directive
-            std::string outputDir;
+        protected:
             std::string nameOfFile = file_name;
+            static void writeFile(std::string& ext);
+            static logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            static std::vector<std::tuple<int, std::pair<std::string, std::any>>> expr;
+            static std::string ext;
+        private:
+            std::string outputDir_;
+            static std::string codeStr;
+            static std::string compactedTreeStr;
     };
     class ast: public generateAst<ast> {
         /* --------------------------------------------------------------------------------------------
@@ -44,15 +51,15 @@ namespace AbstractionTreeSyntax {
          * -------------------------------------------------------------------------------------------
          */
         public:
-            ast() = default; // Use the default constructor to call in the other constructor 
-            ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr);
+            ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_);
             ~ast() noexcept = default;
-            inline void setTable() { this->table = initTable(); };
+            inline void setTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads) { 
+                table = initTable(languageExtensions, downloads); 
+            };
             inline Table getTable() { return table; };
             friend class analyzeSemantics;
         private:
             Table table;
-            std::vector<std::tuple<int, std::pair<std::string, std::any>>> expr;
     };
     class analyzeSemantics: public ast {
         // This class performs the semantic analysis 
@@ -73,4 +80,5 @@ namespace AbstractionTreeSyntax {
     };
 };
 using namespace AbstractionTreeSyntax;
+#include <abstraction_tree_syntax.cc>
 #endif

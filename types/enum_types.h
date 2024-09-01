@@ -2,9 +2,10 @@
 #ifndef _TOKEN_TYPES_H_
 #define _TOKEN_TYPES_H_
 #include <languages_types.h>
-/**
+/**---------------------------------------------------------------------------
  * @brief The underlying are representations of literals
  *
+ * ---------------------------------------------------------------------------
 */
 enum TokenType {
     // Single-character tokens.
@@ -111,6 +112,12 @@ enum LanguageTokenTypes {
     PowerShell, Racket, Elm, Eiffel, LabVIEW, SmallTalk, StandardML, Custom
 };
 
+enum LanguagePatterns {
+    // Common syntax that is used is {}, :  <- for code blocks, () <- for storing arguments , =>, [](){} lamda functions
+    // Variables: :=, =, etc
+    // Include the key words for looping in every language, add support if a lexeme looks like a loop
+    // Add support if a lexeme looks like a if statement, case, or function 
+};
 /**
  * @brief A map that maps enums to strings 
  *

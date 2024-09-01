@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
         std::cerr << "Usage: [script] [language]";
         exit(1); 
     }
-    else if (argc == 2) {
+    else {
         interpretLanguage = user_language((std::string)argv[2]);
         user_choice = (std::string)argv[2]; // user_choice comes from language_types.h
         file_name = (std::string)argv[1];

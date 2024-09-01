@@ -1,3 +1,4 @@
+#pragma once
 #ifndef _PARSER_H_
 #define _PARSER_H_
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -87,8 +88,11 @@
      * Note: Consider managing operator precedence and associativity
      *       in your parsing logic to handle operator priority correctly.
  */
-
 #include <abstraction_tree_syntax.h>
+template<typename B, typename U, typename G, typename L>
+using ExprTypes = std::variant<B, U, G, L>;
+template<typename B, typename U, typename G, typename L>
+static ExprTypes<B, U, G, L>* expr;
 namespace Parser {
     template<class Type>
     class parseError: public catcher<Type> {
@@ -189,4 +193,5 @@ namespace Parser {
     };
 };
 using namespace Parser;
+#include <parser.cc>
 #endif

@@ -1,19 +1,19 @@
 #include <cxxabi.h>
 #include <abstraction_tree_syntax.h>
 logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare variable globally
-class AbstractionTreeSyntaxTest: public ContextFreeGrammar::Binary {
+class Debug: public Binary {
     public:
-        AbstractionTreeSyntaxTest();
-        ~AbstractionTreeSyntaxTest();
+        Debug();
+        ~Debug();
         std::string demangle(const char* name);
         static Binary B();
 };
-Binary AbstractionTreeSyntaxTest::B() { 
+Binary Debug::B() { 
     return Binary(); 
 }
-AbstractionTreeSyntaxTest::AbstractionTreeSyntaxTest() { }
-AbstractionTreeSyntaxTest::~AbstractionTreeSyntaxTest() {}
-std::string AbstractionTreeSyntaxTest::demangle(const char* name) {
+Debug::Debug() { }
+Debug::~Debug() {}
+std::string Debug::demangle(const char* name) {
     int status = -1;
     std::unique_ptr<char, void(*)(void*)> res {
         abi::__cxa_demangle(name, NULL, NULL, &status),
@@ -23,44 +23,35 @@ std::string AbstractionTreeSyntaxTest::demangle(const char* name) {
 }
 
 static void debugReturnsCorrectTuple() {
-    AbstractionTreeSyntaxTest atst;
-    auto res =  AbstractionTreeSyntaxTest::B();
+    Debug D;
+    auto res = Debug::B();
     astTree<int, std::string, std::any> result = compressedAstTree(1, "test", std::make_any<Binary>(res));
      std::cout << "( " << std::get<0>(result)
               << ", " << std::get<1>(result).first 
-              << " " << atst.demangle(typeid(std::any_cast<Binary>(std::get<1>(result).second)).name())
+              << " " << D.demangle(typeid(std::any_cast<Binary>(std::get<1>(result).second)).name())
               << " )\n";
-       
-    /*for (int i = 0; i < std::tuple_size<result>; i++) {
-        std::cout << it << std::endl;
-    }*/
-    astTree<std::string, std::string, std::string> test = compressedAstTree("1", "test", "3.1");
-    //std::vector<astTree> v;
     return;
 }
 
 // Test generateAst constructor Tree method
-void debugGenerateAstConstructor() {
+/*void debugGenerateAstConstructor() {
     // Expecting it to throw an exception
     // Because file_name and user_choice should be both null
     generateAst<ast> gA;
     gA.tree_();
     return;
-}
+}*/
 
-void debugGenerateAstConstructorInvalidPath() {
-    // Temporarily set an invalid environment variable
-    setenv("Public-Projects", "/invalid/path", 1);
-    generateAst<ast> gA;
-    return;
-}
-
-// Test ast constructor
 void debugAstConstructor() {
-    //ExprTypes expr; // You need to define this type and provide a valid instance
-    // ast tree(expr);
+    auto res =  Debug::B();
+    astTree<int, std::string, std::any> result = compressedAstTree(3, "Binary", std::make_any<Binary>(res));
+    std::vector<astTree<int, std::string, std::any>> v;
+    v.push_back(result);
+    // Dynamically allocate memory for `ast`
+    ast at(v);
     return;
 }
+
 
 // Test ast setTable and getTable methods
 void debugAstSetAndGetTable() {
@@ -89,8 +80,8 @@ void debugIntermediateRepresentationConstructorAndGenerate() {
 }
 
 int main(void) {
-    debugReturnsCorrectTuple();
-    //debugGenerateAstConstructor();
+    //debugReturnsCorrectTuple();
+    debugAstConstructor();
     //debugGenerateAstConstructorInvalidPath();
     //debugAstConstructor();
     //debugAstSetAndGetTable();

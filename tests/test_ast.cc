@@ -73,28 +73,28 @@ TEST(CompressedAstTreeTest, ConstructLiteralNode) {
     std::string temp = AbstractionTreeSyntaxTest::demangle(typeid(std::any_cast<Literal>(std::get<1>(result).second)).name());
     EXPECT_EQ(temp, "ContextFreeGrammar::Literal");
 }
-
+using Catcher = catcher<ast>;
 // Test generateAst constructor with invalid path
-TEST_F(AbstractionTreeSyntaxTest, GenerateAstConstructorInvalidPath) {
-    // Temporarily set an invalid environment variable
-    setenv("Public-Projects", "/invalid/path", 1);
+TEST_F(AbstractionTreeSyntaxTest, GenerateAstConstructorInvalidFileNameAndChoice) {
+    auto res =  AbstractionTreeSyntaxTest::G();
+    astTree<int, std::string, std::any> result = compressedAstTree(3, "Grouping", std::make_any<Grouping>(res));
+    std::vector<astTree<int, std::string, std::any>> v;
+    v.push_back(result);
     EXPECT_THROW({
-        generateAst<ast> gA;
-    }, catcher<generateAst<ast>>);
-    // Reset the environment variable
-    unsetenv("Public-Projects");
+        ast at(v);
+        }, Catcher);
 }
 
 
 // Test ast setTable and getTable methods
-TEST_F(AbstractionTreeSyntaxTest, AstSetAndGetTable) {
+/*TEST_F(AbstractionTreeSyntaxTest, AstSetAndGetTable) {
     ExprTypes expr; // You need to define this type and provide a valid instance
     ast tree(expr);
     tree.setTable();
     EXPECT_NO_THROW({
         Table table = tree.getTable();
     });
-}
+}*/
 
 /*
 

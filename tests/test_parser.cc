@@ -1,21 +1,18 @@
 #include <gtest/gtest.h>
 #include "parser.h" 
 // TODO optional: Use google test's input parameter generator to test input values
-class ParserTest : public ::testing::Test {
-protected:
-    void SetUp() override {
-        // Set up any necessary test environment
-    }
+class ParserTest : public testing::Test {
+    protected:
+        void SetUp() override {
+            // Set up any necessary test environment
+        }
 
-    void TearDown() override {
-        // Clean up after each test
-    }
+        void TearDown() override {
+            // Clean up after each test
+        }
 
-    // Helper function to create a parser with tokens
-    parser createParser(const std::vector<Token>& tokens) {
-        // Assuming parser constructor takes a vector of tokens
-        return parser(tokens);
-    }
+        // Helper function to create a parser with tokens
+        parser createParser(const std::vector<Token>& tokens) { return parser(tokens);}
 };
 
 // Test equality method

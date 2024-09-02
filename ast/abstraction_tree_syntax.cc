@@ -24,7 +24,7 @@ ast::ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_) 
     generateAst<ast> gA;
     std::string ext_;
     if (file_name == "\0" || user_choice == "\0") {
-        catcher<generateAst<ast>> c("User is running a custom language!");
+        catcher<ast> c("User is running a custom language!");
         throw c;
     }
     else {
@@ -34,6 +34,7 @@ ast::ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_) 
     }
     compactedTreeNodes = expr_;
     try {
+        generateAst<ast> gA;
         ext = ext_;
         gA.tree_();
     }

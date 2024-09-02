@@ -52,7 +52,7 @@ namespace AbstractionTreeSyntax {
          * -------------------------------------------------------------------------------------------
          */
         public:
-            ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_);
+            ast(std::vector<astTree<int, std::string, std::any>>& expr_);
             ~ast() noexcept = default;
             inline void setTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads) { 
                 table = initTable(languageExtensions, downloads); 

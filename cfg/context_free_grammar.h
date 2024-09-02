@@ -104,6 +104,7 @@ namespace ContextFreeGrammar {
          * Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
+            friend class AbstractionTreeSyntaxTest;
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
             Binary(Expr<Binary>& left_, const Token& op_, Expr<Binary>& right_): left(&left_), right(&right_)  {
                 try {
@@ -141,6 +142,7 @@ namespace ContextFreeGrammar {
                 return "\0";
             };
             inline Token getToken() { return op; };
+            Binary() = default;
         private:
             Expr* left;
             Expr* right;
@@ -148,6 +150,7 @@ namespace ContextFreeGrammar {
     };
     class Unary: public Expr<Unary> {
         public:
+            friend class AbstractionTreeSyntaxTest;
             Unary(Expr& right_, const Token& op_): right(&right_) {
                 try {
                     this->right = right;
@@ -175,12 +178,15 @@ namespace ContextFreeGrammar {
                 return "\0";
             };
             inline Token getToken() { return op; };
+            Unary() = default;
         private:
             Expr* right;
             Token op;
     };
     class Grouping: public Expr<Grouping> {
         public:
+            friend class AbstractionTreeSyntaxTest;
+            Grouping() = default;
             explicit Grouping(const Expr& expression) {
                 this->expression->left = expression.left;
                 this->expression->right = expression.right;
@@ -207,6 +213,8 @@ namespace ContextFreeGrammar {
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
+            friend class AbstractionTreeSyntaxTest;
+            Literal() = default;
             explicit Literal(const auto& value): value(value) {
                 try {
                     this->op = op;

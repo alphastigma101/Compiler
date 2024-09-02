@@ -18,9 +18,7 @@ struct currentType<LanguageTokenTypes> {
  *
  * ---------------------------------------------------------------------------
 */
-inline void currentType<LanguageTokenTypes>::setTokenLanguage(const LanguageTokenTypes& value) {
-    currentLanguage = value;
-};
+inline void currentType<LanguageTokenTypes>::setTokenLanguage(const LanguageTokenTypes& value) { currentLanguage = value; };
 /**---------------------------------------------------------------------------
  * @brief ...
  *

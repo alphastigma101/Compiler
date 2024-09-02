@@ -7,7 +7,6 @@
 static bool hadError = false;
 static LanguageTokenTypes interpretLanguage;
 currentType<LanguageTokenTypes> ct;
-std::string user_choice, file_name;
 /*
  * (run): Is a standalone static void function that runs the user input 
  * Parameters:
@@ -84,7 +83,7 @@ LanguageTokenTypes user_language(const std::string& choice) {
 /* 
  * This function will implement > at runtime 
  */
-void runPrompt() {
+static void runPrompt() {
      try {
          for (;;) { 
              std::cout << "> ";
@@ -104,9 +103,9 @@ static void report(int &line, std::string where, std::string& message) {
     hadError = true;
 }
 
-void error(int& line, std::string& message) { report(line, "", message); }
+static void error(int& line, std::string& message) { report(line, "", message); }
 
-void runFile(const std::string& filePath) {
+static void runFile(const std::string& filePath) {
     std::string source,line;
     if (std::filesystem::exists(filePath)) {
         std::ifstream file (std::filesystem::path(filePath).stem());
@@ -129,7 +128,7 @@ void runFile(const std::string& filePath) {
 
 // This is the driver code
 int main(int argc, char **argv) {
-    const Table table = initTable();
+    const Table table = initTable(languageExtensions, downloads);
     if (argc > 2) {
         std::cout << "Supported languages" << std::endl;
         for (const std::pair<const std::string, std::pair<std::vector<std::string>, std::vector<std::string>>>& it : table) { std::cout << it.first << std::endl; }

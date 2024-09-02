@@ -9,7 +9,6 @@
 */
 extern std::string user_choice; // get the user choice of language from the begining 
 extern std::string file_name;
-std::string file_name, user_choice;
 /**---------------------------------------------------------------------------
  * @brief Used in abstranction_tree_syntax.h
  * ---------------------------------------------------------------------------

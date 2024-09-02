@@ -22,7 +22,8 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
         };
         //TODO: Threading is going to be needed here 
         Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
-        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
+        astTree<int, std::string, Binary> result = compressedAstTree(idx, std::string("Binary: "), std::make_any<Binary&>(*getExpr));
+        node.push_back(result);
         idx++;
         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
     }

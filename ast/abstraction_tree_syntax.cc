@@ -1,16 +1,19 @@
-#pragma once
 #include <abstraction_tree_syntax.h>
 #include <lookup_language.h>
-template<>
-std::string generateAst<ast>::ext;
-template<>
-logTable<std::map<std::string, std::vector<std::string>>> generateAst<ast>::logs_;
-template<>
-std::vector<std::tuple<int, std::pair<std::string, std::any>>> generateAst<ast>::expr;
-template<>
-void generateAst<ast>::writeFile(std::string& ext);
-template<>
-void generateAst<ast>::tree_();
+// Define static members
+template<class T>
+logTable<std::map<std::string, std::vector<std::string>>> generateAst<T>::logs_;
+template<class T>
+std::vector<std::tuple<int, std::pair<std::string, std::any>>> generateAst<T>::compactedTreeNodes;
+template<class T>
+std::string generateAst<T>::ext;
+template<class T>
+std::string generateAst<T>::codeStr;
+template<class T>
+std::string generateAst<T>::compactedTreeStr;
+// declare the global variables types here
+std::string file_name, user_choice;
+template struct std::tuple<int, std::pair<std::string, std::any>>; // Explicit initialize the underyling of astTree type
 /**-----------------------------------------------------------------------------------------
  * @brief The default constructor that calls in generateAst to start creating the .txt file 
  * 
@@ -18,7 +21,8 @@ void generateAst<ast>::tree_();
  * -----------------------------------------------------------------------------------------
 */
 ast::ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_) {
-    std::string ext;
+    generateAst<ast> gA;
+    std::string ext_;
     if (file_name == "\0" || user_choice == "\0") {
         catcher<generateAst<ast>> c("User is running a custom language!");
         throw c;
@@ -28,24 +32,23 @@ ast::ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_) 
         //ext = pair.first // TODO: THis needs to be fixed 
         setTable(languageExtensions, downloads);
     }
-    expr = expr_;
+    compactedTreeNodes = expr_;
     try {
-        generateAst<ast> gA;
-        gA.ext = ext;
+        ext = ext_;
         gA.tree_();
     }
     catch(catcher<ast>& e) {
         std::cout << "Logs folder has been updated!" << std::endl;
         std::string temp = e.what();
-        logging<Literal> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+        logging<generateAst<ast>> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
         logs.update();
         logs.write();
         logs.rotate();
     }
 }
 
-template<>
-void generateAst<ast>::writeFile(std::string& ext) {
+template<class T>
+void generateAst<T>::writeFile(std::string& ext) {
     //codeStr += value.getLexeme();
     std::string Ast = "Ast.txt";
     std::ofstream fAst(Ast);
@@ -60,11 +63,11 @@ void generateAst<ast>::writeFile(std::string& ext) {
     return;
 }
 
-template<>
-void generateAst<ast>::tree_()  {
+template<class T>
+void generateAst<T>::tree_()  {
     try {
-        for (int i = 0; i < expr.size(); i++) {
-            auto temp = expr.at(i);
+        for (int i = 0; i < compactedTreeNodes.size(); i++) {
+            auto temp = compactedTreeNodes.at(i);
             if (std::get<1>(temp).first == "Binary") { 
                 auto value = static_cast<Binary&&>(std::any_cast<Binary>(std::get<1>(temp).second)).visit(std::any_cast<Binary>(std::get<1>(temp).second));
                 compactedTreeStr += std::any_cast<std::string>(std::move(value));

@@ -2,7 +2,7 @@
 
 INCLUDE=" -I ../types/ -I ../logging/ -I ../asm/ -I ../catch/ -I ../tokens/ -I ../languages/ -I ../interface/ -I ../ast/ -I ../cfg/ -I 
              ../declarations/ -I ../definitions/ -I ../runtime/ -I ../interpreter/ -I ../scanner/ -I ../parser/"
-LDFLAFS=" -L $HOME/Public-Projects/logging -lgtest -lgtest_main -pthread"
+LDFLAGS=" -L $HOME/Public-Projects/logging -lgtest -lgtest_main -pthread"
 
 #echo "creating debugging object files and executables"
 g++ -g -w -std=c++17 -fconcepts $INCLUDE  -c ../logging/logging.cc -o logging.o 
@@ -12,7 +12,7 @@ g++ -g -w -std=c++17 -fconcepts $INCLUDE  -c ../logging/logging.cc -o logging.o
 #g++ -g -w -std=c++17 -fconcepts $INCLUDE  -c ../logging/logging.cc -o logging.o  
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_logging.cc -o test_logging.o 
 #echo "Linking the test object files together for the logger"
-#g++ -g -std=c++17 test_logging.o logging.o -o test_logging $LDFLAFS
+#g++ -g -std=c++17 test_logging.o logging.o -o test_logging $LDFLAGS
 
 
 #echo "Creating debugging object files and executables"
@@ -20,7 +20,7 @@ g++ -g -std=c++17 -fconcepts $INCLUDE -c ../languages/languages.cc -o languages.
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c debug_languages.cc -o debug_languages.o
 #g++ -g -std=c++17 debug_languages.o languages.o -o exec_debug_languages
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_languages.cc -o test_languages.o
-#g++ -g -std=c++17 test_languages.o languages.o -o test_languages $LDFLAFS
+#g++ -g -std=c++17 test_languages.o languages.o -o test_languages $LDFLAGS
 
 
 #echo "Creating debugging object files and executables for token"
@@ -28,21 +28,21 @@ g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tokens/token.cc -o token.o
 #g++ -g -std=c++17 $INCLUDE -c debug_tokens.cc -o debug_tokens.o
 #g++ -g -std=c++17 token.o debug_tokens.o languages.o logging.o -o exec_debug_tokens
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_token.cc -o test_token.o 
-#g++ -g -std=c++17 test_token.o token.o languages.o logging.o -o test_tokens $LDFLAFS
+#g++ -g -std=c++17 test_token.o token.o languages.o logging.o -o test_tokens $LDFLAGS
 
 #echo "Creating debuging object files and executables for scanner"
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
 #g++ -g -std=c++17 $INCLUDE -c debug_scanner.cc -o debug_scanner.o
 #g++ -g -std=c++17 token.o scanner.o languages.o logging.o debug_scanner.o -o exec_debug_scanner 
 #g++ -g -std=c++17 $INCLUDE -c ../tests/test_scanner.cc -o test_scanner.o
-#g++ -g -std=c++17 test_scanner.o token.o scanner.o languages.o logging.o -o test_scanner $LDFLAFS
+#g++ -g -std=c++17 test_scanner.o token.o scanner.o languages.o logging.o -o test_scanner $LDFLAGS
 
 echo "Creating debugging object files and executables for ast"
-g++ -g -w -std=c++17 -fconcepts $INCLUDE -c ../ast/abstraction_tree_syntax.cc -o abstraction_tree_syntax.o 
-#g++ -g -std=c++17 -fconcepts $INCLUDE -c ../debugging/debug_ast.cc -o debug_abstraction_tree_syntax.o
-#g++ -g -std=c++17 -fconcepts abstraction_tree_syntax.o languages.o token.o logging.o debug_abstraction_tree_syntax.o -o exec_debug_abstraction_tree_syntax
-#g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_ast.cc -o test_abstraction_tree_syntax.o
-#g++ -g -std=c++17 -fconcepts languages.o token.o logging.o test_abstraction_tree_syntax.o -o test_abstraction_tree_syntax $LDFLAGS
+g++ -g -std=c++17 -fconcepts $INCLUDE -c ../ast/abstraction_tree_syntax.cc -o abstraction_tree_syntax.o 
+g++ -g -std=c++17 -fconcepts $INCLUDE  -c ../debugging/debug_ast.cc -o debug_abstraction_tree_syntax.o 
+g++ -g -std=c++17 -fconcepts  abstraction_tree_syntax.o languages.o token.o logging.o debug_abstraction_tree_syntax.o -o exec_debug_abstraction_tree_syntax
+g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_ast.cc -o test_abstraction_tree_syntax.o 
+g++ -g -std=c++17 -fconcepts test_abstraction_tree_syntax.o abstraction_tree_syntax.o languages.o token.o logging.o -o test_abstraction_tree_syntax $LDFLAGS
 
 #echo "Creating debugging object files and executables for parser"
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../parser/parser.cc -o parser.o 

@@ -1,4 +1,3 @@
-#pragma once
 #ifndef _ABSTRACTION_TREE_SYNTAX_H_
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
@@ -11,7 +10,9 @@ namespace AbstractionTreeSyntax {
          * ------------------------------------------------------------------------------------------
          */
         public:
-            explicit generateAst() {
+            friend class ast;
+            //generateAst() = default;
+            explicit generateAst<Type>() {
                 std::filesystem::path pp = std::filesystem::path(getenv("Public-Projects"));
                 // Check if the path exists and is in user space
                 if (std::filesystem::exists(pp)) {
@@ -31,17 +32,17 @@ namespace AbstractionTreeSyntax {
             };
             virtual ~generateAst() noexcept = default;
             static void tree_();
-            friend class ast;
         protected:
             std::string nameOfFile = file_name;
             static void writeFile(std::string& ext);
-            static logTable<std::map<std::string, std::vector<std::string>>> logs_;
-            static std::vector<std::tuple<int, std::pair<std::string, std::any>>> expr;
-            static std::string ext;
         private:
             std::string outputDir_;
             static std::string codeStr;
             static std::string compactedTreeStr;
+            static logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            static std::vector<std::tuple<int, std::pair<std::string, std::any>>> compactedTreeNodes;
+            static std::string ext;
+
     };
     class ast: public generateAst<ast> {
         /* --------------------------------------------------------------------------------------------
@@ -60,6 +61,7 @@ namespace AbstractionTreeSyntax {
             friend class analyzeSemantics;
         private:
             Table table;
+            
     };
     class analyzeSemantics: public ast {
         // This class performs the semantic analysis 
@@ -80,5 +82,4 @@ namespace AbstractionTreeSyntax {
     };
 };
 using namespace AbstractionTreeSyntax;
-#include <abstraction_tree_syntax.cc>
 #endif

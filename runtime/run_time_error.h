@@ -6,7 +6,7 @@ namespace RunTimeError {
     class runtimeerror {
         public:
             // Constructor with token and message
-            explicit runtimeerror(const auto& type, const std::string& message): type(this->type), message_(message) {};
+            explicit runtimeerror(const TokenType& type, const std::string& message): type_(type), message_(message) {};
 
             // Default constructor
             runtimeerror() : message_("Unspecified runtime error") {};
@@ -18,9 +18,9 @@ namespace RunTimeError {
             virtual const char* what() const throw() { return message_.c_str(); };
 
             // Get the token associated with the error
-            const TokenType& getType() const { return type; };
+            const TokenType& getType() const { return type_; };
         private:
-            TokenType type;
+            TokenType type_;
             std::string message_;
     };
 };

@@ -1,4 +1,3 @@
-#pragma once
 #ifndef _PARSER_H_
 #define _PARSER_H_
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -89,10 +88,10 @@
      *       in your parsing logic to handle operator priority correctly.
  */
 #include <abstraction_tree_syntax.h>
+#include <initializer_list>
 template<typename B, typename U, typename G, typename L>
-using ExprTypes = std::variant<B, U, G, L>;
-template<typename B, typename U, typename G, typename L>
-static ExprTypes<B, U, G, L>* expr;
+using ExprTypes = std::shared_ptr<std::variant<B, U, G, L>>;
+static template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>;
 namespace Parser {
     template<class Type>
     class parseError: public catcher<Type> {
@@ -101,33 +100,35 @@ namespace Parser {
             ~parseError() = default;
             inline std::string error(Token token, const std::string message);                   
             inline std::string report(int line, const std::string where, const std::string message) const throw();
-        private:
-            logTable<std::map<std::string, std::vector<std::string>>> logs_;
     };
-    class parser: public parseError<parser>, public logging<parser> {
+    class parser: public parseError<parser>, public logging<parser>, public Binary, public Unary, public Grouping, public Literal {
         /* ----------------------------------------------------------------------------------------------------------------------------
          * An object that represents a parser. 
          * To add more to the parser, you need to add the new rules to the existing grammar, and define it them inside the class field 
          * ----------------------------------------------------------------------------------------------------------------------------
          */
         public:
-            parser(std::vector<Token>& tokens): tokens(this->tokens){};
+            friend class debugParser;
+            parser(std::vector<Token>& tokens);
             ~parser() noexcept {};
-            ExprTypes<Binary, Unary, Grouping, Literal>* expr;
-            std::vector<std::tuple<int, std::pair<std::string, std::any>>> node;
-            ExprTypes<Binary, Unary, Grouping, Literal>* parse();
-        protected:
+            std::vector<astTree<int, std::string, std::any>> node;
+            ExprTypes<Binary, Unary, Grouping, Literal> parse();
+
+        //protected:
             // Current rules that were made from a grammar 
-            ExprTypes<Binary, Unary, Grouping, Literal>* equality();
-            ExprTypes<Binary, Unary, Grouping, Literal>* comparison();
-            ExprTypes<Binary, Unary, Grouping, Literal>* expression();
-            ExprTypes<Binary, Unary, Grouping, Literal>* term();
-            ExprTypes<Binary, Unary, Grouping, Literal>* factor();
-            ExprTypes<Binary, Unary, Grouping, Literal>* unary();
-            ExprTypes<Binary, Unary, Grouping, Literal>* primary();     
+            ExprTypes<Binary, Unary, Grouping, Literal> equality();
+            ExprTypes<Binary, Unary, Grouping, Literal> comparison();
+            ExprTypes<Binary, Unary, Grouping, Literal> expression();
+            ExprTypes<Binary, Unary, Grouping, Literal> term();
+            ExprTypes<Binary, Unary, Grouping, Literal> factor();
+            ExprTypes<Binary, Unary, Grouping, Literal> unary();
+            ExprTypes<Binary, Unary, Grouping, Literal> primary();     
         private:
-            inline Token previous() { return tokens.at(current - 1); };
-            inline Token peek() { return tokens.at(current); }; 
+            static std::vector<std::variant<Binary, Unary, Grouping, Literal>> instances_;
+            logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            static ExprTypes<Binary, Unary, Grouping, Literal> expr;
+            inline Token previous() { return tokens_.at(current - 1); };
+            inline Token peek() { return tokens_.at(current); }; 
             inline bool isAtEnd() { return peek().getType() == TokenType::END_OF_FILE; };
             inline Token advance() {
                 if (!isAtEnd()) current++;
@@ -155,37 +156,36 @@ namespace Parser {
             };
             int current = 0;
             int idx = 0;
-            std::vector<Token> tokens;
+            std::vector<Token> tokens_;
             inline std::string error(Token token, const std::string message) {
                 if (token.getType() == TokenType::END_OF_FILE) { return report(token.getLine(), " at end", message);}
                     std::string temp = std::to_string(token.getLine());
-                    logging(logs_, temp + " at '" + token.getLexeme() + "'" + message); // Keep the logs updated throughout the whole codebase
-                    logging<parser>update;
-                    logging<parser>rotate;
+                    logging<parser> logs(logs_, temp + " at '" + token.getLexeme() + "'" + message); // Keep the logs updated throughout the whole codebase
+                    logs.update();
+                    logs.rotate();
                     return report(token.getLine(), " at '" + token.getLexeme() + "'", message);
             };
             inline std::string report(int line, const std::string where, const std::string message) const throw() {
                 std::string err = "[line " + std::to_string(line) + "] Error" + where +  ": " + message;
                 std::cout << "[line " <<  line << "] Error" << where << ": " + message;
-                logging(logs_, err); // Keep the logs updated throughout the whole codebase
-                logging<parser>update;
-                logging<parser>rotate;
+                logging<parser> logs(logs_, err); // Keep the logs updated throughout the whole codebase
+                logs.update();
+                logs.rotate();
                 return err;
             };
             inline bool check(const TokenType type) {
                 if (isAtEnd()) return false;
                 return peek().getType() == type;
             };
-            template<typename... Args>
-            inline bool match(Args... types) {
-                for (auto &it: tokens) {
-                    if (check(it.getType())) {
+            inline bool match(std::initializer_list<TokenType> types) {
+                for (const TokenType& type : types) {
+                    if (check(type)) {
                         advance();
                         return true;
                     }
                 }
                 return false;
-            };
+            }
             inline Token consume(const TokenType type, const std::string message) {
                 if (check(type)) return advance();
                 throw error(peek(), message);
@@ -193,5 +193,4 @@ namespace Parser {
     };
 };
 using namespace Parser;
-#include <parser.cc>
 #endif

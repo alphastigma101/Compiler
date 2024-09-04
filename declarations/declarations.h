@@ -69,5 +69,13 @@ typedef std::vector<std::string> LanguageLinks;
 typedef std::map<Key, std::pair<Extension, LanguageLinks>> Table;
 const inline Table initTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads);
 
+/**---------------------------------------------------------------------------
+ * @brief defined in parser.h 
+ *
+ * ---------------------------------------------------------------------------
+*/
+namespace Parser {
+    class parser;
+};
 //#include <definitions.cc> // Link the headers together
 #endif 

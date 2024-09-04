@@ -1,6 +1,26 @@
-#pragma once
 #include <parser.h>
-ExprTypes<Binary, Unary, Grouping, Literal>* expr;
+template struct std::shared_ptr<std::variant<Binary, Grouping, Literal>>;
+ExprTypes<Binary, Unary, Grouping, Literal> parser::expr;
+std::vector<std::variant<Binary, Unary, Grouping, Literal>> parser::instances_;
+
+/**--------------------------------------------------------------------------
+ * @brief default constructor that initalizes private object intances_ and expr
+ *
+ * @param tokens is a list of instances of Tokens class
+ * --------------------------------------------------------------------------
+*/
+parser::parser(std::vector<Token>& tokens): tokens_(tokens) {
+    if (!expr) {
+        expr = std::make_shared<std::variant<Binary, Unary, Grouping, Literal>>(Binary());
+        instances_.push_back(*expr);
+        expr->emplace<Unary>(Unary());
+        instances_.push_back(*expr);
+        expr->emplace<Grouping>(Grouping());
+        instances_.push_back(*expr);
+        expr->emplace<Literal>(Literal());
+        instances_.push_back(*expr);
+    }        
+}
 
 /** ---------------------------------------------------------------------------------------------------------------------------------------
  * @brief ........
@@ -9,26 +29,79 @@ ExprTypes<Binary, Unary, Grouping, Literal>* expr;
     It will recrusive call itself functioning just like the grammar in parser.h
  * ---------------------------------------------------------------------------------------------------------------------------------------
 */
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
-    // TODO: For each function, use Binary and add the tokens and the line 
-    expr = comparison(); // recrusion left !=
-    while (match(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)) {
+ExprTypes<Binary, Unary, Grouping, Literal> parser::equality() {
+    // Recursion left !=
+    expr = ExprTypes<Binary, Unary, Grouping, Literal>(comparison()); 
+    while (match({TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL})) {
         const Token op = previous();
-        ExprTypes<Binary, Unary, Grouping, Literal>* right = comparison(); // recrusion right ==
-        auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
-            if (auto* binary = std::get_if<Binary>(e)) {
-                return std::move(*binary);
-            } else { throw catcher<parser>("Expected Binary expression");}
+        // Recursion right ==
+        ExprTypes<Binary, Unary, Grouping, Literal> right = ExprTypes<Binary, Unary, Grouping, Literal>(comparison());
+        std::cout << "Executing inside equality!" << std::endl;
+        static auto getExpr = [this](bool isLeft) -> Binary* {
+            if (expr == nullptr) {
+                std::cout << "Not good dude!" << std::endl;
+            }
+            else {
+                std::cout << "expr is not null!" << std::endl;
+            }
+            auto* binary = std::get_if<Binary>(expr.get());
+            for (auto& instance : instances_) {
+                if (auto* binaryExpr = std::get_if<Binary>(&instance)) {
+                    if (isLeft == true) {
+                        //Binary temp = *binaryExpr;
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                    else {
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                }
+                else if (binary == nullptr) {
+                    // There will always be a Binary instance inside the vector
+                    // Because of the parser constructor
+                    if (isLeft == true) {
+                        // Bug might occur here if instance object is not checked to see if it is actually Binary type
+                        Binary* Left = std::get_if<Binary>(&instance);
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*Left);
+                        std::swap(instance, *expr);
+                        return Left;
+                    }
+                    else {
+                        Binary* Right = std::get_if<Binary>(&instance);
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*Right);
+                        std::swap(instance, *expr); // get the underlying of expr
+                        return Right;
+                    }
+                }
+            }
+            catcher<parser> cp("NO MATCHING BINARY FOUND!");
+            throw cp;
         };
-        //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
-        astTree<int, std::string, Binary> result = compressedAstTree(idx, std::string("Binary: "), std::make_any<Binary&>(*getExpr));
-        node.push_back(result);
+        std::shared_ptr<Binary> l_Derived = std::make_shared<Binary>(*getExpr(true));
+        std::shared_ptr<Expr<Binary>> L(l_Derived, static_cast<Expr<Binary>*>(l_Derived.get()));
+        
+        std::shared_ptr<Binary> r_Derived = std::make_shared<Binary>(*getExpr(false));
+        std::shared_ptr<Expr<Binary>> R(r_Derived, static_cast<Expr<Binary>*>(r_Derived.get()));
+        Binary B(L, op, R);
+        expr->emplace<Binary>(B);
+        std::cout << "Constructing the New Binary Instance into expr!" << std::endl;
+        std::any temp_l = std::make_any<Binary>(std::move(*l_Derived));
+        astTree<int, std::string, Binary> lr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_l));
+        node.push_back(lr);
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
+        std::any temp_r = std::make_any<Binary>(std::move(*r_Derived));
+        astTree<int, std::string, Binary> rr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_r));
+        node.push_back(rr);
+        idx++;
+        expr = ExprTypes<Binary, Unary, Grouping, Literal>(right);
     }
-    return expr;
+    return std::move(expr);
 }
+
+
 /** --------------------------------------------------------------------------
  * @brief ....
  *
@@ -36,21 +109,67 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::equality() {
  * 
  * --------------------------------------------------------------------------
 */
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::comparison() {
-    expr = term();
-    while (match(TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL)) {
-        const Token op = previous();
-        ExprTypes<Binary, Unary, Grouping, Literal>* right = term();
-        auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
-            if (auto* binary = std::get_if<Binary>(e)) {
-                return std::move(*binary);
-            } else { throw catcher<parser>("Expected Binary expression");}
+ExprTypes<Binary, Unary, Grouping, Literal> parser::comparison() {
+    expr = ExprTypes<Binary, Unary, Grouping, Literal>(term());
+    while (match({TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL})) {
+       const Token op = previous();
+       ExprTypes<Binary, Unary, Grouping, Literal> right = ExprTypes<Binary, Unary, Grouping, Literal>(term());
+       std::cout << "Executing inside comparison" << std::endl;
+       static auto getExpr = [this](bool isLeft) -> Binary* {
+            auto* binary = std::get_if<Binary>(expr.get());
+            for (auto& instance : instances_) {
+                if (auto* binaryExpr = std::get_if<Binary>(&instance)) {
+                    if (isLeft == true) {
+                        //Binary temp = *binaryExpr;
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                    else {
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                }
+                else if (binary == nullptr) {
+                    // There will always be a Binary instance inside the vector
+                    // Because of the parser constructor
+                    if (isLeft == true) {
+                        // Bug might occur here if instance object is not checked to see if it is actually Binary type
+                        Binary* Left = std::get_if<Binary>(&instance);
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*Left);
+                        std::swap(instance, *expr);
+                        return Left;
+                    }
+                    else {
+                        Binary* Right = std::get_if<Binary>(&instance);
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*Right);
+                        std::swap(instance, *expr); // get the underlying of expr
+                        return Right;
+                    }
+                }
+            }
+            catcher<parser> cp("NO MATCHING BINARY FOUND!");
+            throw cp;
         };
-        //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(expr).right)));
-        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
+        std::shared_ptr<Binary> l_Derived = std::make_shared<Binary>(*getExpr(true));
+        std::shared_ptr<Expr<Binary>> L(l_Derived, static_cast<Expr<Binary>*>(l_Derived.get()));
+        
+        std::shared_ptr<Binary> r_Derived = std::make_shared<Binary>(*getExpr(false));
+        std::shared_ptr<Expr<Binary>> R(r_Derived, static_cast<Expr<Binary>*>(r_Derived.get()));
+
+        Binary B(L, op, R);
+        expr->emplace<Binary>(B);
+        std::any temp_l = std::make_any<Binary>(std::move(*l_Derived));
+        astTree<int, std::string, Binary> lr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_l));
+        node.push_back(lr);
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
+
+        std::any temp_r = std::make_any<Binary>(std::move(*r_Derived));
+        astTree<int, std::string, Binary> rr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_r));
+        node.push_back(rr);
+        idx++;
+        expr = ExprTypes<Binary, Unary, Grouping, Literal>(right);
     }
     return expr;
 }
@@ -62,21 +181,67 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::comparison() {
  * --------------------------------------------------------------------------
 */
 
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::term() {
-    expr = factor();
-    while (match(TokenType::MINUS, TokenType::PLUS)) {
+ExprTypes<Binary, Unary, Grouping, Literal> parser::term() {
+    expr = ExprTypes<Binary, Unary, Grouping, Literal>(factor());
+    while (match({TokenType::MINUS, TokenType::PLUS})) {
       const Token op = previous();
-      ExprTypes<Binary, Unary, Grouping, Literal>* right = factor();
-      auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
-          if (auto* binary = std::get_if<Binary>(e)) {
-                return std::move(*binary);
-            } else { throw catcher<parser>("Expected Binary expression");}
+      ExprTypes<Binary, Unary, Grouping, Literal> right = ExprTypes<Binary, Unary, Grouping, Literal>(factor());
+      std::cout << "Executing inside term!" << std::endl;
+      static auto getExpr = [this](bool isLeft) -> Binary* {
+            auto* binary = std::get_if<Binary>(expr.get());
+            for (auto& instance : instances_) {
+                if (auto* binaryExpr = std::get_if<Binary>(&instance)) {
+                    if (isLeft == true) {
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                    else {
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                }
+                else if (binary == nullptr) {
+                    // There will always be a Binary instance inside the vector
+                    // Because of the parser constructor
+                    if (isLeft == true) {
+                        // Bug might occur here if instance object is not checked to see if it is actually Binary type
+                        Binary* Left = std::get_if<Binary>(&instance);
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*Left);
+                        std::swap(instance, *expr);
+                        return Left;
+                    }
+                    else {
+                        Binary* Right = std::get_if<Binary>(&instance);
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*Right);
+                        std::swap(instance, *expr); // get the underlying of expr
+                        return Right;
+                    }
+                }
+            }
+            catcher<parser> cp("NO MATCHING BINARY FOUND!");
+            throw cp;
         };
-        //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
-        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
+        std::shared_ptr<Binary> l_Derived = std::make_shared<Binary>(*getExpr(true));
+        std::shared_ptr<Expr<Binary>> L(l_Derived, static_cast<Expr<Binary>*>(l_Derived.get()));
+        
+        std::shared_ptr<Binary> r_Derived = std::make_shared<Binary>(*getExpr(false));
+        std::shared_ptr<Expr<Binary>> R(r_Derived, static_cast<Expr<Binary>*>(r_Derived.get()));
+
+        Binary B(L, op, R);
+        expr->emplace<Binary>(B);
+        std::any temp_l = std::make_any<Binary>(std::move(*l_Derived));
+        astTree<int, std::string, Binary> lr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_l));
+        node.push_back(lr);
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
+
+        std::any temp_r = std::make_any<Binary>(std::move(*r_Derived));
+        astTree<int, std::string, Binary> rr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_r));
+        node.push_back(rr);
+        idx++;
+        expr = ExprTypes<Binary, Unary, Grouping, Literal>(right);
+
     }
     return expr;
 }
@@ -87,22 +252,66 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::term() {
  * 
  * --------------------------------------------------------------------------
 */
-
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::factor() {
-    expr = unary();
-    while (match(TokenType::SLASH, TokenType::STAR)) {
+ExprTypes<Binary, Unary, Grouping, Literal> parser::factor() {
+    expr = ExprTypes<Binary, Unary, Grouping, Literal>(unary());
+    while (match({TokenType::SLASH, TokenType::STAR})) {
         const Token op = previous();
-        ExprTypes<Binary, Unary, Grouping, Literal>* right = unary();
-        auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Binary> {
-            if (auto* binary = std::get_if<Binary>(e)) {
-                return std::move(*binary);
-            } else { throw catcher<parser>("Expected Binary expression");}
+        ExprTypes<Binary, Unary, Grouping, Literal> right = ExprTypes<Binary, Unary, Grouping, Literal>(unary());
+        std::cout << "Executing inside factor!" << std::endl;
+        static auto getExpr = [this](bool isLeft) -> Binary* {
+            auto* binary = std::get_if<Binary>(expr.get());
+            for (auto& instance : instances_) {
+                if (auto* binaryExpr = std::get_if<Binary>(&instance)) {
+                    if (isLeft == true) {
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                    else {
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*binaryExpr);
+                        std::swap(instance, *expr);
+                        return binaryExpr;
+                    }
+                }
+                else if (binary == nullptr) {
+                    // There will always be a Binary instance inside the vector
+                    // Because of the parser constructor
+                    if (isLeft == true) {
+                        // Bug might occur here if instance object is not checked to see if it is actually Binary type
+                        Binary* Left = std::get_if<Binary>(&instance);
+                        binaryExpr->left = std::make_shared<Expr<Binary>>(*Left);
+                        std::swap(instance, *expr);
+                        return Left;
+                    }
+                    else {
+                        Binary* Right = std::get_if<Binary>(&instance);
+                        binaryExpr->right = std::make_shared<Expr<Binary>>(*Right);
+                        std::swap(instance, *expr); // get the underlying of expr
+                        return Right;
+                    }
+                }
+            }
+            catcher<parser> cp("NO MATCHING BINARY FOUND!");
+            throw cp;
         };
-        //TODO: Threading is going to be needed here 
-        Binary B(static_cast<Expr<Binary>&>(*(getExpr(expr).left)), op, static_cast<Expr<Binary>&>(*(getExpr(right).right)));
-        expr->emplace<0>(B);
-        node.push_back(compressedAstTree(idx, std::string("Binary: "), *getExpr));
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*right);
+        std::shared_ptr<Binary> l_Derived = std::make_shared<Binary>(*getExpr(true));
+        std::shared_ptr<Expr<Binary>> L(l_Derived, static_cast<Expr<Binary>*>(l_Derived.get()));
+        
+        std::shared_ptr<Binary> r_Derived = std::make_shared<Binary>(*getExpr(false));
+        std::shared_ptr<Expr<Binary>> R(r_Derived, static_cast<Expr<Binary>*>(r_Derived.get()));
+
+        Binary B(L, op, R);
+        expr->emplace<Binary>(B);
+        std::any temp_l = std::make_any<Binary>(std::move(*l_Derived));
+        astTree<int, std::string, Binary> lr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_l));
+        node.push_back(lr);
+        idx++;
+
+        std::any temp_r = std::make_any<Binary>(std::move(*r_Derived));
+        astTree<int, std::string, Binary> rr = compressedAstTree(idx, std::string("Binary"), std::any_cast<Binary>(temp_r));
+        node.push_back(rr);
+        idx++;
+        expr = ExprTypes<Binary, Unary, Grouping, Literal>(right);
     }
     return expr;
 }
@@ -113,23 +322,48 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::factor() {
  * 
  * --------------------------------------------------------------------------
 */
-
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::unary() {
-    if (match(TokenType::BANG, TokenType::MINUS)) {
+ExprTypes<Binary, Unary, Grouping, Literal> parser::unary() {
+    if (match({TokenType::BANG, TokenType::MINUS})) {
         const Token op = previous();
-        expr = unary();
-        auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Unary> {
-            if (auto* unary = std::get_if<Unary>(e)) {
-                return std::move(*unary);
-            } else { throw catcher<parser>("Expected Unary expression");}
+        expr = ExprTypes<Binary, Unary, Grouping, Literal>(unary());
+        std::cout << "Executing inside unary!" << std::endl;
+        auto getExpr = [this]() -> Unary* {
+            std::variant<Binary, Unary, Grouping, Literal> temp = *expr; // deference to get the underlying 
+            auto *unary = std::get_if<Unary>(&temp); // get the type
+            for (auto& instance : instances_) {
+                if (unary == nullptr) {
+                    std::cout << "Unary is null" << std::endl;
+                    if (auto* uV = std::get_if<Unary>(&instance)) {
+                        std::cout << "Returning not Null!" << std::endl;
+                        return uV;
+                    }
+                }
+                else {
+                    if (auto* uV = std::get_if<Unary>(&instance)) {
+                        if (typeid(*uV) == typeid(*unary)) {
+                            // Swap the variants if matched
+                            std::swap(instance, *expr);
+                            // Return pointer to Literal in the swapped variant
+                            return std::get_if<Unary>(&instance);
+                        }
+                    }
+                }
+            }
+            catcher<parser> cp("NO MATCH WAS FOUND UNARY Line 257!");
+            throw cp;
         };
-        //TODO: Threading is going to be needed here 
-        Unary U(static_cast<Expr<Unary>&>(*(getExpr(expr).right)), op);
-        expr->emplace<1>(U);
-        node.push_back(compressedAstTree(idx, std::string("Unary: "), *getExpr));
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*expr); 
+        std::shared_ptr<Unary> r_Derived = std::make_shared<Unary>(*getExpr());
+        std::shared_ptr<Expr<Unary>> R(r_Derived, static_cast<Expr<Unary>*>(r_Derived.get()));
+        Unary U(R, op);
+        expr->emplace<Unary>(U);
+        std::any temp_r = std::make_any<Unary>(std::move(*r_Derived));
+        astTree<int, std::string, Unary> rr = compressedAstTree(idx, std::string("Unary"), std::any_cast<Unary>(temp_r));
+        node.push_back(rr);
+        idx++;
+        std::cout << "Returning expr back! Line 268" << std::endl;
         return expr;
     }
+    // Check and see if expr is not null
     return primary();
 }
 /** --------------------------------------------------------------------------
@@ -139,79 +373,201 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::unary() {
  * 
  * --------------------------------------------------------------------------
 */
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
-    if (match(TokenType::FALSE)) {
+ExprTypes<Binary, Unary, Grouping, Literal> parser::primary() {
+    if (match({TokenType::FALSE})) {
+        std::cout << "Executing inside primary TokenType::FALSE" << std::endl;
         Literal l(false);
-        auto res = expr;
-        res->emplace<3>(l);
-        auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
-            if (auto* literal = std::get_if<Literal>(e)) {
-                return std::move(*literal);
-            } else { throw catcher<parser>("Expected Literal expression");}
+        expr->emplace<Literal>(l);
+        static auto getExpr = [this]() -> Literal* {
+            std::variant<Binary, Unary, Grouping, Literal> temp = *expr; // deference to get the underlying 
+            auto *literal = std::get_if<Literal>(&temp); // get the type
+            for (auto& instance : instances_) {
+                if (literal == nullptr) {
+                    std::cout << "literal is null" << std::endl;
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        std::cout << "Returning not Null!" << std::endl;
+                        return lV;
+                    }
+                }
+                else {
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        if (typeid(*lV) == typeid(*literal)) {
+                            // Swap the variants if matched
+                            std::swap(instance, *expr);
+                            // Return pointer to Literal in the swapped variant
+                            return std::get_if<Literal>(&instance);
+                        }
+                    }
+                }
+            }
+            catcher<parser> cp("NO MATCH WAS FOUND FOR LITERAL");
+            throw cp;
         };
-        node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
+        std::shared_ptr<Literal> Derived = std::make_shared<Literal>(*getExpr());
+        std::shared_ptr<Expr<Literal>> L(Derived, static_cast<Expr<Literal>*>(Derived.get()));
+        std::any temp = std::make_any<Literal>(std::move(*Derived));
+        astTree<int, std::string, Literal> res = compressedAstTree(idx, std::string("Literal"), std::any_cast<Literal>(temp));
+        node.push_back(res);
         idx++;
-        ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
-        auto Expr = expr;
         return expr;
     }
-    if (match(TokenType::TRUE)) {
-         Literal l(true);
-         auto res = expr;
-         res->emplace<3>(l);
-         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
-            if (auto* literal = std::get_if<Literal>(e)) {
-                return std::move(*literal);
-            } else { throw catcher<parser>("Expected Literal expression");}
-         };
-         node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
-         idx++;
-         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
-         return expr;
-    }
-    if (match(TokenType::NIL)) {
-         Literal l(NULL);
-         auto res = expr;
-         auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
-            if (auto* literal = std::get_if<Literal>(e)) {
-                return std::move(*literal);
-            } else { throw catcher<parser>("Expected Literal expression");}
+    if (match({TokenType::TRUE})) {
+        std::cout << "Executing inside primary TokenType::TRUE" << std::endl;
+        Literal l(true);
+        expr->emplace<Literal>(l);
+        auto getExpr = [this]() -> Literal* {
+            std::variant<Binary, Unary, Grouping, Literal> temp = *expr; // deference to get the underlying 
+            auto *literal = std::get_if<Literal>(&temp); // get the type
+            for (auto& instance : instances_) {
+                if (literal == nullptr) {
+                    std::cout << "literal is null" << std::endl;
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        std::cout << "Returning not Null!" << std::endl;
+                        return lV;
+                    }
+                }
+                else {
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        if (typeid(*lV) == typeid(*literal)) {
+                            // Swap the variants if matched
+                            std::swap(instance, *expr);
+                            // Return pointer to Literal in the swapped variant
+                            return std::get_if<Literal>(&instance);
+                        }
+                    }
+                }
+            }
+            catcher<parser> cp("NO MATCH WAS FOUND FOR LITERAL");
+            throw cp;
         };
-         node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
-         idx++;
-         ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
-         return expr;
+        std::shared_ptr<Literal> Derived = std::make_shared<Literal>(*getExpr());
+        std::shared_ptr<Expr<Literal>> L(Derived, static_cast<Expr<Literal>*>(Derived.get()));
+        std::any temp = std::make_any<Literal>(std::move(*Derived));
+        astTree<int, std::string, Literal> res = compressedAstTree(idx, std::string("Literal"), std::any_cast<Literal>(temp));
+        node.push_back(res);
+        idx++;
+        return expr;
     }
-    if (match(TokenType::NUMBER, TokenType::STRING)) {
-       Literal l(previous().getLiteral());
-       auto res = expr;
-       auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Literal> {
-            if (auto* literal = std::get_if<Literal>(e)) {
-                return std::move(*literal);
-            } else { throw catcher<parser>("Expected Literal expression");}
+    if (match({TokenType::NIL})) {
+        std::cout << "Executing inside primary TokenType::NIL" << std::endl;
+        Literal l(NULL);
+         expr->emplace<Literal>(l);
+         auto getExpr = [this]() -> Literal* {
+             std::variant<Binary, Unary, Grouping, Literal> temp = *expr; // deference to get the underlying 
+             auto *literal = std::get_if<Literal>(&temp); // get the type
+             for (auto& instance : instances_) {
+                 if (literal == nullptr) {
+                    std::cout << "literal is null" << std::endl;
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        std::cout << "Returning not Null!" << std::endl;
+                        return lV;
+                    }
+                }
+                else {
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        if (typeid(*lV) == typeid(*literal)) {
+                            // Swap the variants if matched
+                            std::swap(instance, *expr);
+                            // Return pointer to Literal in the swapped variant
+                            return std::get_if<Literal>(&instance);
+                        }
+                    }
+                }
+            }
+            std::cout << "NO MATCH WAS FOUND ON LINE 334" << std::endl;
+            return nullptr;
         };
-       node.push_back(compressedAstTree(idx, std::string("Literal: "), *getExpr));
-       idx++;
-       ExprTypes<Binary, Unary, Grouping, Literal>* expr = new std::variant<Binary, Unary, Grouping, Literal>(*res);
-       return expr;
+        std::shared_ptr<Literal> Derived = std::make_shared<Literal>(*getExpr());
+        std::shared_ptr<Expr<Literal>> L(Derived, static_cast<Expr<Literal>*>(Derived.get()));
+        std::any temp = std::make_any<Literal>(std::move(*Derived));
+        astTree<int, std::string, Literal> res = compressedAstTree(idx, std::string("Literal"), std::any_cast<Literal>(temp));
+        node.push_back(res);
+        idx++;
+        return std::move(expr);
     }
-    if (match(TokenType::LEFT_PAREN)) {
-      expr = expression();
-      auto getExpr = [](ExprTypes<Binary, Unary, Grouping, Literal>* e) -> Expr<Grouping> {
-            if (auto* grouping = std::get_if<Grouping>(e)) {
-                return std::move(*grouping);
-            } else { throw catcher<parser>("Expected Grouping expression");}
+    if (match({TokenType::NUMBER, TokenType::STRING})) {
+        std::cout << "Executing inside primary TokenType::NUMBER, TokenType::STRING" << std::endl;
+        Literal l(previous().getLiteral());
+        expr->emplace<Literal>(l);
+        auto getExpr = [this]() -> Literal* {
+            std::variant<Binary, Unary, Grouping, Literal> temp = *expr; // deference to get the underlying 
+            auto *literal = std::get_if<Literal>(&temp); // get the type
+            std::cout << "Executing line 335 TokenType::NUMBER, TokenType::STRING" << std::endl;
+            for (auto& instance : instances_) {
+                if (literal == nullptr) {
+                    std::cout << "literal is null" << std::endl;
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        std::cout << "Returning not Null!" << std::endl;
+                        return lV;
+                    }
+                }
+                else {
+                    if (auto* lV = std::get_if<Literal>(&instance)) {
+                        if (typeid(*lV) == typeid(*literal)) {
+                            // Swap the variants if matched
+                            std::swap(instance, *expr);
+                            // Return pointer to Literal in the swapped variant
+                            return std::get_if<Literal>(&instance);
+                        }
+                    }
+                }
+            }
+            std::cout << "NO MATCH WAS FOUND" << std::endl;
+            return nullptr;
         };
-        //TODO: Threading is going to be needed here 
-        Grouping G(static_cast<Expr<Grouping>>(getExpr(expr)));
-        node.push_back(compressedAstTree(idx, std::string("Grouping: "), *expr));
+        std::shared_ptr<Literal> Derived = std::make_shared<Literal>(*getExpr());
+        std::cout << "Executing line 366!" << std::endl;
+        std::shared_ptr<Expr<Literal>> L(Derived, static_cast<Expr<Literal>*>(Derived.get()));
+        std::any temp = std::make_any<Literal>(std::move(*Derived));
+        astTree<int, std::string, Literal> res = compressedAstTree(idx, std::string("Literal"), std::any_cast<Literal>(temp));
+        node.push_back(res);
+        idx++;
+        std::cout << "Returning the expression!" << std::endl;
+        return expr;
+    }
+    if (match({TokenType::LEFT_PAREN})) {
+        std::cout << "Executing inside primary TokenType::LEFT_PARAN" << std::endl;
+        expr = expression();
+        auto getExpr = [this]() -> Grouping* {
+            std::variant<Binary, Unary, Grouping, Literal> temp = *expr; // deference to get the underlying 
+            auto *grouping = std::get_if<Grouping>(&temp); // get the type
+            for (auto& instance : instances_) {
+                if (grouping == nullptr) {
+                    std::cout << "grouping is null" << std::endl;
+                    if (auto* gV = std::get_if<Grouping>(&instance)) {
+                        std::cout << "Returning not Null!" << std::endl;
+                        return gV;
+                    }
+                }
+                else {
+                    if (auto* gV = std::get_if<Grouping>(&instance)) {
+                        if (typeid(*gV) == typeid(*grouping)) {
+                            // Swap the variants if matched
+                            std::swap(instance, *expr);
+                            // Return pointer to Literal in the swapped variant
+                            return std::get_if<Grouping>(&instance);
+                        }
+                    }
+                }
+            }
+            std::cout << "NO MATCH WAS FOUND FOR GROUPING" << std::endl;
+            return nullptr;
+
+        };
+        std::shared_ptr<Grouping> Derived = std::make_shared<Grouping>(*getExpr());
+        std::shared_ptr<Expr<Grouping>> L(Derived, static_cast<Expr<Grouping>*>(Derived.get()));
+        Grouping G(L);
+        expr->emplace<Grouping>(G);
+        std::any temp = std::make_any<Grouping>(std::move(*Derived));
+        astTree<int, std::string, Grouping> res = compressedAstTree(idx, std::string("Grouping"), std::any_cast<Grouping>(temp));
+        node.push_back(res);
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
         idx++;
+        std::cout << "Returning expr in Grouping! Line 406" << std::endl;
         return expr;
     }
     throw error(peek(), "Expect expression.");
 }
-
 /** --------------------------------------------------------------------------
  * @brief ....
  *
@@ -219,8 +575,8 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::primary() {
  * 
  * --------------------------------------------------------------------------
 */
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::expression() {
-    return equality();
+ExprTypes<Binary, Unary, Grouping, Literal> parser::expression() {
+    return std::move(equality());
 }
 /** --------------------------------------------------------------------------
  * @brief ....
@@ -229,9 +585,16 @@ ExprTypes<Binary, Unary, Grouping, Literal>* parser::expression() {
  * 
  * --------------------------------------------------------------------------
 */
-ExprTypes<Binary, Unary, Grouping, Literal>* parser::parse() {
-    try { return expression();} 
-    catch (parseError& error) { return NULL; }
+ExprTypes<Binary, Unary, Grouping, Literal> parser::parse() {
+    try { return std::move(expression());}
+    catch(catcher<parser>& e) {
+        std::cout << e.what() << std::endl;
+        return NULL;
+    }
+    catch (parseError<parser>& e) { 
+        std::cout << e.what() << std::endl;
+        return NULL; 
+    }
 }
 
 // Additional rules go above this line

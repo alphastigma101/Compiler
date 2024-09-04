@@ -78,13 +78,14 @@ namespace ContextFreeGrammar {
                     return std::any_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
                 }
                 catch(...) {
-                    runtimeerror<Derived> r(nullptr, std::any_cast<std::string>(visitor.left->op->toString()) + std::any_cast<std::string>(visitor.right->op->toString()));
-                    throw r;
+                    //TODO: Replace the nullptr with something else
+                    //runtimeerror<Derived> r(nullptr, std::any_cast<std::string>(visitor.left->op->toString()) + std::any_cast<std::string>(visitor.right->op->toString()));
+                    //throw r;
                 }
             };
-            Expr* right;
-            Expr* left;
-            Token* op;
+            std::shared_ptr<Expr> right;
+            std::shared_ptr<Expr> left;
+            std::shared_ptr<Token> op;
         private:
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
      };
@@ -104,16 +105,13 @@ namespace ContextFreeGrammar {
          * Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            friend class AbstractionTreeSyntaxTest;
+            friend class ::Parser::parser;
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
-            Binary(Expr<Binary>& left_, const Token& op_, Expr<Binary>& right_): left(&left_), right(&right_)  {
+            Binary(std::shared_ptr<Expr<Binary>>& left_, const Token& op_, std::shared_ptr<Expr<Binary>>& right_): Left(left_), Right(right_)  {
                 try {
-                    // TODO: Swap to smart pointers instead of raw pointers
-                    // Also move the enum types to another file called token_types.h inside tokens folder
-                    // Also swap out std::any_cast to static_cast in the correct spots. Some of them still need to stay 
-                    this->left = left;
-                    op = op_;
-                    this->op = op;
+                    left = Left; // transfer the object resources to the abstract class data member left
+                    right = Right; // transfer the object resources to the abstract class data member right
+                    op = std::make_shared<Token>(op_);
                 }
                 catch(...) {
                     catcher<Binary> cb("Undefined behavior occurred in Class Binary!");
@@ -128,12 +126,12 @@ namespace ContextFreeGrammar {
              */
             inline std::string visit(Binary&& expr) {
                 try {
-                    std::string leftResult = expr.left ? expr.left->accept(*this) : "";
-                    std::string rightResult = expr.right ? expr.right->accept(*this) : "";
+                    std::string leftResult = expr.left.get() ? expr.left.get()->accept(*this) : "";
+                    std::string rightResult = expr.right.get() ? expr.right.get()->accept(*this) : "";
                     return " " + leftResult + " " + rightResult;
                 }
                 catch(runtimeerror<Binary>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.op.getLine()) + " " + e.what());
+                    std::string temp = std::string("on line:" + std::to_string(expr.op.get()->getLine()) + " " + e.what());
                     logging<Binary> logs(logs_, temp); 
                     logs.update();
                     logs.write();
@@ -141,21 +139,21 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline Token getToken() { return op; };
+            inline Token getToken() { return *op; };
+        protected:
             Binary() = default;
         private:
-            Expr* left;
-            Expr* right;
-            Token op;
+            std::shared_ptr<Expr> Left;
+            std::shared_ptr<Expr> Right;
+            std::shared_ptr<Token> op_;
     };
     class Unary: public Expr<Unary> {
         public:
-            friend class AbstractionTreeSyntaxTest;
-            Unary(Expr& right_, const Token& op_): right(&right_) {
+            friend class ::Parser::parser;
+            Unary(std::shared_ptr<Expr<Unary>>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
                 try {
-                    this->right = right;
-                    op = op_;
-                    this->op = op_;
+                    right = Right;
+                    op = Op;
                 }
                 catch(...) {
                     catcher<Unary> cu("Undefined behavior occurred in Class Unary!");
@@ -169,7 +167,7 @@ namespace ContextFreeGrammar {
                     return " " + rightResult;
                 }
                 catch(runtimeerror<Unary>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.op.getLine()) + " " + e.what());
+                    std::string temp = std::string("on line:" + std::to_string(expr.Op.get()->getLine()) + " " + e.what());
                     logging<Unary> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
@@ -177,25 +175,25 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline Token getToken() { return op; };
+            inline Token getToken() { return *Op; };
+        protected:
             Unary() = default;
         private:
-            Expr* right;
-            Token op;
+            std::shared_ptr<Expr> Right;
+            std::shared_ptr<Token> Op;
     };
     class Grouping: public Expr<Grouping> {
         public:
-            friend class AbstractionTreeSyntaxTest;
-            Grouping() = default;
-            explicit Grouping(const Expr& expression) {
-                this->expression->left = expression.left;
-                this->expression->right = expression.right;
+            friend class ::Parser::parser;
+            explicit Grouping(std::shared_ptr<Expr<Grouping>>& expression) {
+                expression_->left = expression->left;
+                expression_->right = expression->right;
             };
             ~Grouping() noexcept = default;
             inline std::string visit(Grouping&& expr) {
                 try {
-                    std::string leftResult = expr.left->accept(*this);
-                    std::string rightResult = expr.right->accept(*this);
+                    std::string leftResult = expr.left.get()->accept(*this);
+                    std::string rightResult = expr.right.get()->accept(*this);
                     return "(" + leftResult + " " + rightResult + ")";
                 }
                 catch(runtimeerror<Grouping>& e) {
@@ -207,17 +205,19 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-        inline Expr* getExpr() { return expression; }
+            inline Expr<Grouping> getExpr() { return *expression_; }
+        protected:
+            Grouping() = default;
         private:
-            Expr* expression;
+            std::shared_ptr<Expr> expression_;
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
-            friend class AbstractionTreeSyntaxTest;
-            Literal() = default;
-            explicit Literal(const auto& value): value(value) {
+            friend class ::Parser::parser;
+            explicit Literal(const auto& value) {
                 try {
-                    this->op = op;
+                    value_ = std::make_any<std::any>(value);
+                    op_ = op;
                 }
                 catch(...) {
                     catcher<Literal> cl("Undefined behavior occurred in Class Literal!");
@@ -231,7 +231,7 @@ namespace ContextFreeGrammar {
                     return literal;
                 }
                 catch(runtimeerror<Literal>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.op->getLine()) + " " + e.what());
+                    std::string temp = std::string("on line:" + std::to_string(expr.op_->getLine()) + " " + e.what());
                     logging<Literal> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
@@ -241,11 +241,11 @@ namespace ContextFreeGrammar {
             };
             inline std::any toString() override {
                 try {
-                    return std::any_cast<std::string>(value);
+                    return std::any_cast<std::string>(value_);
                 } 
                 catch (std::bad_any_cast& e) {
-                    auto l = std::any_cast<Literal>(value);
-                    std::string temp = std::to_string(l.op->getLine());
+                    auto l = std::any_cast<Literal>(value_);
+                    std::string temp = std::to_string(l.op.get()->getLine());
                     logging<Literal> logs(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
@@ -253,11 +253,13 @@ namespace ContextFreeGrammar {
                     return "error:" + std::string(e.what());
                 }
             };
-            inline std::any getValue() { return value; };
-            inline Token* getToken() { return op; };
+            inline std::any getValue() { return value_; };
+            inline Token getToken() { return *op_; };
+        protected:
+            Literal() = default;
         private:
-            std::any value;
-            Token* op;
+            std::any value_;
+            std::shared_ptr<Token> op_;
     };
 };
 using namespace ContextFreeGrammar;

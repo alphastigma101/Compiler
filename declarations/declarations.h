@@ -24,6 +24,16 @@ template<typename T, typename U, typename V>
 static astTree<T, U, V> compressedAstTree(T first, U second, V third);
 //TODO: Make an expanded astTree struct. so something like: expandAstTree(T firstNode, U secondNode, V thirdNode, X fourthNode, W stringLiteral, Y ExprTypes)
 
+/**--------------------------------------------------------------------------
+ * @brief Used in parser.cc to keep track of the recrusion 
+ *
+ * --------------------------------------------------------------------------
+*/
+template<typename B, typename U, typename G, typename L>
+using ExprTypes = std::shared_ptr<std::variant<B, U, G, L>>;
+template<typename T, typename U, typename V, typename X, typename Y>
+//template<typename T>
+using grammarParser = std::vector<std::pair<T, std::shared_ptr<std::variant<U, V, X, Y>>>>;
 /**---------------------------------------------------------------------------
  * @brief setTokenLanguage method is initialized in main.cc
  * getTokenLanguage is used in:
@@ -77,5 +87,5 @@ const inline Table initTable(const std::unordered_map<std::string, std::vector<s
 namespace Parser {
     class parser;
 };
-//#include <definitions.cc> // Link the headers together
+
 #endif 

@@ -49,9 +49,11 @@ g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tokens/token.cc -o token.o
 #g++ -g -std=c++17 -fconcepts test_abstraction_tree_syntax.o abstraction_tree_syntax.o languages.o token.o logging.o -o test_abstraction_tree_syntax $LDFLAGS
 
 echo "Creating debugging object files and executables for parser"
-g++ -g -std=c++17 -fconcepts -Wexceptions $INCLUDE -c ../parser/parser.cc -o parser.o 
+g++ -g -std=c++17 -fconcepts  $INCLUDE -c ../parser/parser.cc -o parser.o
+g++ -g -std=c++17 -fconcepts -w  $INCLUDE -c ../parser/parser_handlers.cc -o parser_handlers.o
+# Can debug the handlers by themselves if needed
 g++ -g -std=c++17 -fconcepts $INCLUDE -c ../debugging/debug_parser.cc -o debug_parser.o
-g++ -g -std=c++17 -fconcepts parser.o languages.o token.o logging.o debug_parser.o -o exec_debug_parser
+g++ -g -std=c++17 -fconcepts parser.o  languages.o token.o logging.o debug_parser.o -o exec_debug_parser
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_parser.cc -o test_parser.o
 #g++ -g -std=c++17 -fconcepts parser.o languages.o token.o logging.o test_parser.o -o test_parser $LDFLAGS
 

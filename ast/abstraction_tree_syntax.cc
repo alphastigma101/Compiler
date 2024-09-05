@@ -68,22 +68,22 @@ template<class T>
 void generateAst<T>::tree_()  {
     try {
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
-            auto temp = compactedTreeNodes.at(i);
+           //auto temp = compactedTreeNodes.at(i);
             if (std::get<1>(temp).first == "Binary") { 
-                auto value = static_cast<Binary&&>(std::any_cast<Binary>(std::get<1>(temp).second)).visit(std::any_cast<Binary>(std::get<1>(temp).second));
-                compactedTreeStr += std::any_cast<std::string>(std::move(value));
+                //auto value = static_cast<Binary&&>(std::any_cast<Binary>(std::get<1>(temp).second)).visit(std::any_cast<Binary>(std::get<1>(temp).second));
+                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
             }
             else if (std::get<1>(temp).first == "Unary") { 
-                auto value = static_cast<Unary&&>(std::any_cast<Unary>(std::get<1>(temp).second)).visit(std::any_cast<Unary>(std::get<1>(temp).second)); 
-                compactedTreeStr += std::any_cast<std::string>(std::move(value));
+                //auto value = static_cast<Unary&&>(std::any_cast<Unary>(std::get<1>(temp).second)).visit(std::any_cast<Unary>(std::get<1>(temp).second)); 
+                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
             }
             else if (std::get<1>(temp).first == "Grouping") { 
-                auto value = static_cast<Grouping&&>(std::any_cast<Grouping>(std::get<1>(temp).second)).visit(std::any_cast<Grouping>(std::get<1>(temp).second));
-                compactedTreeStr += std::any_cast<std::string>(std::move(value));
+                //auto value = static_cast<Grouping&&>(std::any_cast<Grouping>(std::get<1>(temp).second)).visit(std::any_cast<Grouping>(std::get<1>(temp).second));
+                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
             }
             else if (std::get<1>(temp).first == "Literal") { 
-                auto value = static_cast<Literal&&>(std::any_cast<Literal>(std::get<1>(temp).second)).visit(std::any_cast<Literal>(std::get<1>(temp).second));
-                compactedTreeStr += std::any_cast<std::string>(std::move(value));
+                //auto value = static_cast<Literal&&>(std::any_cast<Literal>(std::get<1>(temp).second)).visit(std::any_cast<Literal>(std::get<1>(temp).second));
+                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
             }
             else {
                 catcher<generateAst<ast>> c("Unexpected behavior in ast!");

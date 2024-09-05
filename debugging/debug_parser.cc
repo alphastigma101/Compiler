@@ -20,10 +20,12 @@ parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 static void debugEquality() {
     std::vector<Token> tokens = {
         Token(TokenType::LEFT_PAREN, "(", "", 0),
-        Token(TokenType::NUMBER, "1", "1.0", 1),
-        Token(TokenType::EQUAL_EQUAL, "==", "\0" , 1),
-        Token(TokenType::NUMBER, "1", "1.0", 1),
-        Token(TokenType::RIGHT_PAREN, ")", "", 1),
+        Token(TokenType::NUMBER, "", "6", 0),
+        Token(TokenType::SLASH, "/", "", 0),
+        Token(TokenType::NUMBER, "", "3", 0),
+        Token(TokenType::MINUS, "-", "" , 0),
+        Token(TokenType::NUMBER, "1", "", 0),
+        Token(TokenType::RIGHT_PAREN, ")", "", 0),
         Token(TokenType::END_OF_FILE, "EOF", "EOF", EOF)
     };
     parser p = createParser(tokens);

@@ -107,10 +107,8 @@ namespace ContextFreeGrammar {
         public:
             friend class ::Parser::parser;
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
-            Binary(std::shared_ptr<Expr<Binary>>& left_, const Token& op_, std::shared_ptr<Expr<Binary>>& right_): Left(left_), Right(right_)  {
+            Binary(std::shared_ptr<Expr<Binary>>& left_, const Token& op_, std::shared_ptr<Expr<Binary>>& right_)  {
                 try {
-                    left = Left; // transfer the object resources to the abstract class data member left
-                    right = Right; // transfer the object resources to the abstract class data member right
                     op = std::make_shared<Token>(op_);
                 }
                 catch(...) {
@@ -152,7 +150,6 @@ namespace ContextFreeGrammar {
             friend class ::Parser::parser;
             Unary(std::shared_ptr<Expr<Unary>>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
                 try {
-                    right = Right;
                     op = Op;
                 }
                 catch(...) {

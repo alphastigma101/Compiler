@@ -89,9 +89,8 @@
  */
 #include <abstraction_tree_syntax.h>
 #include <initializer_list>
-template<typename B, typename U, typename G, typename L>
-using ExprTypes = std::shared_ptr<std::variant<B, U, G, L>>;
-static template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>;
+extern template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>;
+extern template struct std::vector<std::pair<std::string, std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>>>;
 namespace Parser {
     template<class Type>
     class parseError: public catcher<Type> {
@@ -111,7 +110,7 @@ namespace Parser {
             friend class debugParser;
             parser(std::vector<Token>& tokens);
             ~parser() noexcept {};
-            std::vector<astTree<int, std::string, std::any>> node;
+            static std::vector<std::tuple<int, std::pair<std::string, std::any>>> node;
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
 
         //protected:
@@ -124,9 +123,14 @@ namespace Parser {
             ExprTypes<Binary, Unary, Grouping, Literal> unary();
             ExprTypes<Binary, Unary, Grouping, Literal> primary();     
         private:
-            static std::vector<std::variant<Binary, Unary, Grouping, Literal>> instances_;
-            logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            static void handleBinaryExprAndUpdateNodes(auto& getExpr, const Token& op);
+            static void handleUnaryExprAndUpdateNodes(auto& getExpr, const Token& op);
+            static void handleLiteralExprAndUpdateNodes(auto& getExpr);
+            static void handleGroupingExprAndUpdateNodes(auto& getExpr);
+            static grammarParser<std::string, Binary, Unary, Grouping, Literal> instances_;
+            static bool isLeft;
             static ExprTypes<Binary, Unary, Grouping, Literal> expr;
+            logTable<std::map<std::string, std::vector<std::string>>> logs_;
             inline Token previous() { return tokens_.at(current - 1); };
             inline Token peek() { return tokens_.at(current); }; 
             inline bool isAtEnd() { return peek().getType() == TokenType::END_OF_FILE; };
@@ -155,7 +159,7 @@ namespace Parser {
                 }
             };
             int current = 0;
-            int idx = 0;
+            static int idx;
             std::vector<Token> tokens_;
             inline std::string error(Token token, const std::string message) {
                 if (token.getType() == TokenType::END_OF_FILE) { return report(token.getLine(), " at end", message);}
@@ -193,4 +197,5 @@ namespace Parser {
     };
 };
 using namespace Parser;
+#include <parser_handlers.cc>
 #endif

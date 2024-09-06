@@ -1,10 +1,13 @@
 #include <abstraction_tree_syntax.h>
-#include <lookup_language.h>
+#include <lookup_language.h> // get the file extensions 
+// TODO: You need to check based on what the user types if the language needs to be interpreted or compiled 
+// For example, python cannot be compiled it needs to be interpreted 
+
 // Define static members
 template<class T>
 logTable<std::map<std::string, std::vector<std::string>>> generateAst<T>::logs_;
 template<class T>
-std::vector<std::tuple<int, std::pair<std::string, std::any>>> generateAst<T>::compactedTreeNodes;
+std::vector<treeEntry> generateAst<T>::compactedTreeNodes;
 template<class T>
 std::string generateAst<T>::ext;
 template<class T>
@@ -13,14 +16,16 @@ template<class T>
 std::string generateAst<T>::compactedTreeStr;
 // declare the global variables types here
 std::string file_name, user_choice;
-template struct std::tuple<int, std::pair<std::string, std::any>>; // Explicit initialize the underyling of astTree type
+template<typename T>
+struct std::tuple<int, std::pair<std::string, ExprTypes<ListOfType<T>>>>; // Explicit initialize the underyling of astTree type
+
 /**-----------------------------------------------------------------------------------------
  * @brief The default constructor that calls in generateAst to start creating the .txt file 
  * 
  * @param expr: The data structure that represents the compacted abstraction syntax tree 
  * -----------------------------------------------------------------------------------------
 */
-ast::ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_) {
+ast::ast(std::vector<treeEntry>& expr_) {
     generateAst<ast> gA;
     std::string ext_;
     if (file_name == "\0" || user_choice == "\0") {
@@ -32,7 +37,7 @@ ast::ast(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr_) 
         //ext = pair.first // TODO: THis needs to be fixed 
         setTable(languageExtensions, downloads);
     }
-    compactedTreeNodes = expr_;
+    //compactedTreeNodes = expr_;
     try {
         generateAst<ast> gA;
         ext = ext_;
@@ -66,9 +71,9 @@ void generateAst<T>::writeFile(std::string& ext) {
 
 template<class T>
 void generateAst<T>::tree_()  {
-    try {
+    /*try {
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
-           //auto temp = compactedTreeNodes.at(i);
+           auto temp = compactedTreeNodes.at(i);
             if (std::get<1>(temp).first == "Binary") { 
                 //auto value = static_cast<Binary&&>(std::any_cast<Binary>(std::get<1>(temp).second)).visit(std::any_cast<Binary>(std::get<1>(temp).second));
                 //compactedTreeStr += std::any_cast<std::string>(std::move(value));
@@ -96,6 +101,6 @@ void generateAst<T>::tree_()  {
         logging<generateAst<ast>> logs(logs_, e.what());
         logs.update();
         logs.rotate();
-    }                           
+    }*/                           
     return writeFile(ext);
 }

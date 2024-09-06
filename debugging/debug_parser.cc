@@ -1,35 +1,153 @@
-#include "parser.h"
-logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare variable globally
-/*class debugParser : public parser {
-    public:
-        debugParser(std::vector<Token>& tokens);
-        ~debugParser();
-        //static void debugEquality();
+#include <parser.h>
+#include <scanner.h>
+// Test case 1: Simple addition
+std::vector<Token> test1 = {
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::NUMBER, "4", "4.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
 };
 
-debugParser::debugParser(std::vector<Token>& tokens) : parser(tokens) {}
+// Test case 2: Simple multiplication
+std::vector<Token> test2 = {
+    Token(TokenType::NUMBER, "5", "5.0", 1),
+    Token(TokenType::STAR, "*", "0.0", 1),
+    Token(TokenType::NUMBER, "6", "6.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
 
-debugParser::~debugParser() {}
-*/
-/*void debugParser::debugEquality() {
-    equality();
+// Test case 3: Mixed operations
+std::vector<Token> test3 = {
+    Token(TokenType::NUMBER, "2", "2.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::STAR, "*", "0.0", 1),
+    Token(TokenType::NUMBER, "4", "4.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 4: Parentheses
+std::vector<Token> test4 = {
+    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
+    Token(TokenType::NUMBER, "2", "2.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
+    Token(TokenType::STAR, "*", "0.0", 1),
+    Token(TokenType::NUMBER, "4", "4.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 5: Nested parentheses
+std::vector<Token> test5 = {
+    Token(TokenType::NUMBER, "2", "2.0", 1),
+    Token(TokenType::STAR, "*", "0.0", 1),
+    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
+    Token(TokenType::NUMBER, "4", "4.0", 1),
+    Token(TokenType::MINUS, "-", "0.0", 1),
+    Token(TokenType::NUMBER, "1", "1.0", 1),
+    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
+    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 6: Unary operators
+std::vector<Token> test6 = {
+    Token(TokenType::MINUS, "-", "0.0", 1),
+    Token(TokenType::NUMBER, "5", "5.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::MINUS, "-", "0.0", 1),
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 7: Division
+std::vector<Token> test7 = {
+    Token(TokenType::NUMBER, "10", "10.0", 1),
+    Token(TokenType::SLASH, "/", "0.0", 1),
+    Token(TokenType::NUMBER, "2", "2.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 8: Complex expression
+std::vector<Token> test8 = {
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::NUMBER, "4", "4.0", 1),
+    Token(TokenType::STAR, "*", "0.0", 1),
+    Token(TokenType::NUMBER, "2", "2.0", 1),
+    Token(TokenType::MINUS, "-", "0.0", 1),
+    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
+    Token(TokenType::NUMBER, "6", "6.0", 1),
+    Token(TokenType::SLASH, "/", "0.0", 1),
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 9: Single number
+std::vector<Token> test9 = {
+    Token(TokenType::NUMBER, "42", "42.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 10: Empty expression (should throw an error)
+std::vector<Token> test10 = {
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 11: Mismatched parentheses (should throw an error)
+std::vector<Token> test11 = {
+    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
+    Token(TokenType::NUMBER, "2", "2.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+
+// Test case 12: Invalid token sequence (should throw an error)
+std::vector<Token> test12 = {
+    Token(TokenType::NUMBER, "2", "2.0", 1),
+    Token(TokenType::PLUS, "+", "0.0", 1),
+    Token(TokenType::STAR, "*", "0.0", 1),
+    Token(TokenType::NUMBER, "3", "3.0", 1),
+    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+};
+logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare variable globally
+class debugParser: public parser {
+    public:
+        explicit debugParser(): parser() {}
+        virtual ~debugParser() noexcept = default;
+        static void debugEquality(debugParser* p);
+};
+
+void debugParser::debugEquality(debugParser* p) {
+    p->equality();
     return;
-}*/
+}
+
+
+
 parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 
 static void debugEquality() {
-    std::vector<Token> tokens = {
-        Token(TokenType::LEFT_PAREN, "(", "", 0),
-        Token(TokenType::NUMBER, "", "6", 0),
-        Token(TokenType::SLASH, "/", "", 0),
-        Token(TokenType::NUMBER, "", "3", 0),
-        Token(TokenType::MINUS, "-", "" , 0),
-        Token(TokenType::NUMBER, "1", "", 0),
-        Token(TokenType::RIGHT_PAREN, ")", "", 0),
-        Token(TokenType::END_OF_FILE, "EOF", "EOF", EOF)
-    };
-    parser p = createParser(tokens);
-    auto result = p.equality();
+    //std::string source = "if(x == 10){print \"Hello\";}) // End of line";
+    //Scanner scanner(source);
+    //std::vector<Token> tokens = scanner.ScanTokens();    
+     std::vector<Token> tokens = {
+        Token(TokenType::NUMBER, "5", "5.0", 1),
+        Token(TokenType::PLUS, "+", "0.0", 1),
+        Token(TokenType::NUMBER, "3", "3.0", 1),
+        Token(TokenType::STAR, "*", "0.0", 1),
+        Token(TokenType::NUMBER, "2", "2.0", 1),
+        Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+     };  
+     parser p(tokens);
+     debugParser dP;
+     dP.debugEquality(&dP);
 }
 
 /*static void debugComparison() {

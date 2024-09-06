@@ -2,6 +2,9 @@
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
 #include <catch.h>
+typedef std::variant<Binary, Unary, Grouping, Literal> ExprVariant;
+typedef astTree<int, std::string, ExprVariant> treeEntry;
+extern template struct std::tuple<int, std::pair<std::string, ExprTypes<std::monostate, ListOfType<ExprVariant>>>>;
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public catcher<Type> {
@@ -40,7 +43,7 @@ namespace AbstractionTreeSyntax {
             static std::string codeStr;
             static std::string compactedTreeStr;
             static logTable<std::map<std::string, std::vector<std::string>>> logs_;
-            static std::vector<std::tuple<int, std::pair<std::string, std::any>>> compactedTreeNodes;
+            static std::vector<treeEntry> compactedTreeNodes;
             static std::string ext;
 
     };
@@ -52,7 +55,7 @@ namespace AbstractionTreeSyntax {
          * -------------------------------------------------------------------------------------------
          */
         public:
-            ast(std::vector<astTree<int, std::string, std::any>>& expr_);
+            ast(std::vector<treeEntry>& expr_);
             ~ast() noexcept = default;
             inline void setTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads) { 
                 table = initTable(languageExtensions, downloads); 

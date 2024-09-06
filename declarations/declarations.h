@@ -11,29 +11,32 @@ extern std::string user_choice; // get the user choice of language from the begi
 extern std::string file_name;
 /**---------------------------------------------------------------------------
  * @brief Used in abstranction_tree_syntax.h
+ * -----------------Templates Objects-----------------------------------------
+ * @detials 'InitializerListType' is represents a container type using an initializer list
+ * @detials 'ListOfType' is an alias template to InitalizerListType
+ * @detials 'externalList' is a external declare of a template variable
+ * @detials 'ExprTypes' used alot in parser.cc 
+ * ---------------------------------------------------------------------------
+ *  ----------------Data structures------------------------------------------
+ * @detials 'astTree' Represents a tree structure with a type T, a pair of type U and ListOfType<V>
  * ---------------------------------------------------------------------------
 */
+template<typename... Derived>
+using ExprTypes = std::shared_ptr<std::variant<Derived...>>;
+template<typename T>
+using InitializerListType = std::initializer_list<T>;
+template<typename T>
+using ListOfType = InitializerListType<T>;
+template<typename T>
+extern ListOfType<T> externalList;
 template<typename T, typename U, typename V>
-using astTree = std::tuple<T, std::pair<U, V>>;
-extern template struct std::tuple<int, std::pair<std::string, std::any>>;
-/**---------------------------------------------------------------------------
- * @brief Used in parser.cc to initalize the tree 
- * ---------------------------------------------------------------------------
-*/
+using astTree = std::tuple<T, std::pair<U, std::shared_ptr<ListOfType<V>>>>;
 template<typename T, typename U, typename V>
-static astTree<T, U, V> compressedAstTree(T first, U second, V third);
+static astTree<T, U, std::shared_ptr<ListOfType<V>>> compressedAstTree(T first, U second, V third);
 //TODO: Make an expanded astTree struct. so something like: expandAstTree(T firstNode, U secondNode, V thirdNode, X fourthNode, W stringLiteral, Y ExprTypes)
 
-/**--------------------------------------------------------------------------
- * @brief Used in parser.cc to keep track of the recrusion 
- *
- * --------------------------------------------------------------------------
-*/
-template<typename B, typename U, typename G, typename L>
-using ExprTypes = std::shared_ptr<std::variant<B, U, G, L>>;
-template<typename T, typename U, typename V, typename X, typename Y>
-//template<typename T>
-using grammarParser = std::vector<std::pair<T, std::shared_ptr<std::variant<U, V, X, Y>>>>;
+
+
 /**---------------------------------------------------------------------------
  * @brief setTokenLanguage method is initialized in main.cc
  * getTokenLanguage is used in:

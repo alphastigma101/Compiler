@@ -30,10 +30,22 @@ inline LanguageTokenTypes currentType<LanguageTokenTypes>::getTokenLanguage() { 
  *
  * ---------------------------------------------------------------------------
 */
+// Returns this type: tuple(int, string, shared_ptr(initializer_list(variant,variant)))
 template<typename T, typename U, typename V>
-inline astTree<T, U, V> compressedAstTree(T first, U second, V third) {
-    return std::make_tuple(first, std::make_pair(second, third));
+astTree<T, U, V> compressedAstTree(T first, U second, InitializerListType<V> third) {
+    return std::make_tuple(
+        first,
+        std::make_pair(
+            second,
+            std::make_shared<InitializerListType<V>>(third)
+        )
+    );
 };
+
+/*template<typename T, typename U, typename V>
+inline astTree<T, U, X<V>> compressedAstTree(T first, U second, V third) {
+    return std::make_tuple(first, std::make_pair(second, third));
+};*/
 /**---------------------------------------------------------------------------
  * @brief ...
  *

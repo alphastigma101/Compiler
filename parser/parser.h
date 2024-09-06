@@ -88,9 +88,7 @@
      *       in your parsing logic to handle operator priority correctly.
  */
 #include <abstraction_tree_syntax.h>
-#include <initializer_list>
-extern template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>;
-extern template struct std::vector<std::pair<std::string, std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>>>;
+extern template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>; // define the underlying of ExprTypes 
 namespace Parser {
     template<class Type>
     class parseError: public catcher<Type> {
@@ -108,12 +106,13 @@ namespace Parser {
          */
         public:
             friend class debugParser;
+            friend class TestParser;
             parser(std::vector<Token>& tokens);
             ~parser() noexcept {};
-            static std::vector<std::tuple<int, std::pair<std::string, std::any>>> node;
+            template<typename T>
+            static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<T>>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
-
-        //protected:
+        protected:
             // Current rules that were made from a grammar 
             ExprTypes<Binary, Unary, Grouping, Literal> equality();
             ExprTypes<Binary, Unary, Grouping, Literal> comparison();
@@ -122,13 +121,8 @@ namespace Parser {
             ExprTypes<Binary, Unary, Grouping, Literal> factor();
             ExprTypes<Binary, Unary, Grouping, Literal> unary();
             ExprTypes<Binary, Unary, Grouping, Literal> primary();     
+            parser() = default; // use for testing/debugging only 
         private:
-            static void handleBinaryExprAndUpdateNodes(auto& getExpr, const Token& op);
-            static void handleUnaryExprAndUpdateNodes(auto& getExpr, const Token& op);
-            static void handleLiteralExprAndUpdateNodes(auto& getExpr);
-            static void handleGroupingExprAndUpdateNodes(auto& getExpr);
-            static grammarParser<std::string, Binary, Unary, Grouping, Literal> instances_;
-            static bool isLeft;
             static ExprTypes<Binary, Unary, Grouping, Literal> expr;
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
             inline Token previous() { return tokens_.at(current - 1); };
@@ -197,5 +191,4 @@ namespace Parser {
     };
 };
 using namespace Parser;
-#include <parser_handlers.cc>
 #endif

@@ -112,7 +112,7 @@ namespace Parser {
             template<typename T>
             static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<T>>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
-        protected:
+        //protected:
             // Current rules that were made from a grammar 
             ExprTypes<Binary, Unary, Grouping, Literal> equality();
             ExprTypes<Binary, Unary, Grouping, Literal> comparison();

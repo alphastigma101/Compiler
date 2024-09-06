@@ -83,8 +83,8 @@ namespace ContextFreeGrammar {
                     //throw r;
                 }
             };
-            std::shared_ptr<Expr> right;
-            std::shared_ptr<Expr> left;
+            ExprTypes<std::monostate, Expr> right;
+            ExprTypes<std::monostate, Expr> left;
             std::shared_ptr<Token> op;
         private:
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
@@ -108,10 +108,10 @@ namespace ContextFreeGrammar {
             friend class ::Parser::parser;
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
             //Binary(std::shared_ptr<Expr>& left_, const Token& op_, std::shared_ptr<Expr>& right_): Left(left_), Right(right_)  {
-            Binary(ExprTypes<std::monostate, Expr>& left_, const Token& op_, ExprTypes<std::monostate, Expr>& right_) {
+            Binary(ExprTypes<std::monostate, Expr>& left_, const Token& op_, ExprTypes<std::monostate, Expr>& right_): Left(std::move(left_)), Right(std::move(right_)) {
                 try {
-                    //left = Left;
-                    //right = Right;
+                    left = std::move(Left);
+                    right = std::move(Right);
                     op = std::make_shared<Token>(op_);
                 }
                 catch(...) {
@@ -127,9 +127,9 @@ namespace ContextFreeGrammar {
              */
             inline std::string visit(Binary&& expr) {
                 try {
-                    std::string leftResult = expr.left.get() ? expr.left.get()->accept(*this) : "";
-                    std::string rightResult = expr.right.get() ? expr.right.get()->accept(*this) : "";
-                    return " " + leftResult + " " + rightResult;
+                    //std::string leftResult = (expr.left.get() && std::get_if<Binary>(expr.left.get())) ? std::get_if<Binary>(expr.left.get())->accept(*this) : "";
+                    //std::string rightResult = expr.right.get() ? std::get_if<Binary>(expr.right.get())->accept(*this) : "";
+                    //return " " + leftResult + " " + rightResult;
                 }
                 catch(runtimeerror<Binary>& e) {
                     std::string temp = std::string("on line:" + std::to_string(expr.op.get()->getLine()) + " " + e.what());
@@ -144,14 +144,14 @@ namespace ContextFreeGrammar {
         protected:
             Binary() = default;
         private:
-            std::shared_ptr<Expr> Left;
-            std::shared_ptr<Expr> Right;
+            ExprTypes<std::monostate, Expr> Left;
+            ExprTypes<std::monostate, Expr> Right;
             std::shared_ptr<Token> op_;
     };
     class Unary: public Expr<Unary> {
         public:
             friend class ::Parser::parser;
-            Unary(std::shared_ptr<Expr<Unary>>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
+            Unary(ExprTypes<std::monostate, Expr>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
                 try {
                     op = Op;
                 }
@@ -163,8 +163,8 @@ namespace ContextFreeGrammar {
             ~Unary() noexcept = default;
             inline std::string visit(Unary&& expr) {
                 try {
-                    std::string rightResult = expr.right->accept(*this);
-                    return " " + rightResult;
+                    //std::string rightResult = (std::get_if<Unary>(expr.right.get()) != nullptr) ? std::get_if<Unary>(expr.right.get())->accept(*this) : "";
+                    //return " " + rightResult;
                 }
                 catch(runtimeerror<Unary>& e) {
                     std::string temp = std::string("on line:" + std::to_string(expr.Op.get()->getLine()) + " " + e.what());
@@ -179,22 +179,22 @@ namespace ContextFreeGrammar {
         protected:
             Unary() = default;
         private:
-            std::shared_ptr<Expr> Right;
+            ExprTypes<std::monostate, Expr> Right;
             std::shared_ptr<Token> Op;
     };
     class Grouping: public Expr<Grouping> {
         public:
             friend class ::Parser::parser;
-            explicit Grouping(std::shared_ptr<Expr<Grouping>>& expression) {
-                expression_->left = expression->left;
-                expression_->right = expression->right;
+            explicit Grouping(ExprTypes<std::monostate, Expr>& expression) {
+                //expression_->left = expression->left;
+                //expression_->right = expression->right;
             };
             ~Grouping() noexcept = default;
             inline std::string visit(Grouping&& expr) {
                 try {
-                    std::string leftResult = expr.left.get()->accept(*this);
-                    std::string rightResult = expr.right.get()->accept(*this);
-                    return "(" + leftResult + " " + rightResult + ")";
+                    //std::string leftResult = expr.left.get()->accept(*this);
+                    //std::string rightResult = expr.right.get()->accept(*this);
+                    //return "(" + leftResult + " " + rightResult + ")";
                 }
                 catch(runtimeerror<Grouping>& e) {
                     std::string temp = std::string("on line:" + std::to_string(expr.op->getLine()) + " " + e.what());
@@ -205,11 +205,11 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline Expr<Grouping> getExpr() { return *expression_; }
+            //inline Expr<Grouping> getExpr() { return *expression_; }
         protected:
             Grouping() = default;
         private:
-            std::shared_ptr<Expr> expression_;
+            ExprTypes<std::monostate, Expr> expression_;
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:

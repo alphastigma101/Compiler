@@ -24,7 +24,7 @@ extern std::string file_name;
 template<typename... Derived>
 using ExprTypes = std::shared_ptr<std::variant<Derived...>>;
 template<typename T>
-using InitializerListType = std::initializer_list<T>;
+using InitializerListType = std::initializer_list<T>; // change this line with another container if swapping is needed
 template<typename T>
 using ListOfType = InitializerListType<T>;
 template<typename T>

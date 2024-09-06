@@ -5,7 +5,7 @@ std::vector<Token> test1 = {
     Token(TokenType::NUMBER, "3", "3.0", 1),
     Token(TokenType::PLUS, "+", "0.0", 1),
     Token(TokenType::NUMBER, "4", "4.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+    Token(TokenType::END_OF_FILE, "EOF", "EOF", EOF)
 };
 
 // Test case 2: Simple multiplication
@@ -143,11 +143,13 @@ static void debugEquality() {
         Token(TokenType::NUMBER, "3", "3.0", 1),
         Token(TokenType::STAR, "*", "0.0", 1),
         Token(TokenType::NUMBER, "2", "2.0", 1),
-        Token(TokenType::END_OF_FILE, "", "EOF", EOF)
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", EOF)
+
      };  
      parser p(tokens);
-     debugParser dP;
-     dP.debugEquality(&dP);
+     p.equality();
+     //debugParser dP;
+    //dP.debugEquality(&dP);
 }
 
 /*static void debugComparison() {

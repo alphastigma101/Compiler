@@ -1,121 +1,34 @@
 #include <parser.h>
 #include <scanner.h>
-// Test case 1: Simple addition
-std::vector<Token> test1 = {
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::NUMBER, "4", "4.0", 1),
-    Token(TokenType::END_OF_FILE, "EOF", "EOF", EOF)
-};
+void runTest(const std::string& input) {
+    std::cout << "Testing input: " << input << std::endl;
+    
+    // Create scanner and generate tokens
+    Scanner scanner(input);
+    std::vector<Token> tokens = scanner.ScanTokens();
+    
+    // Print tokens for debugging
+    //std::cout << "Tokens:" << std::endl;
+    //for (auto& token : tokens) {
+        //std::string temp = std::any_cast<std::string>(token.toString());
+        //std::cout << temp << std::endl;
+   //}
+    
+    // Parse tokens
+    parser p(tokens);
+    auto result = p.parse();
+    
+    // Print result or error
+    if (result) {
+        std::cout << "Parsing successful!" << std::endl;
+        // You might want to add a method to print the AST here
+    } else {
+        std::cout << "Parsing failed." << std::endl;
+    }
+    
+    std::cout << "------------------------" << std::endl;
+}
 
-// Test case 2: Simple multiplication
-std::vector<Token> test2 = {
-    Token(TokenType::NUMBER, "5", "5.0", 1),
-    Token(TokenType::STAR, "*", "0.0", 1),
-    Token(TokenType::NUMBER, "6", "6.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 3: Mixed operations
-std::vector<Token> test3 = {
-    Token(TokenType::NUMBER, "2", "2.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::STAR, "*", "0.0", 1),
-    Token(TokenType::NUMBER, "4", "4.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 4: Parentheses
-std::vector<Token> test4 = {
-    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
-    Token(TokenType::NUMBER, "2", "2.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
-    Token(TokenType::STAR, "*", "0.0", 1),
-    Token(TokenType::NUMBER, "4", "4.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 5: Nested parentheses
-std::vector<Token> test5 = {
-    Token(TokenType::NUMBER, "2", "2.0", 1),
-    Token(TokenType::STAR, "*", "0.0", 1),
-    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
-    Token(TokenType::NUMBER, "4", "4.0", 1),
-    Token(TokenType::MINUS, "-", "0.0", 1),
-    Token(TokenType::NUMBER, "1", "1.0", 1),
-    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
-    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 6: Unary operators
-std::vector<Token> test6 = {
-    Token(TokenType::MINUS, "-", "0.0", 1),
-    Token(TokenType::NUMBER, "5", "5.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::MINUS, "-", "0.0", 1),
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 7: Division
-std::vector<Token> test7 = {
-    Token(TokenType::NUMBER, "10", "10.0", 1),
-    Token(TokenType::SLASH, "/", "0.0", 1),
-    Token(TokenType::NUMBER, "2", "2.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 8: Complex expression
-std::vector<Token> test8 = {
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::NUMBER, "4", "4.0", 1),
-    Token(TokenType::STAR, "*", "0.0", 1),
-    Token(TokenType::NUMBER, "2", "2.0", 1),
-    Token(TokenType::MINUS, "-", "0.0", 1),
-    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
-    Token(TokenType::NUMBER, "6", "6.0", 1),
-    Token(TokenType::SLASH, "/", "0.0", 1),
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::RIGHT_PAREN, ")", "0.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 9: Single number
-std::vector<Token> test9 = {
-    Token(TokenType::NUMBER, "42", "42.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 10: Empty expression (should throw an error)
-std::vector<Token> test10 = {
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 11: Mismatched parentheses (should throw an error)
-std::vector<Token> test11 = {
-    Token(TokenType::LEFT_PAREN, "(", "0.0", 1),
-    Token(TokenType::NUMBER, "2", "2.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
-
-// Test case 12: Invalid token sequence (should throw an error)
-std::vector<Token> test12 = {
-    Token(TokenType::NUMBER, "2", "2.0", 1),
-    Token(TokenType::PLUS, "+", "0.0", 1),
-    Token(TokenType::STAR, "*", "0.0", 1),
-    Token(TokenType::NUMBER, "3", "3.0", 1),
-    Token(TokenType::END_OF_FILE, "", "EOF", EOF)
-};
 logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare variable globally
 class debugParser: public parser {
     public:
@@ -125,30 +38,38 @@ class debugParser: public parser {
 };
 
 void debugParser::debugEquality(debugParser* p) {
-    p->equality();
+    //p->equality();
     return;
 }
-
 
 
 parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 
 static void debugEquality() {
-    //std::string source = "if(x == 10){print \"Hello\";}) // End of line";
-    //Scanner scanner(source);
-    //std::vector<Token> tokens = scanner.ScanTokens();    
-     std::vector<Token> tokens = {
-        Token(TokenType::NUMBER, "5", "5.0", 1),
-        Token(TokenType::PLUS, "+", "0.0", 1),
-        Token(TokenType::NUMBER, "3", "3.0", 1),
-        Token(TokenType::STAR, "*", "0.0", 1),
-        Token(TokenType::NUMBER, "2", "2.0", 1),
-        Token(TokenType::END_OF_FILE, "EOF", "EOF", EOF)
-
-     };  
-     parser p(tokens);
-     p.equality();
-     //debugParser dP;
+    const std::vector<std::string> testCases = {
+        "3 + 4",
+        "5 * 6",
+        "2 + 3 * 4",
+        "(2 + 3) * 4",
+        "2 * (3 + (4 - 1))",
+        "-5 + -3",
+        "10 / 2",
+        "3 + 4 * 2 - (6 / 3)",
+        "42",
+        //"",
+        "(2 >= 3) / 5",
+        //"2 + * 3"
+    };  
+    /*for (int i = 0; i < test_strings.size(); i++) {
+        Scanner scanner(test_strings[i]);
+        std::vector<Token> tokens = scanner.ScanTokens();
+        parser p(tokens);
+        p.equality();
+    }*/
+    for (const auto& testCase : testCases) {
+        runTest(testCase);
+    }
+    //debugParser dP;
     //dP.debugEquality(&dP);
 }
 

@@ -110,7 +110,7 @@ namespace Parser {
             parser(std::vector<Token>& tokens);
             ~parser() noexcept {};
             template<typename T>
-            static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<T>>>>> nodes; // passed into ast constructor
+            static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<T>>>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
         //protected:
             // Current rules that were made from a grammar 
@@ -126,7 +126,11 @@ namespace Parser {
             static ExprTypes<Binary, Unary, Grouping, Literal> expr;
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
             inline Token previous() { return tokens_.at(current - 1); };
-            inline Token peek() { return tokens_.at(current); }; 
+            inline Token peek() {
+                //std::cout << "Current Token Type:" << std::endl;
+                //std::cout << tokenTypeStrings.at(tokens_.at(current).getType()) << std::endl;
+                return tokens_.at(current); 
+            }; 
             inline bool isAtEnd() { return peek().getType() == TokenType::END_OF_FILE; };
             inline Token advance() {
                 if (!isAtEnd()) current++;
@@ -168,22 +172,27 @@ namespace Parser {
                 std::cout << "[line " <<  line << "] Error" << where << ": " + message;
                 logging<parser> logs(logs_, err); // Keep the logs updated throughout the whole codebase
                 logs.update();
-                logs.rotate();
+                //logs.rotate();
                 return err;
             };
             inline bool check(const TokenType type) {
                 if (isAtEnd()) return false;
                 return peek().getType() == type;
             };
-            inline bool match(std::initializer_list<TokenType> types) {
-                for (const TokenType& type : types) {
-                    if (check(type)) {
+            template<typename... Args>
+            inline bool match(Args... types) {
+                return (... || (check(types) ? (advance(), true) : false));
+            }
+            /*inline bool match(std::initializer_list<TokenType> types) {
+                for (const auto& it : types) {
+                    std::cout << tokenTypeStrings.at(it) << std::endl;
+                    if (check(it)) {
                         advance();
                         return true;
                     }
                 }
                 return false;
-            }
+            }*/
             inline Token consume(const TokenType type, const std::string message) {
                 if (check(type)) return advance();
                 throw error(peek(), message);

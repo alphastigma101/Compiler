@@ -127,8 +127,6 @@ namespace Parser {
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
             inline Token previous() { return tokens_.at(current - 1); };
             inline Token peek() {
-                //std::cout << "Current Token Type:" << std::endl;
-                //std::cout << tokenTypeStrings.at(tokens_.at(current).getType()) << std::endl;
                 return tokens_.at(current); 
             }; 
             inline bool isAtEnd() { return peek().getType() == TokenType::END_OF_FILE; };
@@ -180,19 +178,7 @@ namespace Parser {
                 return peek().getType() == type;
             };
             template<typename... Args>
-            inline bool match(Args... types) {
-                return (... || (check(types) ? (advance(), true) : false));
-            }
-            /*inline bool match(std::initializer_list<TokenType> types) {
-                for (const auto& it : types) {
-                    std::cout << tokenTypeStrings.at(it) << std::endl;
-                    if (check(it)) {
-                        advance();
-                        return true;
-                    }
-                }
-                return false;
-            }*/
+            inline bool match(Args... types) { return (... || (check(types) ? (advance(), true) : false)); };
             inline Token consume(const TokenType type, const std::string message) {
                 if (check(type)) return advance();
                 throw error(peek(), message);

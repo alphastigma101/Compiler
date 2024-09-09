@@ -88,10 +88,14 @@ const inline Table initTable(const std::unordered_map<std::string, std::vector<s
  * ---------------------------------------------------------------------------
 */
 namespace Parser {
+    template<class Derived>
+    class parseError;
     class parser;
 };
 
-
+/**------------------------------------------------
+ * @brief Defined in context_free_grammar.h 
+ */
 namespace ContextFreeGrammar {
     template<class Derived>
     class Expr;
@@ -100,6 +104,9 @@ namespace ContextFreeGrammar {
     class Grouping;
     class Literal;
 };
+/**------------------------------------------------
+ * @brief Used in context_free_grammar.h and in parser.cc
+*/
 typedef std::variant<
     ContextFreeGrammar::Binary,
     ContextFreeGrammar::Unary,

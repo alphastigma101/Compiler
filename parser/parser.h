@@ -90,51 +90,101 @@
 #include <abstraction_tree_syntax.h>
 extern template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>; // define the underlying of ExprTypes 
 namespace Parser {
-    template<class Type>
-    class parseError: public catcher<Type> {
+    template<class Derived>
+    class parseError {
         public:
             friend class parser;
+            explicit parseError<Derived>(const Token& t, const std::string& msg) {
+                try {
+                    token = std::move(t);
+                    message = std::move(msg);
+                }
+                catch(...) {
+                    
+                }
+                
+            };
             ~parseError() = default;
-            inline std::string error(Token token, const std::string message);                   
-            inline std::string report(int line, const std::string where, const std::string message) const throw();
+            /** --------------------------------------------------------------------------------------
+             * @brief A method that calls in the report method the error
+             * -------------------------------------------------------------------------------------- 
+            */
+            inline std::string error() { return static_cast<Derived*>(this)->error();};
+            /** --------------------------------------------------------------------------------------
+             * @brief A method that calls in logging to store the error that occured
+             * 
+             * @param line: The line it occured 
+             * @param where: The literal 
+             * @param message: The error message
+             * -------------------------------------------------------------------------------------- 
+            */                   
+            inline std::string report(int line, const std::string where, const std::string message) throw() {
+                return static_cast<Derived*>(this)->report(line, where, message);
+            };
+        protected:
+            parseError<Derived>() = default;
+        private:
+            static Token token;
+            static std::string message;
     };
-    class parser: public parseError<parser>, public logging<parser>, public Binary, public Unary, public Grouping, public Literal {
-        /* ----------------------------------------------------------------------------------------------------------------------------
-         * An object that represents a parser. 
-         * To add more to the parser, you need to add the new rules to the existing grammar, and define it them inside the class field 
+    class parser: public parseError<parser>, public logging<parser> {
+        /** ----------------------------------------------------------------------------------------------------------------------------
+         * @brief  object that represents a parser. 
+         * @details To add more to the parser, you need to add the new rules to the existing grammar, and define it them inside the class field 
          * ----------------------------------------------------------------------------------------------------------------------------
-         */
+        */
         public:
-            friend class debugParser;
-            friend class TestParser;
-            parser(std::vector<Token>& tokens);
+            friend class parseError;
+            /** ----------------------------------------------------------------------------------------------------------
+             * @brief Copy constructor. You will need a default constructor if you want to inherit from this constructor
+             * 
+             * @param tokens: A vector that holds a list of Token instances
+             * 
+             * @details moves data over to tokens_  from tokens
+             * ----------------------------------------------------------------------------------------------------------
+            */
+            explicit parser(std::vector<Token>& tokens) { tokens_ = std::move(tokens); };
+            // Current rules that were made from a grammar 
+            static ExprTypes<Binary, Unary, Grouping, Literal> equality();
+            static ExprTypes<Binary, Unary, Grouping, Literal> comparison();
+            static ExprTypes<Binary, Unary, Grouping, Literal> expression();
+            static ExprTypes<Binary, Unary, Grouping, Literal> term();
+            static ExprTypes<Binary, Unary, Grouping, Literal> factor();
+            static ExprTypes<Binary, Unary, Grouping, Literal> unary();
+            static ExprTypes<Binary, Unary, Grouping, Literal> primary();
             ~parser() noexcept {};
             template<typename T>
             static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<T>>>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
-        //protected:
-            // Current rules that were made from a grammar 
-            ExprTypes<Binary, Unary, Grouping, Literal> equality();
-            ExprTypes<Binary, Unary, Grouping, Literal> comparison();
-            ExprTypes<Binary, Unary, Grouping, Literal> expression();
-            ExprTypes<Binary, Unary, Grouping, Literal> term();
-            ExprTypes<Binary, Unary, Grouping, Literal> factor();
-            ExprTypes<Binary, Unary, Grouping, Literal> unary();
-            ExprTypes<Binary, Unary, Grouping, Literal> primary();     
-            parser() = default; // use for testing/debugging only 
-        private:
-            static ExprTypes<Binary, Unary, Grouping, Literal> expr;
-            logTable<std::map<std::string, std::vector<std::string>>> logs_;
-            inline Token previous() { return tokens_.at(current - 1); };
-            inline Token peek() {
-                return tokens_.at(current); 
-            }; 
-            inline bool isAtEnd() { return peek().getType() == TokenType::END_OF_FILE; };
-            inline Token advance() {
+        protected:
+            /**----------------------------------------------------------------------------------------------------------
+             * @brief Get the previous TokenType
+             * ----------------------------------------------------------------------------------------------------------
+             */
+            static inline Token previous() { return tokens_.at(current - 1); };
+            /**----------------------------------------------------------------------------------------------------------
+             * @brief Peek at the current TokenType.
+             * ----------------------------------------------------------------------------------------------------------
+             */
+            static inline Token peek() { return tokens_.at(current); }; 
+            /**----------------------------------------------------------------------------------------------------------
+             * @brief Copy constructor. You will need a default constructor if you want to inherit from this constructor
+             * ----------------------------------------------------------------------------------------------------------
+             */
+            static inline bool isAtEnd() { return peek().getType() == TokenType::END_OF_FILE; };
+            /**----------------------------------------------------------------------------------------------------------
+             * @brief Advance the vector's iterator by one when it isn't at the end 
+             * ----------------------------------------------------------------------------------------------------------
+            */
+            static inline Token advance() {
                 if (!isAtEnd()) current++;
                 return previous();
             };
-            inline void synchronize() {
+             /** ----------------------------------------------------------------------------------------------------------
+             * @brief Sync.
+             * ----------------------------------------------------------------------------------------------------------
+            */
+            static inline void synchronize() {
                 advance();
                 while (!isAtEnd()) {                                                        
                     // TODO: Need to capture other boundaries that will simulate a new statement
@@ -154,35 +204,38 @@ namespace Parser {
                     advance();
                 }
             };
-            int current = 0;
-            static int idx;
-            std::vector<Token> tokens_;
-            inline std::string error(Token token, const std::string message) {
-                if (token.getType() == TokenType::END_OF_FILE) { return report(token.getLine(), " at end", message);}
-                    std::string temp = std::to_string(token.getLine());
-                    logging<parser> logs(logs_, temp + " at '" + token.getLexeme() + "'" + message); // Keep the logs updated throughout the whole codebase
-                    logs.update();
-                    logs.rotate();
-                    return report(token.getLine(), " at '" + token.getLexeme() + "'", message);
-            };
-            inline std::string report(int line, const std::string where, const std::string message) const throw() {
-                std::string err = "[line " + std::to_string(line) + "] Error" + where +  ": " + message;
-                std::cout << "[line " <<  line << "] Error" << where << ": " + message;
-                logging<parser> logs(logs_, err); // Keep the logs updated throughout the whole codebase
-                logs.update();
-                //logs.rotate();
-                return err;
-            };
-            inline bool check(const TokenType type) {
+            static inline bool check(const TokenType type) {
                 if (isAtEnd()) return false;
                 return peek().getType() == type;
             };
+            /** --------------------------------------------------------------------------------------------------------------
+             * @brief Calls in protected methods to match certain tokens. If a match exists, returns true. Otherwise, return false
+             * ---------------------------------------------------------------------------------------------------------------
+            */
             template<typename... Args>
-            inline bool match(Args... types) { return (... || (check(types) ? (advance(), true) : false)); };
-            inline Token consume(const TokenType type, const std::string message) {
-                if (check(type)) return advance();
-                throw error(peek(), message);
+            static inline bool match(Args... types) { 
+                return (... || (check(types) ? (advance(), true) : false)); 
             };
+            static inline Token consume(const TokenType type, const std::string message) {
+                if (check(type)) return advance();
+                parseError<parser> pp(peek(), message);
+                throw pp;
+            };
+            /** -------------------------------------------
+             *  @brief Acesss the memory value created in the os and resets it back to zero
+            */ 
+            static void reset() {
+                current = 0;
+                idx = 0;
+            };
+        private:
+            static std::vector<Token>&& tokens_;
+            static ExprTypes<Binary, Unary, Grouping, Literal> expr;
+            static logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            inline static int current = 0;
+            inline static int idx = 0;
+            static std::string error();
+            static inline std::string report(int line, const std::string where, const std::string message) throw();
     };
 };
 using namespace Parser;

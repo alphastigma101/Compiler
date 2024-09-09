@@ -20,7 +20,6 @@ std::string logging<T>::text;
 template<class T>
 void logging<T>::rotate() {
     std::filesystem::path logDir = "logs";
-    std::cout << "Executing the rotation!" << std::endl;
     // Create logs directory if it doesn't exist
     if (!std::filesystem::exists(logDir)) { std::filesystem::create_directory(logDir); }
 
@@ -207,7 +206,6 @@ std::string logging<T>::read() {
         auto diff = std::chrono::duration_cast<std::chrono::hours>(now - file_time);
         // if the difference is 0, then it is within the hour and return the string
         if (diff.count() == 0) {
-            std::cout << "Returning temp!" << std::endl;
             return temp; 
         } 
     }

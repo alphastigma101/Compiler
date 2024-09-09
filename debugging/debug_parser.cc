@@ -30,19 +30,6 @@ void runTest(const std::string& input) {
 }
 
 logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare variable globally
-class debugParser: public parser {
-    public:
-        explicit debugParser(): parser() {}
-        virtual ~debugParser() noexcept = default;
-        static void debugEquality(debugParser* p);
-};
-
-void debugParser::debugEquality(debugParser* p) {
-    //p->equality();
-    return;
-}
-
-
 parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 
 static void debugEquality() {
@@ -58,17 +45,11 @@ static void debugEquality() {
         "13 + 34 * 2 - (6 / 2)",
         "33 + 34 * 2 / (6 / 3)",
 
-        //"42",
-        //"",
-        "(2 / 3) / 5",
-        //"2 + * 3"
+        "42",
+        "",
+        "(2 / 3 / 5",
+        "2 + * 3"
     };  
-    /*for (int i = 0; i < test_strings.size(); i++) {
-        Scanner scanner(test_strings[i]);
-        std::vector<Token> tokens = scanner.ScanTokens();
-        parser p(tokens);
-        p.equality();
-    }*/
     for (const auto& testCase : testCases) {
         runTest(testCase);
     }

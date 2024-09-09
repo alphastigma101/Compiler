@@ -109,8 +109,8 @@ namespace ContextFreeGrammar {
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
             Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_): Left(std::move(left_)), Right(std::move(right_)) {
                 try {
-                    //left = std::move(Left);
-                    //right = std::move(Right);
+                    left = std::move(Left);
+                    right = std::move(Right);
                     op = std::make_shared<Token>(op_);
                 }
                 catch(...) {

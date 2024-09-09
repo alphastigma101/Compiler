@@ -2,7 +2,6 @@
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
 #include <catch.h>
-typedef std::variant<Binary, Unary, Grouping, Literal> ExprVariant;
 typedef astTree<int, std::string, ExprVariant> treeEntry;
 extern template struct std::tuple<int, std::pair<std::string, ExprTypes<std::monostate, ListOfType<ExprVariant>>>>;
 namespace AbstractionTreeSyntax {

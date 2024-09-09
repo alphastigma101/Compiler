@@ -91,4 +91,21 @@ namespace Parser {
     class parser;
 };
 
+
+namespace ContextFreeGrammar {
+    template<class Derived>
+    class Expr;
+    class Binary;
+    class Unary;
+    class Grouping;
+    class Literal;
+};
+typedef std::variant<
+    ContextFreeGrammar::Binary,
+    ContextFreeGrammar::Unary,
+    ContextFreeGrammar::Grouping,
+    ContextFreeGrammar::Literal
+> ExprVariant;
+
+
 #endif 

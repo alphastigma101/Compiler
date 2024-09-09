@@ -83,8 +83,8 @@ namespace ContextFreeGrammar {
                     //throw r;
                 }
             };
-            ExprTypes<std::monostate, Expr> right;
-            ExprTypes<std::monostate, Expr> left;
+            std::shared_ptr<ExprVariant> right;
+            std::shared_ptr<ExprVariant> left;
             std::shared_ptr<Token> op;
         private:
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
@@ -107,11 +107,10 @@ namespace ContextFreeGrammar {
         public:
             friend class ::Parser::parser;
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
-            //Binary(std::shared_ptr<Expr>& left_, const Token& op_, std::shared_ptr<Expr>& right_): Left(left_), Right(right_)  {
-            Binary(ExprTypes<std::monostate, Expr>& left_, const Token& op_, ExprTypes<std::monostate, Expr>& right_): Left(std::move(left_)), Right(std::move(right_)) {
+            Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_): Left(std::move(left_)), Right(std::move(right_)) {
                 try {
-                    left = std::move(Left);
-                    right = std::move(Right);
+                    //left = std::move(Left);
+                    //right = std::move(Right);
                     op = std::make_shared<Token>(op_);
                 }
                 catch(...) {
@@ -144,14 +143,14 @@ namespace ContextFreeGrammar {
         protected:
             Binary() = default;
         private:
-            ExprTypes<std::monostate, Expr> Left;
-            ExprTypes<std::monostate, Expr> Right;
+            std::shared_ptr<ExprVariant> Left;
+            std::shared_ptr<ExprVariant> Right;
             std::shared_ptr<Token> op_;
     };
     class Unary: public Expr<Unary> {
         public:
             friend class ::Parser::parser;
-            Unary(ExprTypes<std::monostate, Expr>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
+            Unary(std::shared_ptr<ExprVariant>& right_, const Token& op_): Right(std::move(right_)), Op(std::make_shared<Token>(op_))  {
                 try {
                     op = Op;
                 }
@@ -179,13 +178,13 @@ namespace ContextFreeGrammar {
         protected:
             Unary() = default;
         private:
-            ExprTypes<std::monostate, Expr> Right;
+            std::shared_ptr<ExprVariant> Right;
             std::shared_ptr<Token> Op;
     };
     class Grouping: public Expr<Grouping> {
         public:
             friend class ::Parser::parser;
-            explicit Grouping(ExprTypes<std::monostate, Expr>& expression) {
+            explicit Grouping(std::shared_ptr<ExprVariant>& expression) {
                 //expression_->left = expression->left;
                 //expression_->right = expression->right;
             };
@@ -209,7 +208,7 @@ namespace ContextFreeGrammar {
         protected:
             Grouping() = default;
         private:
-            ExprTypes<std::monostate, Expr> expression_;
+           std::shared_ptr<ExprVariant> expression_;
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:

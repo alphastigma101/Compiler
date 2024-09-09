@@ -8,11 +8,11 @@ void runTest(const std::string& input) {
     std::vector<Token> tokens = scanner.ScanTokens();
     
     // Print tokens for debugging
-    //std::cout << "Tokens:" << std::endl;
-    //for (auto& token : tokens) {
-        //std::string temp = std::any_cast<std::string>(token.toString());
-        //std::cout << temp << std::endl;
-   //}
+    std::cout << "Tokens:" << std::endl;
+    for (auto& token : tokens) {
+        std::string temp = std::any_cast<std::string>(token.toString());
+        std::cout << temp << std::endl;
+    }
     
     // Parse tokens
     parser p(tokens);
@@ -54,10 +54,13 @@ static void debugEquality() {
         "2 * (3 + (4 - 1))",
         "-5 + -3",
         "10 / 2",
-        "3 + 4 * 2 - (6 / 3)",
-        "42",
+        "3 + 4 * 2 + (6 / 3)",
+        "13 + 34 * 2 - (6 / 2)",
+        "33 + 34 * 2 / (6 / 3)",
+
+        //"42",
         //"",
-        "(2 >= 3) / 5",
+        "(2 / 3) / 5",
         //"2 + * 3"
     };  
     /*for (int i = 0; i < test_strings.size(); i++) {

@@ -25,23 +25,12 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::equality()  {
     // Recursion left !=
     auto expr_ = comparison(); 
     while (match(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)) {
-        ExprTypes<std::monostate, Expr<Binary>> L,R;
-        if (auto* binaryL = std::get_if<Binary>(expr_.get())) {
-            std::cout << "Left EQUALITY is not Null!" << std::endl;
-            L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(*binaryL); 
-        }
-        else { L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); }
         const Token op = previous();
         // Recursion right ==
         auto right = comparison();
-        if (auto* binaryR = std::get_if<Binary>(right.get())) { 
-            std::cout << "Right EQUALITY is not Null!" << std::endl;
-            R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::variant<std::monostate, Expr<Binary>>(*binaryR)); 
-        }
-        else { R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); }
-        expr = std::make_shared<ExprVariant>(Binary(L, op, R)); // initialize it with Binary instance
-        auto res = compressedAstTree(idx, std::string("Binary"), {L, R});
-        nodes<std::variant<std::monostate, Expr<Binary>>>.push_back(res);
+        expr = std::make_shared<ExprVariant>(Binary(expr_, op, right)); // initialize it with Binary instance
+        auto res = compressedAstTree(idx, std::string("Binary"), {expr});
+        nodes<ExprVariant>.push_back(res);
         idx++;
     }
     return expr;
@@ -55,22 +44,11 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::equality()  {
 ExprTypes<Binary, Unary, Grouping, Literal> parser::comparison()  {
     auto expr_ = term();
     while (match(TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL)) {
-        ExprTypes<std::monostate, Expr<Binary>> L,R;
-        if (auto* binaryL = std::get_if<Binary>(expr_.get())) {
-            std::cout << "Left COMPARISON is not Null!" << std::endl;
-            L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(*binaryL); 
-        }
-        else { L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); }
         const Token op = previous();
         auto right = term();
-        if (auto* binaryR = std::get_if<Binary>(right.get())) { 
-            std::cout << "Right COMPARISION is not Null!" << std::endl;
-            R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::variant<std::monostate, Expr<Binary>>(*binaryR)); 
-        }
-        else { R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); }
-        expr = std::make_shared<ExprVariant>(Binary(L, op, R)); // initialize it with Binary instance
-        auto res = compressedAstTree(idx, std::string("Binary"), {L, R});
-        nodes<std::variant<std::monostate, Expr<Binary>>>.push_back(res);
+        expr = std::make_shared<ExprVariant>(Binary(expr_, op, right));
+        auto res = compressedAstTree(idx, std::string("Binary"), {expr});
+        nodes<ExprVariant>.push_back(res);
         idx++;
     }
     return expr;
@@ -86,22 +64,11 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::comparison()  {
 ExprTypes<Binary, Unary, Grouping, Literal> parser::term() {
     auto expr_ = factor();
     while (match(TokenType::MINUS, TokenType::PLUS)) {
-        ExprTypes<std::monostate, Expr<Binary>> L,R;
-        if (auto* binaryL = std::get_if<Binary>(expr_.get())) {
-            std::cout << "Left TERM is not null!"  << std::endl;
-            L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::variant<std::monostate, Expr<Binary>>(*binaryL)); 
-        }
-        else { L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); }
         const Token op = previous();
         auto right = factor();
-        if (auto* binaryR = std::get_if<Binary>(right.get())) { 
-            std::cout << "Right TERM is not null!" << std::endl;
-            R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::variant<std::monostate, Expr<Binary>>(*binaryR)); 
-        }
-        else { R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); }
-        expr = std::make_shared<ExprVariant>(Binary(L, op, R)); // initialize it with Binary instance
-        auto res = compressedAstTree(idx, std::string("Binary"), {L, R});
-        nodes<std::variant<std::monostate, Expr<Binary>>>.push_back(res);
+        expr = std::make_shared<ExprVariant>(Binary(expr_, op, right)); // initialize it with Binary instance
+        auto res = compressedAstTree(idx, std::string("Binary"), {expr});
+        nodes<ExprVariant>.push_back(res);
         idx++;
     }
     return expr;
@@ -115,30 +82,13 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::term() {
  * --------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal> parser::factor() {
-    auto expr_ = unary(); // returns either Literal instance or a grouping instance
+    auto expr_ = unary();
     while (match(TokenType::SLASH, TokenType::STAR)) {
-        ExprTypes<std::monostate, Expr<Binary>> L,R;
-        if (auto* binaryL = std::get_if<Binary>(expr.get())) {
-            std::cout << "Left FACTOR is not null!" << std::endl;
-            L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::variant<std::monostate, Expr<Binary>>(*binaryL)); 
-        }
-        else {
-            std::cout << "Left FACTOR is null!" << std::endl;
-            L = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); 
-        }
-        auto right = unary();
         const Token op = previous();
-        if (auto* binaryR = std::get_if<Binary>(right.get())) { 
-            std::cout << "Right FACTOR is not null!" << std::endl;
-            R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::variant<std::monostate, Expr<Binary>>(*binaryR)); 
-        }
-        else { 
-            std::cout << "Right FACTOR is null!" << std::endl;
-            R = std::make_shared<std::variant<std::monostate, Expr<Binary>>>(std::monostate{}); 
-        }
-        expr = std::make_shared<ExprVariant>(Binary(L, op, R)); // initialize it with Binary instance
-        auto res = compressedAstTree(idx, std::string("Binary"), {L, R});
-        nodes<std::variant<std::monostate, Expr<Binary>>>.push_back(res);
+        auto right = unary();
+        expr = std::make_shared<ExprVariant>(Binary(expr_, op, right));
+        auto res = compressedAstTree(idx, std::string("Binary"), {expr});
+        nodes<ExprVariant>.push_back(res);
         idx++;
     }
     return expr;
@@ -155,18 +105,9 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::unary() {
     if (match(TokenType::BANG, TokenType::MINUS)) {
         const Token op = previous();
         auto right = unary();
-        ExprTypes<std::monostate, Expr<Unary>> R;
-        if (auto* unaryR = std::get_if<Unary>(right.get())) {
-            std::cout << "Right UNARY is not null!" << std::endl;
-            R = std::make_shared<std::variant<std::monostate, Expr<Unary>>>(std::variant<std::monostate, Expr<Unary>>(*unaryR)); 
-        }
-        else { 
-            std::cout << "Right UNARY is null!" << std::endl;
-            R = std::make_shared<std::variant<std::monostate, Expr<Unary>>>(std::monostate{}); 
-        }
-        expr = std::make_shared<ExprVariant>(Unary(R, op)); // initialize it with Binary instance
-        auto res = compressedAstTree(idx, std::string("Unary"), {R});
-        nodes<std::variant<std::monostate, Expr<Unary>>>.push_back(res);
+        expr = std::make_shared<ExprVariant>(Unary(right, op));
+        auto res = compressedAstTree(idx, std::string("Unary"), {right});
+        nodes<ExprVariant>.push_back(res);
         idx++;
         return expr;
     }
@@ -189,47 +130,31 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::primary() {
     }
     if (match(TokenType::TRUE)) {
         expr = std::make_shared<ExprVariant>(Literal(true));
-        ExprTypes<std::monostate, Expr<Literal>> L = std::make_shared<std::variant<std::monostate, Expr<Literal>>>(std::variant<std::monostate, Expr<Literal>>(std::get<Literal>(*expr)));;
-        auto res = compressedAstTree(idx, std::string("Literal"), {L});
-        nodes<std::variant<std::monostate, Expr<Literal>>>.push_back(res);
+        auto res = compressedAstTree(idx, std::string("Literal"), {expr});
+        nodes<ExprVariant>.push_back(res);
         idx++;
         return expr;
     }
     if (match(TokenType::NIL)) {
         expr = std::make_shared<ExprVariant>(Literal(NULL));
-        ExprTypes<std::monostate, Expr<Literal>> L = std::make_shared<std::variant<std::monostate, Expr<Literal>>>(std::variant<std::monostate, Expr<Literal>>(std::get<Literal>(*expr)));;
-        auto res = compressedAstTree(idx, std::string("Literal"), {L});
-        nodes<std::variant<std::monostate, Expr<Literal>>>.push_back(res);
+        auto res = compressedAstTree(idx, std::string("Literal"), {expr});
+        nodes<ExprVariant>.push_back(res);
         idx++;
         return expr;
     }
     if (match(TokenType::NUMBER, TokenType::STRING)) {
         expr = std::make_shared<ExprVariant>(Literal(previous().getLiteral()));
-        ExprTypes<std::monostate, Expr<Literal>> L = std::make_shared<std::variant<std::monostate, Expr<Literal>>>(std::variant<std::monostate, Expr<Literal>>(std::get<Literal>(*expr)));;
-        auto res = compressedAstTree(idx, std::string("Literal"), {L}); 
-        nodes<std::variant<std::monostate, Expr<Literal>>>.push_back(res);
+        auto res = compressedAstTree(idx, std::string("Literal"), {expr}); 
+        nodes<ExprVariant>.push_back(res);
         idx++;
         return expr;
     }
     if (match(TokenType::LEFT_PAREN)) {
-        ExprTypes<std::monostate, Expr<Grouping>> arg;
         auto expr_ = expression();
-        if (auto* Group_ = std::get_if<Grouping>(expr_.get())) {
-            std::cout << "Grouping is not null!" << std::endl;
-            arg = std::make_shared<std::variant<std::monostate, Expr<Grouping>>>(std::variant<std::monostate, Expr<Grouping>>(*Group_));
-        }
-        else { arg = std::make_shared<std::variant<std::monostate, Expr<Grouping>>>(std::monostate{}); }
-        consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-        // TODO: THE CODE BELOW IF UNCOMMENTED WILL BREAK FACTOR WHICH WORKS PERFECTLY 
-        // Ideas:
-        // you can make another shared pointer that groups the stuff up and make expr point to that object 
-        // Cause a shared pointer have ownership of one object while pointing to another one and it needs to point to expr_
-        // View the user manual for shared pointers it looks something like this: 
-        // (another shared_ptr pointing to something else(this will be expr_), this is the main pointer(this will be expr))
-        //expr = std::make_shared<ExprVariant>(Grouping(arg));
-        //auto res = compressedAstTree(idx, std::string("Grouping"), {arg}); 
-        //nodes<std::variant<std::monostate, Expr<Grouping>>>.push_back(res);
-        //idx++;
+        expr = std::make_shared<ExprVariant>(Grouping(expr_));
+        auto res = compressedAstTree(idx, std::string("Grouping"), {expr}); 
+        nodes<ExprVariant>.push_back(res);
+        idx++;
         return expr;
     }
     throw error(peek(), "Expect expression.");

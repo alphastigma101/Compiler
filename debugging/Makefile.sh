@@ -52,8 +52,8 @@ echo "Creating debugging object files and executables for parser"
 g++ -g -std=c++17 -fconcepts  $INCLUDE -c ../parser/parser.cc -o parser.o
 g++ -g -std=c++17 -fconcepts $INCLUDE -c ../debugging/debug_parser.cc -o debug_parser.o
 g++ -g -std=c++17 -fconcepts token.o scanner.o abstraction_tree_syntax.o parser.o  languages.o logging.o debug_parser.o -o exec_debug_parser
-#g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_parser.cc -o test_parser.o
-#g++ -g -std=c++17 -fconcepts parser.o languages.o token.o logging.o test_parser.o -o test_parser $LDFLAGS
+g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_parser.cc -o test_parser.o
+g++ -g -std=c++17 -fconcepts scanner.o abstraction_tree_syntax.o parser.o languages.o token.o logging.o test_parser.o -o test_parser $LDFLAGS
 
 #echo "Creating debugging object files and executables for truthy"
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../interpreter/language_specific_truthy_operations.cc -o language_specific_truthy_operations.o 

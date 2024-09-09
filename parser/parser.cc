@@ -3,8 +3,7 @@ template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>;
 ExprTypes<Binary, Unary, Grouping, Literal> parser::expr;
 logTable<std::map<std::string, std::vector<std::string>>> parser::logs_;
 std::vector<Token>&& parser::tokens_ = {};
-template<typename T>
-std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<T>>>>>> parser::nodes;
+std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<ExprVariant>>>>>> parser::nodes = {};
 template<class T>
 Token parseError<T>::token;
 template<class T>
@@ -29,7 +28,7 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::equality()  {
         auto right = comparison();
         expr = std::make_shared<ExprVariant>(Binary(expr_, op, right)); // initialize it with Binary instance
         auto res = compressedAstTree(idx, std::string("Binary"), {expr});
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
     }
     return expr;
@@ -47,7 +46,7 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::comparison()  {
         auto right = term();
         expr = std::make_shared<ExprVariant>(Binary(expr_, op, right));
         auto res = compressedAstTree(idx, std::string("Binary"), {expr});
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
     }
     return expr;
@@ -67,7 +66,7 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::term() {
         auto right = factor();
         expr = std::make_shared<ExprVariant>(Binary(expr_, op, right)); // initialize it with Binary instance
         auto res = compressedAstTree(idx, std::string("Binary"), {expr});
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
     }
     return expr;
@@ -87,7 +86,7 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::factor() {
         auto right = unary();
         expr = std::make_shared<ExprVariant>(Binary(expr_, op, right));
         auto res = compressedAstTree(idx, std::string("Binary"), {expr});
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
     }
     return expr;
@@ -106,7 +105,7 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::unary() {
         auto right = unary();
         expr = std::make_shared<ExprVariant>(Unary(right, op));
         auto res = compressedAstTree(idx, std::string("Unary"), {right});
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
         return expr;
     }
@@ -121,30 +120,29 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::unary() {
 ExprTypes<Binary, Unary, Grouping, Literal> parser::primary() {
     if (match(TokenType::FALSE)) {
         expr = std::make_shared<ExprVariant>(Literal(false)); // initialize it with Literal instance
-        ExprTypes<std::monostate, Expr<Literal>> L = std::make_shared<std::variant<std::monostate, Expr<Literal>>>(std::variant<std::monostate, Expr<Literal>>(std::get<Literal>(*expr)));;
-        auto res = compressedAstTree(idx, std::string("Literal"), {L});
-        nodes<std::variant<std::monostate, Expr<Literal>>>.push_back(res);
+        auto res = compressedAstTree(idx, std::string("Literal"), {expr});
+        nodes.push_back(res);
         idx++;
         return expr;
     }
     if (match(TokenType::TRUE)) {
         expr = std::make_shared<ExprVariant>(Literal(true));
         auto res = compressedAstTree(idx, std::string("Literal"), {expr});
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
         return expr;
     }
     if (match(TokenType::NIL)) {
         expr = std::make_shared<ExprVariant>(Literal(NULL));
         auto res = compressedAstTree(idx, std::string("Literal"), {expr});
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
         return expr;
     }
     if (match(TokenType::NUMBER, TokenType::STRING)) {
         expr = std::make_shared<ExprVariant>(Literal(previous().getLiteral()));
         auto res = compressedAstTree(idx, std::string("Literal"), {expr}); 
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
         return expr;
     }
@@ -153,7 +151,7 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::primary() {
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
         expr = std::make_shared<ExprVariant>(Grouping(expr_));
         auto res = compressedAstTree(idx, std::string("Grouping"), {expr}); 
-        nodes<ExprVariant>.push_back(res);
+        nodes.push_back(res);
         idx++;
         return expr;
     }

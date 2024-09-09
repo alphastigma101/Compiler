@@ -153,8 +153,7 @@ namespace Parser {
             static ExprTypes<Binary, Unary, Grouping, Literal> unary();
             static ExprTypes<Binary, Unary, Grouping, Literal> primary();
             ~parser() noexcept {};
-            template<typename T>
-            static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<T>>>>>> nodes; // passed into ast constructor
+            static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<ExprVariant>>>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
         protected:
             /**----------------------------------------------------------------------------------------------------------

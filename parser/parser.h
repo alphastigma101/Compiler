@@ -91,7 +91,7 @@
 extern template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>; // define the underlying of ExprTypes 
 namespace Parser {
     template<class Derived>
-    class parseError {
+    class parseError: public catcher<Derived> {
         public:
             friend class parser;
             explicit parseError<Derived>(const Token& t, const std::string& msg) {
@@ -102,7 +102,6 @@ namespace Parser {
                 catch(...) {
                     
                 }
-                
             };
             ~parseError() = default;
             /** --------------------------------------------------------------------------------------
@@ -234,7 +233,7 @@ namespace Parser {
             inline static int current = 0;
             inline static int idx = 0;
             static std::string error();
-            static inline std::string report(int line, const std::string where, const std::string message) throw();
+            static std::string report(int line, const std::string where, const std::string message) throw();
     };
 };
 using namespace Parser;

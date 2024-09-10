@@ -67,16 +67,19 @@ std::vector<Token> Scanner::ScanTokens() {
     return tokens;
 
 }
-/* ---------------------------------------------------------------------------------------------------------
- * (scanToken) is a method that is apart of the (Scanner) class 
- * Arguments:
-    * None
+/** ---------------------------------------------------------------------------------------------------------
+ * @brief Apart of the (Scanner) class, it scans the string literals from the given file and turns them into tokens
+ * 
+ * @param None
  * ---------------------------------(Additional Info)-------------------------------------------------------
  * The purpose of (scanToken) is to perform a lexical analysis by gathering up lexemes 
  * lexemes are only the raw substrings of the source code.
     * Couple examples of lexemes would be 'v' 'a' 'r' group them together to make something useful out of them 
     * Lexeme is known as a string and so is a token
     * Note: grouping these bits of characters into lexemes are called its (lexical grammar). 
+ * @details Adjust the case expressions so that it can support a certain string literal. 
+    You should not adjust the parser beforehand without ajusting the scanner first!
+ * @details If you add another Token Type to TokenType, then you must update tokenTypeStrings
  * ------------------------------------------------------------------------------------------
 */
 void Scanner::scanToken() {
@@ -94,14 +97,18 @@ void Scanner::scanToken() {
         case ';': addToken(TokenType::SEMICOLON); break;
         case '*': addToken(TokenType::STAR); break;
         case '!': addToken(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG); break;
+        //TODO: Make the case below the = so it searches for := and = 
         case '=': addToken(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL); break;
         case '<': addToken(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS); break;
         case '>': addToken(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER); break;
         case '/':
-            if (match('/')) {
-            // A comment goes until the end of the line.
-            while (peek() != '\n' && !isAtEnd()) advance();
-            } else { addToken(TokenType::SLASH); }
+        case '%':
+            if (match(c == '/' ? '/' : '%')) {
+                // A comment goes until the end of the line (only for '//')
+                while (peek() != '\n' && !isAtEnd()) advance();
+            } else {
+                addToken(c == '/' ? TokenType::SLASH : TokenType::MODULO);
+            }
             break;
         case 'o':
             // Need to also add support for | and || 

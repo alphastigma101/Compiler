@@ -33,12 +33,17 @@ logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare
 parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 
 static void debugEquality() {
-   std::vector<std::string> testCases = {
+    std::string temp = "'apple'"; 
+    temp += ">";
+    temp += "'banana'";
+    std::vector<std::string> testCases = {
         "1 == 1",
         "2 != 3",
         "true == true",
         "false != true",
         "null == null",
+        //temp,
+        "5 % 0",
         //"42 == 42.0",
         //"3.14 != 3.14159",*/
         //"'hello' == 'hello'",

@@ -367,8 +367,8 @@ TEST_F(ParserTest, TermTest_8) {
 }
 
 // --- Factor Testing ----
-/*TEST_F(ParserTest, FactorTest_0) {
-    Scanner scanner("3 * 4");
+TEST_F(ParserTest, FactorTest_0) {
+    Scanner scanner("(3 * 4) / 6");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
     auto result = p.factor();
@@ -392,7 +392,7 @@ TEST_F(ParserTest, TermTest_2) {
     auto result = p.term();
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
-}*/
+}
 
 // Test unary method
 TEST_F(ParserTest, UnaryTest) {

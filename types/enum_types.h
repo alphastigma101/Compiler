@@ -12,7 +12,7 @@ enum TokenType {
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE,
     RIGHT_BRACE, COMMA, DOT, 
     MINUS, PLUS, SEMICOLON,
-    SLASH, STAR,
+    SLASH, STAR, MODULO,
     // One or two character tokens.
     BANG, BANG_EQUAL,
     EQUAL, EQUAL_EQUAL,
@@ -111,16 +111,11 @@ enum LanguageTokenTypes {
     Prolog, Ada, AWK, TCL, D, Julia, VisualBasic,
     PowerShell, Racket, Elm, Eiffel, LabVIEW, SmallTalk, StandardML, Custom
 };
-
-enum LanguagePatterns {
-    // Common syntax that is used is {}, :  <- for code blocks, () <- for storing arguments , =>, [](){} lamda functions
-    // Variables: :=, =, etc
-    // Include the key words for looping in every language, add support if a lexeme looks like a loop
-    // Add support if a lexeme looks like a if statement, case, or function 
-};
-/**
- * @brief A map that maps enums to strings 
+/** ------------------------------------------------------
+ * @brief A map that maps enums to strings
  *
+ * @details Add more tokens to the list below, if you add any to the tokenType enum class 
+ * -------------------------------------------------------
 */
 static const std::unordered_map<TokenType, std::string> tokenTypeStrings = {
     {TokenType::LEFT_PAREN, "LEFT_PAREN"},
@@ -296,7 +291,8 @@ static const std::unordered_map<TokenType, std::string> tokenTypeStrings = {
     {TokenType::EXCLAMATION, "EXCLAMATION"},
     {TokenType::BRACES, "BRACES"},
     {TokenType::PARENS, "PARENS"},
-    {TokenType::END_OF_FILE, "EOF"}
+    {TokenType::END_OF_FILE, "EOF"},
+    {TokenType::MODULO, "MODULO"}
 };
 
 

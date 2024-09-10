@@ -77,11 +77,13 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::term() {
  * @return expr
  *
  * @details expr is a shared_ptr wrapper that wraps around variants that hold Binary, Unary, Grouping, and Literal instances
+ * @details Also, grouping class is not needed if you do not want to parse the TokenTypes even farther.
+   Ex: Factor can handle the () but Grouping is needed so it can get the nested () expression as it's own 
  * --------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal> parser::factor() {
     auto expr_ = unary();
-    while (match(TokenType::SLASH, TokenType::STAR)) {
+    while (match(TokenType::SLASH, TokenType::STAR, TokenType::MODULO)) {
         const Token op = previous();
         auto right = unary();
         expr = std::make_shared<ExprVariant>(Binary(expr_, op, right));
@@ -182,7 +184,42 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::parse() {
         return NULL; 
     }
 }
+/** ----------------------------------------------------------------------------- 
+ * @brief An identifier is a name of something. Generallly something that is not wrapped around in quotes
+ * 
+ * @details For example, variable name, function name, class name, if statements, structs, etc.
+ * 
+ * ------------------------------------------------------------------------------
+*/
+ExprTypes<Binary, Unary, Grouping, Literal> parser::identifier() {
+    // Rules usually require recrusion 
+    // Think of Calling a funciton again as if you're looking ahead 
+    // LR is look ahead right 
+    // LL is look ahead left
+    // LAR occurs when the rule aka the funciton gets called multuple times. Typically in a loop
+    // LAL is the same thing but it looks ahead to the left
+    // https://www.gnu.org/software/bison/manual/bison.html#Grammar-File 
+    // 
+    if(match(TokenType::IDENTIFIER)) {
+        auto expr_ = arguments(); // Look to the right
 
+    }
+    
+    return primary(); // indentifier has a literal 
+}
+/**---------------------------------------------------------------
+ * 
+ * 
+ */
+ExprTypes<Binary, Unary, Grouping, Literal> parser::arguments() {
+    auto expr_ = arguments(); // Look to the left
+    while(TokenType::IDENTIFIER, TokenType::LEFT_BRACE, TokenType::RIGHT_BRACE, TokenType::LEFT_PAREN, TokenType::RIGHT_PAREN) {
+        auto right = arguments(); // Look ahead to the right
+
+    }
+
+    return expr;
+}
 // Additional rules go above this line
 //
 //

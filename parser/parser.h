@@ -1,92 +1,5 @@
 #ifndef _PARSER_H_
 #define _PARSER_H_
-/*--------------------------------------------------------------------------------------------------------------------------
- * This is the current grammar that parser.h, parser.cc, and abstraction_syntax_tree.cc and abstraction_syntax_tree.h use:
- * expression     → literal
-               | unary
-               | binary
-               | grouping ;
-
-   literal        → NUMBER | STRING | "true" | "false" | "nil" ;
-   grouping       → "(" expression ")" ;
-   unary          → ( "-" | "!" ) expression ;
-   binary         → expression operator expression ;
-   operator       → "==" | "!=" | "<" | "<=" | ">" | ">=" | "+"  | "-"  | "*" | "/" ;
- * --------------------------------------------------------------------------------------------------------------------------
- *  //TODO: enhance your parser by adding these features:
-     *
-     * 1. Function Calls:
-     * expression → literal
-     *            | unary
-     *            | binary
-     *            | grouping
-     *            | function_call ;
-     *
-     * function_call → IDENTIFIER "(" argument_list ")" ;
-     * argument_list → expression ("," expression)* ;
-     *
-     * 2. Variables:
-     * expression → literal
-     *            | unary
-     *            | binary
-     *            | grouping
-     *            | function_call
-     *            | variable
-     *            | assignment ;
-     *
-     * variable     → IDENTIFIER ;
-     * assignment   → IDENTIFIER "=" expression ;
-     *
-     * 3. Arrays:
-     * expression → literal
-     *            | unary
-     *            | binary
-     *            | grouping
-     *            | function_call
-     *            | variable
-     *            | assignment
-     *            | array
-     *            | array_indexing ;
-     *
-     * array        → "[" (expression ("," expression)*)? "]" ;
-     * array_indexing → expression "[" expression "]" ;
-     *
-     * 4. Member Access:
-     * expression → literal
-     *            | unary
-     *            | binary
-     *            | grouping
-     *            | function_call
-     *            | variable
-     *            | assignment
-     *            | array
-     *            | array_indexing
-     *            | member_access ;
-     *
-     * member_access → expression "." IDENTIFIER ;
-     *
-     * 5. Control Flow (if applicable):
-     * statement  → expression
-     *            | print_statement
-     *            | if_statement
-     *            | while_statement
-     *            | block
-     *            | return_statement ;
-     *
-     * print_statement → "print" expression ";" ;
-     * if_statement    → "if" "(" expression ")" block ("else" block)? ;
-     * while_statement → "while" "(" expression ")" block ;
-     * block           → "{" (statement)* "}" ;
-     * return_statement → "return" expression ";" ;
-     *
-     * 6. Logical Operators:
-     * operator   → "==" | "!=" | "<" | "<=" | ">" | ">="
-     *            | "+"  | "-"  | "*" | "/"
-     *            | "and" | "or" ;
-     *
-     * Note: Consider managing operator precedence and associativity
-     *       in your parsing logic to handle operator priority correctly.
- */
 #include <abstraction_tree_syntax.h>
 extern template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>; // define the underlying of ExprTypes 
 namespace Parser {
@@ -154,6 +67,8 @@ namespace Parser {
             static ExprTypes<Binary, Unary, Grouping, Literal> factor();
             static ExprTypes<Binary, Unary, Grouping, Literal> unary();
             static ExprTypes<Binary, Unary, Grouping, Literal> primary();
+            static ExprTypes<Binary, Unary, Grouping, Literal> identifier();
+            static ExprTypes<Binary, Unary, Grouping, Literal> arguments();
             ~parser() noexcept {};
             static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<ExprVariant>>>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();

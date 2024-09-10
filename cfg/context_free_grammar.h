@@ -6,7 +6,8 @@
  * A Context Free Grammar consists of a head and a body, which describes what it can generate.
  * The body's purest form will be a list of symbols and these symbols are:
     * (Terminal):
-        * letter from the grammar’s alphabet, which you can think of it as a literal value. They are the endpoints in a sense as you only produce one symbol
+        * letter from the grammar’s alphabet, which you can think of it as a literal value.  They are the endpoints in a sense as you only produce one symbol
+        * In a sense, the symbol will represent a token of some sort 
     * (Nonterminal):
         * is a reference of another grammar rule, which allows you to pick any rules for it 
  * The rule is on the very left side of the ->. On the other side of it are: 

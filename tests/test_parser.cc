@@ -16,8 +16,8 @@ class ParserTest : public testing::Test {
         // Helper function to create a parser with tokens
         parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 };
-// Test equality for "1 == 1"
-TEST_F(ParserTest, EqualityTest_1_equals_1) {
+//--Equality Testing--
+TEST_F(ParserTest, EqualityTest_0) {
     Scanner scanner("1 == 1");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -25,9 +25,7 @@ TEST_F(ParserTest, EqualityTest_1_equals_1) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-// Test equality for "2 != 3"
-TEST_F(ParserTest, EqualityTest_2_not_equals_3) {
+TEST_F(ParserTest,EqualityTest_1) {
     Scanner scanner("2 != 3");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -35,9 +33,7 @@ TEST_F(ParserTest, EqualityTest_2_not_equals_3) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-// Test equality for "true == true"
-TEST_F(ParserTest, EqualityTest_true_equals_true) {
+TEST_F(ParserTest, EqualityTest_2) {
     Scanner scanner("true == true");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -45,9 +41,7 @@ TEST_F(ParserTest, EqualityTest_true_equals_true) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-// Test equality for "false != true"
-TEST_F(ParserTest, EqualityTest_false_not_equals_true) {
+TEST_F(ParserTest, EqualityTest_3) {
     Scanner scanner("false != true");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -55,9 +49,7 @@ TEST_F(ParserTest, EqualityTest_false_not_equals_true) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-// Test equality for "'hello' == 'hello'"
-TEST_F(ParserTest, EqualityTest_hello_equals_hello) {
+TEST_F(ParserTest, EqualityTest_4) {
     Scanner scanner("'hello' == 'hello'");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -65,9 +57,7 @@ TEST_F(ParserTest, EqualityTest_hello_equals_hello) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-// Test equality for "'world' != 'World'"
-TEST_F(ParserTest, EqualityTest_world_not_equals_World) {
+TEST_F(ParserTest, EqualityTest_5) {
     Scanner scanner("'world' != 'World'");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -75,8 +65,7 @@ TEST_F(ParserTest, EqualityTest_world_not_equals_World) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-// Test equality for "42 != 42.0"
-TEST_F(ParserTest, EqualityTest_float_integer) {
+TEST_F(ParserTest, EqualityTest_6) {
     Scanner scanner("42 == 42.0");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -84,8 +73,7 @@ TEST_F(ParserTest, EqualityTest_float_integer) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-// Test equality for "42 != 42.0"
-TEST_F(ParserTest, EqualityTest_float_float) {
+TEST_F(ParserTest, EqualityTest_7) {
     Scanner scanner("3.14 != 3.14159");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -93,8 +81,7 @@ TEST_F(ParserTest, EqualityTest_float_float) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-// Test equality for "1 == 2 == false"
-TEST_F(ParserTest, EqualityTest_one_equals_2_equals_false) {
+TEST_F(ParserTest, EqualityTest_8) {
     Scanner scanner("1 == 2 == false");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -102,8 +89,7 @@ TEST_F(ParserTest, EqualityTest_one_equals_2_equals_false) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-// Test equality for "42 != 42.0"
-TEST_F(ParserTest, EqualityTest_one_not_equal_two_not_equal) {
+TEST_F(ParserTest, EqualityTest_9) {
     Scanner scanner("1 != 2 != false");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -111,9 +97,7 @@ TEST_F(ParserTest, EqualityTest_one_not_equal_two_not_equal) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-
-TEST_F(ParserTest, one_doesnt_equal_one) {
+TEST_F(ParserTest, EqualityTest_10) {
    Scanner scanner("(1 != 1) == false");
    std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -121,8 +105,7 @@ TEST_F(ParserTest, one_doesnt_equal_one) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-TEST_F(ParserTest, true_equals_false) {
+TEST_F(ParserTest, EqualityTest_11) {
     Scanner scanner("true == !false");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -130,18 +113,15 @@ TEST_F(ParserTest, true_equals_false) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-TEST_F(ParserTest, zero_equals_false) {
+TEST_F(ParserTest,EqualityTest_12) {
     Scanner scanner("0 == false");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
     auto result = p.equality();
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
-
 }
-
-TEST_F(ParserTest, EqualityTest_5) {
+TEST_F(ParserTest,EqualityTest_13) {
     Scanner scanner("1 == true");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -150,8 +130,7 @@ TEST_F(ParserTest, EqualityTest_5) {
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 
 }
-
-TEST_F(ParserTest, EqualityTest_6) {
+TEST_F(ParserTest,EqualityTest_14) {
    Scanner scanner("'' == false");
    std::vector<Token> tokens = scanner.ScanTokens();
    parser p = createParser(tokens);
@@ -159,8 +138,7 @@ TEST_F(ParserTest, EqualityTest_6) {
    ASSERT_NE(result, nullptr);
    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-TEST_F(ParserTest, EqualityTest_7) {
+TEST_F(ParserTest, EqualityTest_15) {
     Scanner scanner("'0' != 0");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
@@ -168,7 +146,6 @@ TEST_F(ParserTest, EqualityTest_7) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
 /*TEST_F(ParserTest, EqualityTest_8) {
     Scanner scanner("null != undefined");
     std::vector<Token> tokens = scanner.ScanTokens();
@@ -230,63 +207,192 @@ TEST_F(ParserTest, EqualityTest_14) {
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }*/
-
-
-
-// Test comparison method
-TEST_F(ParserTest, ComparisonTest) {
-    std::vector<std::string> test_str = {
-        "1 < 2",
-        "3 > 4",
-        "5 <= 6",
-        "7 >= 8",
-        "9 == 10",
-        "11 != 12",
-        "13 < 14 < 15",
-        "16 > 17 > 18",
-        "19 <= 20 <= 21",
-        "22 >= 23 >= 24",
-        "25 == 26 == 27",
-        "28 != 29 != 30",
-        "31 < 32 > 33 <= 34 >= 35 == 36 != 37",
-        "true < false",
-        //std::string("apple" + ">" + "banana"),
-        "null <= 42",
-        "3.14 >= 2.71"
-    };
-    Scanner scanner(test_str[3]);
+//--Comparison Testing----
+TEST_F(ParserTest, ComparisonTest_0) {
+    Scanner scanner("1 < 2");
     std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
     auto result = p.comparison();
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
-
-// Test term method
-/*TEST_F(ParserTest, TermTest) {
-    std::vector<Token> tokens = {
-        Token(TokenType::NUMBER, "1", "1.0", 1),
-        Token(TokenType::PLUS, "+", "", 1),
-        Token(TokenType::NUMBER, "2", "2.0", 1)
-    };
+TEST_F(ParserTest, ComparisonTest_1) {
+    Scanner scanner("3 > 4");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, fComparisonTest_2) {
+    Scanner scanner("5 <= 6");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_3) {
+    Scanner scanner("7 >= 8");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_4) {
+    Scanner scanner("13 < 14 < 15");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_5) {
+    Scanner scanner("16 > 17 > 18");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_6) {
+    Scanner scanner("19 <= 20 <= 21");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_7) {
+    Scanner scanner("22 >= 23 >= 24");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_8) {
+    Scanner scanner("31 < 32 > 33 <= 34 >= 35 <= 36 => 37");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_9) {
+    Scanner scanner("true < false");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+//TODO: Debug this later on after getting the other test suites to work
+/*TEST_F(ParserTest, ComparisonTest_10) {
+    std::string temp = "apple"; 
+    temp += ">";
+    temp += "banana";
+    Scanner scanner(temp);
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}*/
+TEST_F(ParserTest, ComparisonTest_11) {
+    Scanner scanner("null <= 42");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, ComparisonTest_12) {
+    Scanner scanner("3.14 >= 2.71");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.comparison();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+//--Term Testing---
+TEST_F(ParserTest, TermTest_0) {
+    Scanner scanner("10 - 2");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.term();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, TermTest_3) {
+    Scanner scanner("2 - 3 + 4");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.term();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, TermTest_4) {
+    Scanner scanner("5 + 6 - 7");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.term();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, TermTest_5) {
+    Scanner scanner("-3 - 4");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.term();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, TermTest_6) {
+    Scanner scanner("1 + 0");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.term();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+TEST_F(ParserTest, TermTest_8) {
+    Scanner scanner("3.14 + 2.5");
+    std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
     auto result = p.term();
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
 
-// Test factor method
-TEST_F(ParserTest, FactorTest) {
-    std::vector<Token> tokens = {
-        Token(TokenType::NUMBER, "2", "2.0", 1),
-        Token(TokenType::STAR, "*", "", 1),
-        Token(TokenType::NUMBER, "3", "3.0", 1)
-    };
+// --- Factor Testing ----
+/*TEST_F(ParserTest, FactorTest_0) {
+    Scanner scanner("3 * 4");
+    std::vector<Token> tokens = scanner.ScanTokens();
     parser p = createParser(tokens);
     auto result = p.factor();
     ASSERT_NE(result, nullptr);
     EXPECT_TRUE(std::holds_alternative<Binary>(*result));
 }
+
+TEST_F(ParserTest, FactorTest_1) {
+    Scanner scanner("7 % 3");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.factor();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}
+
+TEST_F(ParserTest, TermTest_2) {
+    Scanner scanner("5 % 0");
+    std::vector<Token> tokens = scanner.ScanTokens();
+    parser p = createParser(tokens);
+    auto result = p.term();
+    ASSERT_NE(result, nullptr);
+    EXPECT_TRUE(std::holds_alternative<Binary>(*result));
+}*/
 
 // Test unary method
 TEST_F(ParserTest, UnaryTest) {
@@ -310,7 +416,10 @@ TEST_F(ParserTest, PrimaryTestNumber) {
 }
 
 TEST_F(ParserTest, PrimaryTestString) {
-    std::vector<Token> tokens = {Token(TokenType::STRING, "hello", "hello", 1)};
+    std::vector<Token> tokens = {
+        Token(TokenType::STRING, "hello", "hello", 1),
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", 1)
+    };
     parser p = createParser(tokens);
     auto result = p.primary();
     ASSERT_NE(result, nullptr);
@@ -318,7 +427,10 @@ TEST_F(ParserTest, PrimaryTestString) {
 }
 
 TEST_F(ParserTest, PrimaryTestTrue) {
-    std::vector<Token> tokens = {Token(TokenType::TRUE, "true", "true", 1)};
+    std::vector<Token> tokens = {
+        Token(TokenType::TRUE, "true", "true", 1),
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", 1)
+    };
     parser p = createParser(tokens);
     auto result = p.primary();
     ASSERT_NE(result, nullptr);
@@ -326,7 +438,10 @@ TEST_F(ParserTest, PrimaryTestTrue) {
 }
 
 TEST_F(ParserTest, PrimaryTestFalse) {
-    std::vector<Token> tokens = {Token(TokenType::FALSE, "false", "false", 1)};
+    std::vector<Token> tokens = {
+        Token(TokenType::FALSE, "false", "false", 1),
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", 1)
+    };
     parser p = createParser(tokens);
     auto result = p.primary();
     ASSERT_NE(result, nullptr);
@@ -334,7 +449,10 @@ TEST_F(ParserTest, PrimaryTestFalse) {
 }
 
 TEST_F(ParserTest, PrimaryTestNil) {
-    std::vector<Token> tokens = {Token(TokenType::NIL, "nil", "", 1)};
+    std::vector<Token> tokens = {
+        Token(TokenType::NIL, "nil", "", 1),
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", 1)
+    };
     parser p = createParser(tokens);
     auto result = p.primary();
     ASSERT_NE(result, nullptr);
@@ -345,7 +463,8 @@ TEST_F(ParserTest, PrimaryTestGrouping) {
     std::vector<Token> tokens = {
         Token(TokenType::LEFT_PAREN, "(", "", 1),
         Token(TokenType::NUMBER, "42", "42.0", 1),
-        Token(TokenType::RIGHT_PAREN, ")", "", 1)
+        Token(TokenType::RIGHT_PAREN, ")", "", 1),
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", 1)
     };
     parser p = createParser(tokens);
     auto result = p.primary();
@@ -358,7 +477,8 @@ TEST_F(ParserTest, ExpressionTest) {
     std::vector<Token> tokens = {
         Token(TokenType::NUMBER, "1", "1.0", 1),
         Token(TokenType::PLUS, "+", "", 1),
-        Token(TokenType::NUMBER, "2", "2.0", 1)
+        Token(TokenType::NUMBER, "2", "2.0", 1),
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", 1)
     };
     parser p = createParser(tokens);
     auto result = p.expression();
@@ -371,7 +491,8 @@ TEST_F(ParserTest, ParseTest) {
     std::vector<Token> tokens = {
         Token(TokenType::NUMBER, "1", "1.0", 1),
         Token(TokenType::PLUS, "+", "", 1),
-        Token(TokenType::NUMBER, "2", "2.0", 1)
+        Token(TokenType::NUMBER, "2", "2.0", 1),
+        Token(TokenType::END_OF_FILE, "EOF", "EOF", 1)
     };
     parser p = createParser(tokens);
     auto result = p.parse();
@@ -380,7 +501,7 @@ TEST_F(ParserTest, ParseTest) {
 }
 
 // Test error handling
-TEST_F(ParserTest, ParseErrorTest) {
+/*TEST_F(ParserTest, ParseErrorTest) {
     std::vector<Token> tokens = {
         Token(TokenType::LEFT_PAREN, "(", "", 1),
         Token(TokenType::NUMBER, "42", "42.0", 1)

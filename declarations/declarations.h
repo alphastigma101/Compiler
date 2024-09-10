@@ -36,7 +36,6 @@ static astTree<T, U, std::shared_ptr<ListOfType<V>>> compressedAstTree(T first, 
 //TODO: Make an expanded astTree struct. so something like: expandAstTree(T firstNode, U secondNode, V thirdNode, X fourthNode, W stringLiteral, Y ExprTypes)
 
 
-
 /**---------------------------------------------------------------------------
  * @brief setTokenLanguage method is initialized in main.cc
  * getTokenLanguage is used in:

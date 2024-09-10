@@ -180,21 +180,21 @@ bool Scanner::match(const char expected) {
  *
 */
 void Scanner::string_() {
-    if (peek() == '"') {
-        while (peek() != '"' && !isAtEnd()) {
+    
+        while ((peek() != '"' && !isAtEnd()) || (peek() != '\'' && !isAtEnd())) {
             if (peek() == '\n') line++;
             advance();
         }
         if (isAtEnd()) { throw catcher<Scanner>("Unterminated string."); }
-    }
-    else {
+    
+    /*else {
         while (peek() != '\'' && !isAtEnd()) {
             if (peek() == '\n') line++;
             advance();
         }
         if (isAtEnd()) { throw catcher<Scanner>("Unterminated string."); }
 
-    }
+    }*/
     // The closing " or '.
     advance();
     // Trim the surrounding quotes.

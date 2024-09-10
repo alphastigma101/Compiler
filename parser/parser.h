@@ -142,7 +142,10 @@ namespace Parser {
              * @details moves data over to tokens_  from tokens
              * ----------------------------------------------------------------------------------------------------------
             */
-            explicit parser(std::vector<Token>& tokens) { tokens_ = std::move(tokens); };
+            explicit parser(std::vector<Token>& tokens) { 
+                reset(); // reset idx and current
+                tokens_ = std::move(tokens); 
+            };
             // Current rules that were made from a grammar 
             static ExprTypes<Binary, Unary, Grouping, Literal> equality();
             static ExprTypes<Binary, Unary, Grouping, Literal> comparison();

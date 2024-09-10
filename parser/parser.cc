@@ -176,7 +176,6 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::expression() { return equali
  * --------------------------------------------------------------------------
 */
 ExprTypes<Binary, Unary, Grouping, Literal> parser::parse() {
-    reset(); // reset idx and current
     try { return expression();}
     catch (parseError<parser>& e) { 
         std::cout << e.error() << std::endl;

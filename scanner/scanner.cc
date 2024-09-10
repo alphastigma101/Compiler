@@ -6,7 +6,7 @@
     *  std::string source: the source line of code from a file or from the runprompt function
  * --------------------------------------------------------------------------------------------  
  */
-Scanner::Scanner(const std::string source): source(source) {}
+Scanner::Scanner(const std::string source): source(std::move(source)) {}
 
 /* ----------------------------------------------------------------------------------
  * (keywords) is a dictionary that holds in various keywords of programming languages 
@@ -23,6 +23,8 @@ const std::unordered_map<std::string, TokenType> Scanner::keywords = {
     {"fun",    TokenType::FUN},
     {"if",     TokenType::IF},
     {"nil",    TokenType::NIL},
+    {"null",   TokenType::NIL},
+    {"nullptr", TokenType::NIL},
     {"or",     TokenType::OR},
     {"print",  TokenType::PRINT},
     {"return", TokenType::RETURN},
@@ -42,7 +44,11 @@ const std::unordered_map<std::string, TokenType> Scanner::keywords = {
     {"final", TokenType::FINAL},
     {"std", TokenType::STD},
     {"var", TokenType::VAR},
-    {"nuke", TokenType::NUKE}
+    {"nuke", TokenType::NUKE},
+    {"void", TokenType::VOID},
+    {"bool", TokenType::BOOL},
+    {"boolean", TokenType::BOOLEAN}, 
+    {"undefined", TokenType::UNDEFINED}
 };
 
 /* ------------------------------------------------------------------------------------------------------
@@ -92,44 +98,45 @@ void Scanner::scanToken() {
         case '<': addToken(match('=') ? TokenType::LESS_EQUAL : TokenType::LESS); break;
         case '>': addToken(match('=') ? TokenType::GREATER_EQUAL : TokenType::GREATER); break;
         case '/':
-               if (match('/')) {
-                   // A comment goes until the end of the line.
-                   while (peek() != '\n' && !isAtEnd()) advance();
-               } else { addToken(TokenType::SLASH); }
-               break;
+            if (match('/')) {
+            // A comment goes until the end of the line.
+            while (peek() != '\n' && !isAtEnd()) advance();
+            } else { addToken(TokenType::SLASH); }
+            break;
         case 'o':
-               // Need to also add support for | and || 
-               if (match('r')) { addToken(TokenType::OR); }
-               break;
+            // Need to also add support for | and || 
+            if (match('r')) { addToken(TokenType::OR); }
+            break;
         case ' ':
         case '\r':
         case '\t':
-               // Ignore whitespace.
-                break;
+            // Ignore whitespace.
+            break;
         case '\n':
-                line++;
-                break;
+            line++;
+            break;
         case '"': string_(); break;
+        case '\'': string_(); break;
         default: 
-               if (isDigit(c)) { number_();} 
-               else if (isAlpha(c)) { identifier(); }
-               else { 
-                   //throw runtimeerror<Scaner>(line, "Unexcepted character");
-               }                
-               break;
+            if (isDigit(c)) { number_();} 
+            else if (isAlpha(c)) { identifier(); }
+            else { 
+                //throw runtimeerror<Scaner>(line, "Unexcepted character");
+            }                
+            break;
     }
 }
-/* ---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief Helper function that adds tokens to a container
- * @param const TokenType type: represents enum literals
+ * @param type: represents enum literals
  * ---------------------------------------------------------------------------
 */
 void Scanner::addToken(const TokenType type) { addToken(type, ""); }
 
-/* ---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief A method that gets called by a data memeber function helper
- * @param Tokentype type: Is a Lexical grammar
- * @param const std::string literal: A representation of a primitive instance type 
+ * @param type: Is a Lexical grammar
+ * @param literal: A representation of a primitive instance type 
  * @return Nothing. This method only pushes to a vector. 
  * ---------------------------------------------------------------------------
 */
@@ -138,7 +145,7 @@ void Scanner::addToken(const TokenType type, const std::string literal) {
     tokens.push_back(Token(type, text, literal, line));
 }
 
-/* ---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief Searches for the keyword inside a string literal.
  * @param None
  * @return None. It uses a dictionary to see if the object type is inside the dictionary 
@@ -157,9 +164,9 @@ void Scanner::identifier() {
     }
     addToken(type);
 }
-/* --------------------------------------------------------------------------
+/** --------------------------------------------------------------------------
  * @brief It scans through the string literal and matches it with a enum type
- * @param const char expected: A character literal that is matched with an enum type
+ * @param expected: A character literal that is matched with an enum type
  * @return True if there is a match. Otherwise false
 */
 bool Scanner::match(const char expected) {
@@ -168,19 +175,28 @@ bool Scanner::match(const char expected) {
     current++;
     return true;
 }
-/*
+/** ------------------------------------
  *
  *
 */
 void Scanner::string_() {
-    while (peek() != '"' && !isAtEnd()) {
-        if (peek() == '\n') line++;
-        advance();
+    if (peek() == '"') {
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n') line++;
+            advance();
+        }
+        if (isAtEnd()) { throw catcher<Scanner>("Unterminated string."); }
     }
-    if (isAtEnd()) { throw catcher<Scanner>("Unterminated string."); }
-    // The closing ".
-    advance();
+    else {
+        while (peek() != '\'' && !isAtEnd()) {
+            if (peek() == '\n') line++;
+            advance();
+        }
+        if (isAtEnd()) { throw catcher<Scanner>("Unterminated string."); }
 
+    }
+    // The closing " or '.
+    advance();
     // Trim the surrounding quotes.
     std::string value = source.substr(start + 1, current - start - 2);
     //std::string value = source;

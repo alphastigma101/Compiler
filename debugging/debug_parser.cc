@@ -33,23 +33,33 @@ logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare
 parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 
 static void debugEquality() {
-    const std::vector<std::string> testCases = {
-        "3 + 4",
-        "5 * 6",
-        "2 + 3 * 4",
-        "(2 + 3) * 4",
-        "2 * (3 + (4 - 1))",
-        "-5 + -3",
-        "10 / 2",
-        "3 + 4 * 2 + (6 / 3)",
-        "13 + 34 * 2 - (6 / 2)",
-        "33 + 34 * 2 / (6 / 3)",
-
-        "42",
-        "",
-        "(2 / 3 / 5",
-        "2 + * 3"
-    };  
+   std::vector<std::string> testCases = {
+        "1 == 1",
+        "2 != 3",
+        "true == true",
+        "false != true",
+        "null == null",
+        //"42 == 42.0",
+        //"3.14 != 3.14159",*/
+        //"'hello' == 'hello'",
+        /*"('world' != 'World')",
+        //"1 == 2 == false",
+        //"1 != 2 != false",
+        "(1 == 1) == true",
+        "(1 != 1) == false",
+        "true == !false",
+        "null != undefined",
+        "0 == false",
+        "1 == true",
+        "'' == false",
+        "'0' != 0",
+        "[] == []",
+        "{} != {}", 
+        "(Infinity == Infinity)",
+        "NaN != NaN",
+        "(1 < 2) == (3 > 2)",
+        "(1 <= 1) != (2 >= 3)"*/
+    };
     for (const auto& testCase : testCases) {
         runTest(testCase);
     }

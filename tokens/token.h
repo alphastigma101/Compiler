@@ -12,16 +12,16 @@ class Token: public MemberConv<Token>, catcher<Token>  {
         ~Token() noexcept = default;
         // Other Constructor
         explicit Token(const TokenType type, const std::string lexeme, const std::string literal, const int line);
-        static TokenType getType();
+        TokenType getType();
         std::string getTypeStr();
         std::string getLexeme();
         std::string getLiteral();
         int getLine();
-        inline static std::any toString() {
+        inline std::any toString() {
             return std::make_any<std::string>(tokenTypeToString() + " " + lexeme + " " + literal);
         };
     protected:
-        inline static std::string tokenTypeToString() {
+        inline std::string tokenTypeToString() {
             auto it = tokenTypeStrings.find(type);
             if (it != tokenTypeStrings.end()) { return it->second;}
             catcher<Token> cT("Unknown TokenType");
@@ -29,9 +29,9 @@ class Token: public MemberConv<Token>, catcher<Token>  {
         };
         inline static const char* what(const char* msg = std::move(getMsg())) throw() { return msg;};
     private:
-        static TokenType&& type;
-        static std::string&& lexeme;
-        static std::string&& literal; 
+        TokenType type;
+        std::string lexeme;
+        std::string literal; 
         int line;
     };
 

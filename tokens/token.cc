@@ -1,10 +1,23 @@
 #include <token.h>
+TokenType&& Token::type = TokenType::NIL;
+std::string&& Token::lexeme = "\0";
+std::string&& Token::literal = "\0";
+
 /* ---------------------------------------------------------------------------
  * @brief Default constructor is using list-initializing 
  * ---------------------------------------------------------------------------
 */
-Token::Token(const TokenType type, const std::string lexeme, const std::string literal, const int line): type(type), lexeme(lexeme), literal(literal), line(line) {
+Token::Token(const TokenType type_, const std::string lexeme_, const std::string literal_, const int line_): line(line_) {
+    try {
+        type = std::move(type_);
+        lexeme = std::move(lexeme_);
+        literal = std::move(literal_);
 
+    }
+    catch(...) {
+        catcher<Token> cT("Undefined Behavior!");
+        throw cT;
+    }
 }
 
 /* ---------------------------------------------------------------------------
@@ -12,7 +25,7 @@ Token::Token(const TokenType type, const std::string lexeme, const std::string l
  * @return TokenType type-id
  * ---------------------------------------------------------------------------
 */
-TokenType Token::getType() { return type; }
+TokenType Token::getType() { return std::move(type); }
 
 /* --------------------------------------------------------------------------
  * @brief A getter method to get the lexeme object

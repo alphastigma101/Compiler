@@ -100,7 +100,7 @@ void debugComplexCase() {
 // Driver Code
 int main(void) {
     //debugConstructor();
-    //debugSingleCharacterTokens();
+    debugSingleCharacterTokens();
     //debugDoubleCharacterTokens();
     //debugKeywords();
     //debugIdentifiers();

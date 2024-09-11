@@ -21,6 +21,7 @@ class Scanner: public catcher<Scanner> {
         int start = 0;
         int current = 0;
         int line = 1;
+        inline static const char* what(const char* msg = getMsg()) throw() { return msg;};
         inline bool isAtEnd() { return current >= source.length();}; 
         inline char advance() { return source.at(current++); };
         inline bool isDigit(const char c) { return c >= '0' && c <= '9'; };

@@ -41,7 +41,7 @@ ast::ast(std::vector<treeEntry>& expr_) {
     try {
         generateAst<ast> gA;
         ext = ext_;
-        gA.tree_();
+        gA.tree_(gA);
     }
     catch(catcher<ast>& e) {
         std::cout << "Logs folder has been updated!" << std::endl;
@@ -53,8 +53,7 @@ ast::ast(std::vector<treeEntry>& expr_) {
     }
 }
 
-template<class T>
-void generateAst<T>::writeFile(std::string& ext) {
+void parser::writeFile(std::string& ext) {
     //codeStr += value.getLexeme();
     std::string Ast = "Ast.txt";
     std::ofstream fAst(Ast);
@@ -69,8 +68,7 @@ void generateAst<T>::writeFile(std::string& ext) {
     return;
 }
 
-template<class T>
-void generateAst<T>::tree_()  {
+void parser::tree_()  {
     /*try {
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
            auto temp = compactedTreeNodes.at(i);

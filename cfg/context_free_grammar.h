@@ -89,6 +89,7 @@ namespace ContextFreeGrammar {
             std::shared_ptr<Token> op;
         private:
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            inline static const char* what(const char* msg = decltype(getMsg())) const throw() { return msg;};
      };
     class Binary: public Expr<Binary> {
         /*
@@ -106,12 +107,13 @@ namespace ContextFreeGrammar {
          * Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            friend class ::Parser::parser;
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
-            Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_): Left(std::move(left_)), Right(std::move(right_)) {
+            Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_): Left(left_), Right(right_) {
                 try {
-                    left = std::move(Left);
-                    right = std::move(Right);
+                    left = std::make_shared<ExprVariant>(left_, Left); // copy the resources to a new memory location
+                    Left = std::move(left_); // move the current left_ resources memory location into Left 
+                    right = std::make_shared<ExprVariant>(right_, Right);
+                    Right = std::move(right_);
                     op = std::make_shared<Token>(op_);
                 }
                 catch(...) {
@@ -127,8 +129,8 @@ namespace ContextFreeGrammar {
              */
             inline std::string visit(Binary&& expr) {
                 try {
-                    //std::string leftResult = (expr.left.get() && std::get_if<Binary>(expr.left.get())) ? std::get_if<Binary>(expr.left.get())->accept(*this) : "";
-                    //std::string rightResult = expr.right.get() ? std::get_if<Binary>(expr.right.get())->accept(*this) : "";
+                    //std::string leftResult = (expr.Left.get() && std::get_if<Binary>(expr.left.get())) ? std::get_if<Binary>(expr.left.get())->accept(*this) : "";
+                    //std::string rightResult = expr.Right.get() ? std::get_if<Binary>(expr.right.get())->accept(*this) : "";
                     //return " " + leftResult + " " + rightResult;
                 }
                 catch(runtimeerror<Binary>& e) {
@@ -141,8 +143,6 @@ namespace ContextFreeGrammar {
                 return "\0";
             };
             inline Token getToken() { return *op; };
-        protected:
-            Binary() = default;
         private:
             std::shared_ptr<ExprVariant> Left;
             std::shared_ptr<ExprVariant> Right;
@@ -150,10 +150,11 @@ namespace ContextFreeGrammar {
     };
     class Unary: public Expr<Unary> {
         public:
-            friend class ::Parser::parser;
-            Unary(std::shared_ptr<ExprVariant>& right_, const Token& op_): Right(std::move(right_)), Op(std::make_shared<Token>(op_))  {
+            Unary(std::shared_ptr<ExprVariant>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
                 try {
                     op = Op;
+                    right = std::make_shared<ExprVariant>(right_, Right);
+                    Right = std::move(right_);
                 }
                 catch(...) {
                     catcher<Unary> cu("Undefined behavior occurred in Class Unary!");
@@ -176,16 +177,24 @@ namespace ContextFreeGrammar {
                 return "\0";
             };
             inline Token getToken() { return *Op; };
-        protected:
-            Unary() = default;
         private:
             std::shared_ptr<ExprVariant> Right;
             std::shared_ptr<Token> Op;
     };
     class Grouping: public Expr<Grouping> {
         public:
-            friend class ::Parser::parser;
-            explicit Grouping(std::shared_ptr<ExprVariant>& expression) {
+            /** ---------------------------------------------------------------
+             * @brief Initializes the expression_ and moves the resources into it 
+             *
+             * @detials Moves left's stored pointer resources into data member Left 
+             * @detials with left's and Right with the
+             * @detials 1. A snippet of the ast tree would look like: ...., Binary, Grouping, Binary, Binary, Grouping
+             * @detials 2. A snippet of the ast tree would look like: ...., Binary, Grouping, Binary, Unary, Unary, Grouping
+             * @detials 3. A snippet of the ast tree would look like: ...., Binary, Grouping, Grouping, Unary, Unary, Grouping, Binary, Grouping, Grouping
+             * ----------------------------------------------------------------
+             */
+            explicit Grouping(std::shared_ptr<ExprVariant>& expression): expression_(std::move(expression)) {
+                // Access the pointers stored in left and right and move them to Left and Right
                 //expression_->left = expression->left;
                 //expression_->right = expression->right;
             };
@@ -205,11 +214,10 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            //inline Expr<Grouping> getExpr() { return *expression_; }
-        protected:
-            Grouping() = default;
+            //inline Expr<Grouping> getExpr() { return *expression_; 
         private:
            std::shared_ptr<ExprVariant> expression_;
+           std::shared_ptr<ExprVariant> Left, Right; 
     };
     class Literal: public MemberConv<Literal>, public Expr<Literal> {
         public:
@@ -239,7 +247,7 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline std::any toString() override {
+            inline static std::any toString() {
                 try {
                     return std::any_cast<std::string>(value_);
                 } 

@@ -247,7 +247,7 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline static std::any toString() {
+            inline std::any toString() {
                 try {
                     return std::any_cast<std::string>(value_);
                 } 

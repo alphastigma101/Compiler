@@ -3,13 +3,13 @@
 // TODO: You need to check based on what the user types if the language needs to be interpreted or compiled 
 // For example, python cannot be compiled it needs to be interpreted 
 
-// Define static members
+// Define static members for generateAst
 template<class T>
 logTable<std::map<std::string, std::vector<std::string>>> generateAst<T>::logs_;
 template<class T>
 std::vector<treeEntry> generateAst<T>::compactedTreeNodes;
 template<class T>
-std::string generateAst<T>::ext;
+std::pair<std::vector<std::vector<std::string>>, std::vector<std::string>> generateAst<T>::ext;
 template<class T>
 std::string generateAst<T>::codeStr;
 template<class T>
@@ -18,8 +18,10 @@ std::string generateAst<T>::compactedTreeStr;
 std::string file_name, user_choice;
 template<typename T>
 struct std::tuple<int, std::pair<std::string, ExprTypes<ListOfType<T>>>>; // Explicit initialize the underyling of astTree type
+Table ast::table;
 
-/**-----------------------------------------------------------------------------------------
+
+/** -----------------------------------------------------------------------------------------
  * @brief The default constructor that calls in generateAst to start creating the .txt file 
  * 
  * @param expr: The data structure that represents the compacted abstraction syntax tree 
@@ -27,21 +29,22 @@ struct std::tuple<int, std::pair<std::string, ExprTypes<ListOfType<T>>>>; // Exp
 */
 ast::ast(std::vector<treeEntry>& expr_) {
     generateAst<ast> gA;
-    std::string ext_;
-    if (file_name == "\0" || user_choice == "\0") {
+    //std::string ext_;
+    if (file_name.empty() || user_choice.empty()) {
+        // TODO: This shouldn't be here, but for now, it will be used for the test cases 
         catcher<ast> c("User is running a custom language!");
         throw c;
     }
     else {
-        auto pair = table.at(user_choice); // pair->first is the extensions, pair->ssecond is the download links for the program
-        //ext = pair.first // TODO: THis needs to be fixed 
-        setTable(languageExtensions, downloads);
+        table = initTable(languageExtensions, downloads); 
+        auto getPair = table.at(user_choice); // pair->first is the extensions, pair->ssecond is the download links for the program
+        ext = getPair.first.at(0);
     }
-    //compactedTreeNodes = expr_;
+    compactedTreeNodes = std::move(expr_);
     try {
         generateAst<ast> gA;
-        ext = ext_;
-        gA.tree_(gA);
+        //ext = ext_;
+        gA.tree_(std::move(gA));
     }
     catch(catcher<ast>& e) {
         std::cout << "Logs folder has been updated!" << std::endl;
@@ -52,7 +55,15 @@ ast::ast(std::vector<treeEntry>& expr_) {
         logs.rotate();
     }
 }
-
+/** -------------------------------------------------------------------------
+ * @brief Writes the code to target file
+ *
+ * @param ext Is an string object that is implicitly initalized with the targeted extension
+ *
+ * @return None
+ *
+ * --------------------------------------------------------------------------
+*/
 void ast::writeFile(std::string& ext) {
     //codeStr += value.getLexeme();
     std::string Ast = "Ast.txt";

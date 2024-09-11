@@ -28,7 +28,7 @@ static void run(std::string& source) {
 }
 
 
-LanguageTokenTypes user_language(const std::string& choice) {
+static LanguageTokenTypes user_language(const std::string& choice) {
     if (choice == "Python") return LanguageTokenTypes::Python;
     else if (choice == "JavaScript") return LanguageTokenTypes::JavaScript;
     else if (choice == "Ruby") return LanguageTokenTypes::Ruby;

@@ -6,7 +6,7 @@
 #include <map>
 #include <vector>
 #include <iostream>
-const std::unordered_map<std::string, std::string> downloads = {
+static const std::unordered_map<std::string, std::string> downloads = {
     {"C", "https://gcc.gnu.org/"},
     {"C++ (CPP)", "https://gcc.gnu.org/"},
     {"Java", "https://www.oracle.com/java/technologies/javase-downloads.html"},
@@ -57,7 +57,7 @@ const std::unordered_map<std::string, std::string> downloads = {
     {"Standard ML (SML)", "https://www.standardml.org/"}
 };
 
-const std::unordered_map<std::string, std::vector<std::string>> languageExtensions = {
+static const std::unordered_map<std::string, std::vector<std::string>> languageExtensions = {
         {"C", {".c"}},
         {"C++ (CPP)", {".cpp", ".cc", ".cxx"}},
         {"Java", {".java"}},
@@ -107,6 +107,4 @@ const std::unordered_map<std::string, std::vector<std::string>> languageExtensio
         {"Smalltalk", {".st"}}, // No specific extension, commonly ".st" or others
         {"Standard ML (SML)", {".sml", ".ml"}}
     };
-
-
 #endif 

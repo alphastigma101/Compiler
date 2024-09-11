@@ -3,13 +3,13 @@
 #define _DECLARATIONS_H_
 #include <utility>
 #include <languages.h>
-/**---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief Initialized in main.cc and is copy-initialized in abstraction_syntax_tree.cc
  * ---------------------------------------------------------------------------
 */
 extern std::string user_choice; // get the user choice of language from the begining 
 extern std::string file_name;
-/**---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief Used in abstranction_tree_syntax.h
  * -----------------Templates Objects-----------------------------------------
  * @detials 'InitializerListType' is represents a container type using an initializer list
@@ -36,9 +36,9 @@ static astTree<T, U, std::shared_ptr<ListOfType<V>>> compressedAstTree(T first, 
 //TODO: Make an expanded astTree struct. so something like: expandAstTree(T firstNode, U secondNode, V thirdNode, X fourthNode, W stringLiteral, Y ExprTypes)
 
 
-/**---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief setTokenLanguage method is initialized in main.cc
- * getTokenLanguage is used in:
+ * @details getTokenLanguage is used in:
     * language_specific_binary_operations.h 
     * language_specific_truthy_operations.h 
     * language_specific_unary_operations.h
@@ -70,7 +70,7 @@ extern languages type;
 */
 template<typename T>
 using logTable = T;
-extern logTable<std::map<std::string, std::vector<std::string>>> logEntries;  // More descriptive of its purpose
+extern logTable<std::map<std::string, std::vector<std::string>>> logEntries; 
 /**---------------------------------------------------------------------------
  * @brief Used to create a specific file with a specific extension. Is used  by interpreter.cc 
  * ---------------------------------------------------------------------------
@@ -79,7 +79,7 @@ typedef std::string Key;
 typedef std::vector<std::string> Extension;
 typedef std::vector<std::string> LanguageLinks;
 typedef std::map<Key, std::pair<Extension, LanguageLinks>> Table;
-const inline Table initTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads);
+static const Table initTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads);
 
 /**---------------------------------------------------------------------------
  * @brief defined in parser.h 
@@ -92,9 +92,13 @@ namespace Parser {
     class parser;
 };
 
-/**------------------------------------------------
- * @brief Defined in context_free_grammar.h 
- */
+/**---------------------------------------------------------------------------
+ * @brief Defined in context_free_grammar.h
+ *
+ * @details This is a forward declaration which will be very useful for later on.
+ *
+ * --------------------------------------------------------------------------
+*/
 namespace ContextFreeGrammar {
     template<class Derived>
     class Expr;
@@ -103,8 +107,11 @@ namespace ContextFreeGrammar {
     class Grouping;
     class Literal;
 };
-/**------------------------------------------------
+/** --------------------------------------------------------------------------
  * @brief Used in context_free_grammar.h and in parser.cc
+ *
+ * @details Used immensly in parser.cc for recrusive parsing 
+ * ---------------------------------------------------------------------------
 */
 typedef std::variant<
     ContextFreeGrammar::Binary,

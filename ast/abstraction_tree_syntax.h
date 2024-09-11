@@ -44,7 +44,7 @@ namespace AbstractionTreeSyntax {
             static std::string compactedTreeStr;
             static logTable<std::map<std::string, std::vector<std::string>>> logs_;
             static std::vector<treeEntry> compactedTreeNodes;
-            static std::string ext;
+            static std::pair<std::vector<std::vector<std::string>>, std::vector<std::string>> ext;
     };
     class ast: public generateAst<ast> {
         /* --------------------------------------------------------------------------------------------
@@ -52,18 +52,24 @@ namespace AbstractionTreeSyntax {
          * -------------------------------------------------------------------------------------------
         */
         public:
-            friend class generateAst<ast>;
+            friend class generateAst<ast>; // Link the generateAst together with the ast 
             ast(std::vector<treeEntry>& expr_);
             ~ast() noexcept = default;
-            inline void setTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads) { 
-                table = initTable(languageExtensions, downloads); 
-            };
-            inline Table getTable() { return table; };
-            //inline static treeEntry getTree() { return compactedTreeNodes; };
+            inline static Table getTable() { return table; };
+            /** ---------------------------------------------------------------
+             * @brief Is a simple getter method. but once used, it will move the resources over to the new variable 
+             *
+             * @param None
+             *
+             * @return compactedTreeNodes resources
+             *
+             * ----------------------------------------------------------------
+             */
+            inline static const std::vector<treeEntry>& getTree() { return std::move(compactedTreeNodes); };
         private:
             static void tree_(const generateAst<ast>& gA);
             static void writeFile(std::string& ext);
-            Table table;
+            static Table table;
     };
     class analyzeSemantics: public catcher<analyzeSemantics> {
         // This class performs the semantic analysis 

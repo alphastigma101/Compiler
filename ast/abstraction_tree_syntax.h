@@ -13,6 +13,7 @@ namespace AbstractionTreeSyntax {
          */
         public:
             friend class ast;
+            friend class catcher<Type>;
             explicit generateAst<Type>() {
                 std::filesystem::path pp = std::filesystem::path(getenv("Public-Projects"));
                 // Check if the path exists and is in user space
@@ -34,7 +35,7 @@ namespace AbstractionTreeSyntax {
             virtual ~generateAst() noexcept = default;
             inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
         protected:
-            inline static const char* what(const char* msg = decltype(getMsg())) const throw() { return msg;};
+            inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
             std::string nameOfFile = std::move(file_name);
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
@@ -57,8 +58,8 @@ namespace AbstractionTreeSyntax {
                 table = initTable(languageExtensions, downloads); 
             };
             inline Table getTable() { return table; };
-            inline static treeEntry getTree() { return std::move(compactedTreeNodes); };
-        private:
+            //inline static treeEntry getTree() { return compactedTreeNodes; };
+        //private:
             static void tree_(const generateAst<ast>& gA);
             static void writeFile(std::string& ext);
             Table table;

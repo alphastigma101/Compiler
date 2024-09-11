@@ -53,7 +53,7 @@ ast::ast(std::vector<treeEntry>& expr_) {
     }
 }
 
-void parser::writeFile(std::string& ext) {
+void ast::writeFile(std::string& ext) {
     //codeStr += value.getLexeme();
     std::string Ast = "Ast.txt";
     std::ofstream fAst(Ast);
@@ -68,7 +68,7 @@ void parser::writeFile(std::string& ext) {
     return;
 }
 
-void parser::tree_()  {
+void ast::tree_(const generateAst<ast>& gA)  {
     /*try {
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
            auto temp = compactedTreeNodes.at(i);

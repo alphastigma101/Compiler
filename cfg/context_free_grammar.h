@@ -89,7 +89,7 @@ namespace ContextFreeGrammar {
             std::shared_ptr<Token> op;
         private:
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
-            inline static const char* what(const char* msg = decltype(getMsg())) const throw() { return msg;};
+            inline static const char* what(const char* msg = catcher<Derived>::getMsg()) throw() { return msg;};
      };
     class Binary: public Expr<Binary> {
         /*
@@ -110,9 +110,9 @@ namespace ContextFreeGrammar {
             // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
             Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_): Left(left_), Right(right_) {
                 try {
-                    left = std::make_shared<ExprVariant>(left_, Left); // copy the resources to a new memory location
+                    left = std::shared_ptr<ExprVariant>(left_, Left.get()); // copy the resources to a new memory location
                     Left = std::move(left_); // move the current left_ resources memory location into Left 
-                    right = std::make_shared<ExprVariant>(right_, Right);
+                    right = std::shared_ptr<ExprVariant>(right_, Right.get());
                     Right = std::move(right_);
                     op = std::make_shared<Token>(op_);
                 }
@@ -153,7 +153,7 @@ namespace ContextFreeGrammar {
             Unary(std::shared_ptr<ExprVariant>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
                 try {
                     op = Op;
-                    right = std::make_shared<ExprVariant>(right_, Right);
+                    right = std::shared_ptr<ExprVariant>(right_, Right.get());
                     Right = std::move(right_);
                 }
                 catch(...) {

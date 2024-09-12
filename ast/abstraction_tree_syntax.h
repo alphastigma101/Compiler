@@ -1,9 +1,8 @@
 #ifndef _ABSTRACTION_TREE_SYNTAX_H_
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
-typedef astTree<int, std::string, ExprVariant> treeEntry;
-//TODO: Need to remove the wrapper around the ExprVariant 
-extern template struct std::tuple<int, std::pair<std::string, ExprTypes<std::monostate, ListOfType<ExprVariant>>>>;
+extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>;
+typedef astTree<int, String, ExprVariant> treeEntry;
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public catcher<Type> {
@@ -40,11 +39,11 @@ namespace AbstractionTreeSyntax {
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
             std::string outputDir_;
-            static std::string codeStr;
-            static std::string compactedTreeStr;
-            static logTable<std::map<std::string, std::vector<std::string>>> logs_;
-            static std::vector<treeEntry> compactedTreeNodes;
-            static std::string ext;
+            static String codeStr;
+            static String compactedTreeStr;
+            static logTable<Map<String, Vector<String>>> logs_;
+            static Vector<treeEntry> compactedTreeNodes;
+            static String ext;
     };
     class ast: public generateAst<ast> {
         /* --------------------------------------------------------------------------------------------
@@ -52,34 +51,45 @@ namespace AbstractionTreeSyntax {
          * -------------------------------------------------------------------------------------------
         */
         public:
+            friend class generateAst<ast>; // Link the generateAst together with the ast 
             ast(std::vector<treeEntry>& expr_);
             ~ast() noexcept = default;
-            inline void setTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads) { 
-                table = initTable(languageExtensions, downloads); 
-            };
-            inline Table getTable() { return table; };
-            //inline static treeEntry getTree() { return compactedTreeNodes; };
-        //private:
+            inline static Table getTable() { return table; };
+            /** ---------------------------------------------------------------
+             * @brief Is a simple getter method. but once used, it will move the resources over to the new variable 
+             *
+             * @param None
+             *
+             * @return compactedTreeNodes resources
+             *
+             * ----------------------------------------------------------------
+             */
+            inline static const std::vector<treeEntry>& getTree() { return std::move(compactedTreeNodes); };
+        private:
             static void tree_(const generateAst<ast>& gA);
             static void writeFile(std::string& ext);
-            Table table;
+            static Table table;
     };
-    class analyzeSemantics: public ast {
+    class analyzeSemantics: public catcher<analyzeSemantics> {
         // This class performs the semantic analysis 
         public: 
-            analyzeSemantics(ast &Ast);
+            friend class catcher<analyzeSemantics>;
+            explicit analyzeSemantics(ast &Ast_);
             ~analyzeSemantics() noexcept = default;
+        protected:
+            inline static const char* what(const char* msg = catcher<analyzeSemantics>::getMsg()) throw() { return msg; };
         private:
-            ast Ast; // Use list initializer to initialize this value 
+            ast&& Ast; // Use list initializer to initialize this value 
     };
-    class intermediateRepresentation: public analyzeSemantics {
+    class intermediateRepresentation: public catcher<intermediateRepresentation> {
         // This class Translates AST to intermediate representation (IR)
         public:
-            intermediateRepresentation(analyzeSemantics &as);
+            friend class catcher<intermediateRepresentation>;
+            explicit intermediateRepresentation(analyzeSemantics &as_);
             ~intermediateRepresentation() noexcept = default;
-            void generate();
+            static void generate();
         private:
-            analyzeSemantics as;
+            analyzeSemantics&& as;
     };
 };
 using namespace AbstractionTreeSyntax;

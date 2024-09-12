@@ -1,7 +1,7 @@
 #ifndef _PARSER_H_
 #define _PARSER_H_
 #include <abstraction_tree_syntax.h>
-extern template struct std::shared_ptr<std::variant<Binary, Unary, Grouping, Literal>>; // define the underlying of ExprTypes 
+extern template struct std::shared_ptr<Variant<Binary, Unary, Grouping, Literal>>; // define the underlying of ExprTypes 
 namespace Parser {
     template<class Derived>
     class parseError: public catcher<Derived> {
@@ -70,7 +70,7 @@ namespace Parser {
             static ExprTypes<Binary, Unary, Grouping, Literal> identifier();
             static ExprTypes<Binary, Unary, Grouping, Literal> arguments();
             ~parser() noexcept {};
-            static std::vector<std::tuple<int, std::pair<std::string, std::shared_ptr<ListOfType<std::shared_ptr<ExprVariant>>>>>> nodes; // passed into ast constructor
+            static std::vector<std::tuple<int, std::pair<String, Shared<ExprVariant>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
         protected:
             /**----------------------------------------------------------------------------------------------------------

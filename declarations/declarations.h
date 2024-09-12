@@ -3,13 +3,47 @@
 #define _DECLARATIONS_H_
 #include <utility>
 #include <languages.h>
-/**---------------------------------------------------------------------------
+/** ------------------------------------------------------------------------
+ * @brief Used to control the programs behavior based on the user choice of language
+ *
+ * @details setI and setC are declared in declarations.h and defined in definitions.h.
+*/
+static int setI(const int val...);
+static int setC(const int val...); 
+extern int settings;
+
+typedef std::string String;
+template<typename K, typename V>
+// Containers
+using Map = std::map<K, V>;
+template<typename K, typename V>
+using Unordered = std::unordered_map<K, V>;
+template<typename... T>
+using Variant = std::variant<T...>;
+template<typename T>
+using Vector = std::vector<T>;
+template<typename T>
+// Pointers
+using Shared = std::shared_ptr<T>;
+template<typename T>
+using Unique = std::unique_ptr<T>;
+template<typename T>
+using Weak = std::weak_ptr<T>;
+// Threading/Atomic/Mutex
+template<typename T>
+using Atomic = std::atomic<T>;
+//template<typename T>
+//using Mutex = std::mutex<T>;
+/*template<typename T>
+using Threading = std::threading<T>*/
+
+/** --------------------------------------------------------------------------
  * @brief Initialized in main.cc and is copy-initialized in abstraction_syntax_tree.cc
  * ---------------------------------------------------------------------------
 */
-extern std::string user_choice; // get the user choice of language from the begining 
-extern std::string file_name;
-/**---------------------------------------------------------------------------
+extern String user_choice; // get the user choice of language from the begining 
+extern String file_name;
+/** ---------------------------------------------------------------------------
  * @brief Used in abstranction_tree_syntax.h
  * -----------------Templates Objects-----------------------------------------
  * @detials 'InitializerListType' is represents a container type using an initializer list
@@ -22,23 +56,17 @@ extern std::string file_name;
  * ---------------------------------------------------------------------------
 */
 template<typename... Derived>
-using ExprTypes = std::shared_ptr<std::variant<Derived...>>;
-template<typename T>
-using InitializerListType = std::initializer_list<T>; // change this line with another container if swapping is needed
-template<typename T>
-using ListOfType = InitializerListType<T>;
-template<typename T>
-extern ListOfType<T> externalList;
+using ExprTypes = Shared<Variant<Derived...>>;
 template<typename T, typename U, typename V>
-using astTree = std::tuple<T, std::pair<U, std::shared_ptr<ListOfType<V>>>>;
+using astTree = std::tuple<T, std::pair<U, Shared<V>>>;
 template<typename T, typename U, typename V>
-static astTree<T, U, std::shared_ptr<ListOfType<V>>> compressedAstTree(T first, U second, V third);
+static astTree<T, U, Shared<V>> compressedAstTree(T first, U second, V third);
 //TODO: Make an expanded astTree struct. so something like: expandAstTree(T firstNode, U secondNode, V thirdNode, X fourthNode, W stringLiteral, Y ExprTypes)
 
 
-/**---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief setTokenLanguage method is initialized in main.cc
- * getTokenLanguage is used in:
+ * @details getTokenLanguage is used in:
     * language_specific_binary_operations.h 
     * language_specific_truthy_operations.h 
     * language_specific_unary_operations.h
@@ -70,16 +98,13 @@ extern languages type;
 */
 template<typename T>
 using logTable = T;
-extern logTable<std::map<std::string, std::vector<std::string>>> logEntries;  // More descriptive of its purpose
+extern logTable<std::map<std::string, std::vector<std::string>>> logEntries; 
 /**---------------------------------------------------------------------------
  * @brief Used to create a specific file with a specific extension. Is used  by interpreter.cc 
  * ---------------------------------------------------------------------------
 */
-typedef std::string Key;
-typedef std::vector<std::string> Extension;
-typedef std::vector<std::string> LanguageLinks;
-typedef std::map<Key, std::pair<Extension, LanguageLinks>> Table;
-const inline Table initTable(const std::unordered_map<std::string, std::vector<std::string>> languageExtensions, const std::unordered_map<std::string, std::string> downloads);
+typedef std::map<String, std::pair<String, String>> Table;
+static Table initTable(const Unordered<String, Vector<String>> languageExtensions, const Unordered<std::string, String> downloads);
 
 /**---------------------------------------------------------------------------
  * @brief defined in parser.h 
@@ -92,9 +117,13 @@ namespace Parser {
     class parser;
 };
 
-/**------------------------------------------------
- * @brief Defined in context_free_grammar.h 
- */
+/**---------------------------------------------------------------------------
+ * @brief Defined in context_free_grammar.h
+ *
+ * @details This is a forward declaration which will be very useful for later on.
+ *
+ * --------------------------------------------------------------------------
+*/
 namespace ContextFreeGrammar {
     template<class Derived>
     class Expr;
@@ -103,8 +132,11 @@ namespace ContextFreeGrammar {
     class Grouping;
     class Literal;
 };
-/**------------------------------------------------
+/** --------------------------------------------------------------------------
  * @brief Used in context_free_grammar.h and in parser.cc
+ *
+ * @details Used immensly in parser.cc for recrusive parsing 
+ * ---------------------------------------------------------------------------
 */
 typedef std::variant<
     ContextFreeGrammar::Binary,

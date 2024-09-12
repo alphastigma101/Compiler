@@ -25,4 +25,4 @@ jobs:
           source_branch: "AbstractionSyntaxTree"
           destination_repo: "https://alphastigma101:${{ env.PUBLIC_REPO_PAT }}@github.com/alphastigma101/Private-Projects.git"
           destination_branch: "compiler"
-            #github_token: ${{ env.PUBLIC_REPO_PAT }}
+          ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}

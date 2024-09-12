@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: Sync Environment  # Create the environment variable to use
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          persist-credentials: false
+      #- name: Checkout repository
+      #uses: actions/checkout@v2
+      #with:
+      #persist-credentials: false
       - name: Sync to Private Repo
         uses: wei/git-sync@v3
         env:

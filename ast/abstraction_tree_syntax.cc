@@ -2,7 +2,6 @@
 #include <lookup_language.h> // get the file extensions 
 // TODO: You need to check based on what the user types if the language needs to be interpreted or compiled 
 // For example, python cannot be compiled it needs to be interpreted 
-
 // Define static members for generateAst
 template<class T>
 logTable<std::map<std::string, std::vector<std::string>>> generateAst<T>::logs_;

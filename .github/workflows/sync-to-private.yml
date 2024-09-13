@@ -21,6 +21,6 @@ jobs:
         with:
           source_repo: "git@github.com:alphastigma101/Compiler.git"
           source_branch: "AbstractionSyntaxTree"
-          destination_repo: "https://alphastigma101:${{ secrets.PUBLIC_REPO_PAT }}@github.com/alphastigma101/Private-Projects.git"
-          destination_branch: "compiler"
+          destination_repo: "git@github.com:alphastigma101/Private-Projects.git"
+          destination_branch: "refs/heads/compiler"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}

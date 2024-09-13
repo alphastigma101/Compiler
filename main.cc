@@ -7,26 +7,42 @@
 static bool hadError = false;
 static LanguageTokenTypes interpretLanguage;
 currentType<LanguageTokenTypes> ct;
-/*
- * (run): Is a standalone static void function that runs the user input 
- * Parameters:
- * source: is a file that contains data of possibly of a language 
- */
+String file_name, user_choice;
+int settings;
+
+
+/* -------------------------------------------------------------------------
+ * @brief Is a standalone static void function that runs the user input 
+ * 
+ * @param source: is a file that contains data of possibly of a language 
+ *
+ * @return If an error occurred while parsing it will return back void. Otherwise, continue to execute 
+*/
 static void run(std::string& source) {
     Scanner scanner(source); // Create a new scanner instance
     std::vector<Token> tokens = scanner.ScanTokens();
     ct.setTokenLanguage(interpretLanguage); // set the language
-    parser parser_(tokens);
-    parser_.parse();
-    //TODO: Add threading here and thread the ast 
-    // ast aT(parser_.node);
-    //
-    // ----- (No threading is needed below this line)
-    interpreter interp(parser_.node, ct.getTokenLanguage());
-    //expr = parser.parse();
+    parser p(tokens);
+    p.parse();
+    std::thread build_(ast, p.nodes);
+    if (ENABLE_INTERPRETER) {
+        interpreter interp(parser_.node, ct.getTokenLanguage());
+        ENABLE_COMPILER = 0;
+    }
+    else if (ENABLE_COMPILER) {
+        ENABLE_INTERPRETER = 0;
+        // TODO: This is just an example and it needs to be properly filled out
+        compiler c();
+    }
     if (hadError) return;
 }
 
+// TODO: Make sure that the maps in language_lookup.h key's match and also here as well 
+/** ------------------------------------------------------------------------- 
+ * @brief This looks for whatever the user inputed. If not found, it will assume it is running custom and return it 
+ *
+ * -------------------------------------------------------------------------
+*/
 
 static LanguageTokenTypes user_language(const std::string& choice) {
     if (choice == "Python") return LanguageTokenTypes::Python;
@@ -80,9 +96,11 @@ static LanguageTokenTypes user_language(const std::string& choice) {
     else return LanguageTokenTypes::Custom;
 }
 
-/* 
- * This function will implement > at runtime 
- */
+/** ------------------------------------------------------------------------- 
+ * @brief This function will implement > at runtime 
+ *
+ * -------------------------------------------------------------------------
+*/
 static void runPrompt() {
      try {
          for (;;) { 
@@ -97,14 +115,38 @@ static void runPrompt() {
         std::cout << "Caught system_error with code " "[" << e.code() << "] meaning " "[" << e.what() << "]\n";
     }
 }
-
+/** ------------------------------------------------------------------------- 
+ * @brief This function will report an error if something crashed 
+ *
+ * @param line The line it occured 
+ * @param where The string literal 
+ * @param message The message as to why it crashed
+ *
+ * @return None
+ *
+ * -------------------------------------------------------------------------
+*/
 static void report(int &line, std::string where, std::string& message) {
     std::cout << "[line " <<  line << "] Error" << where << ": " + message;
     hadError = true;
 }
+/** ------------------------------------------------------------------------- 
+ * @brief A helper function that calls in report and uses the pass by reference
+ *
+ * @param line the source line 
+ * @param message the message as to why it crashed
+ *
+ * -------------------------------------------------------------------------
+*/
+static void error(int& line, std::string& message) { report(line, "", std::move(message)); }
 
-static void error(int& line, std::string& message) { report(line, "", message); }
-
+//TODO: Update the function below so it takes in more than one file 
+/** ------------------------------------------------------------------------- 
+ * @brief This function will run the file. 
+ *
+ * @param filePath The file that was fed into the program
+ * -------------------------------------------------------------------------
+*/
 static void runFile(const std::string& filePath) {
     std::string source,line;
     if (std::filesystem::exists(filePath)) {
@@ -128,7 +170,7 @@ static void runFile(const std::string& filePath) {
 
 // This is the driver code
 int main(int argc, char **argv) {
-    const Table table = initTable(languageExtensions, downloads);
+    Table table = initTable(languageExtensions, downloads);
     if (argc > 2) {
         std::cout << "Supported languages" << std::endl;
         for (const std::pair<const std::string, std::pair<std::vector<std::string>, std::vector<std::string>>>& it : table) { std::cout << it.first << std::endl; }

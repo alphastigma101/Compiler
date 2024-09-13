@@ -1,9 +1,8 @@
 #ifndef _ABSTRACTION_TREE_SYNTAX_H_
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
-typedef astTree<int, std::string, ExprVariant> treeEntry;
-//TODO: Need to remove the wrapper around the ExprVariant 
-extern template struct std::tuple<int, std::pair<std::string, ExprTypes<std::monostate, ListOfType<ExprVariant>>>>;
+extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>;
+typedef astTree<int, String, ExprVariant> treeEntry;
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public catcher<Type> {
@@ -40,11 +39,11 @@ namespace AbstractionTreeSyntax {
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
             std::string outputDir_;
-            static std::string codeStr;
-            static std::string compactedTreeStr;
-            static logTable<std::map<std::string, std::vector<std::string>>> logs_;
-            static std::vector<treeEntry> compactedTreeNodes;
-            static std::pair<std::vector<std::vector<std::string>>, std::vector<std::string>> ext;
+            static String codeStr;
+            static String compactedTreeStr;
+            static logTable<Map<String, Vector<String>>> logs_;
+            static Vector<treeEntry> compactedTreeNodes;
+            static String ext;
     };
     class ast: public generateAst<ast> {
         /* --------------------------------------------------------------------------------------------

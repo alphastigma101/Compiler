@@ -23,6 +23,9 @@
 #include <future>
 #include <iostream>
 #include <initializer_list>
+#include <atomic>
+#include <mutex>
+#include <cstdarg>
 /** ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
  * @details This header file is designed to be used in conjunction with `enum_types.h` at the end. This separation helps to better organize the code and its definitions.
  *

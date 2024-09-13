@@ -6,9 +6,14 @@
 #include <map>
 #include <vector>
 #include <iostream>
+/** ------------------------------------------------------------------
+ * @brief A hardcoded map that is used immensly throughout this codebase
+ * @details Use grep -R 'downloads' ../ or ./ 
+ *
+*/
 static const std::unordered_map<std::string, std::string> downloads = {
     {"C", "https://gcc.gnu.org/"},
-    {"C++ (CPP)", "https://gcc.gnu.org/"},
+    {"CPP", "https://gcc.gnu.org/"},
     {"Java", "https://www.oracle.com/java/technologies/javase-downloads.html"},
     {"Python", "https://www.python.org/downloads/"},
     {"JavaScript", "https://nodejs.org/en/download/"},
@@ -31,8 +36,8 @@ static const std::unordered_map<std::string, std::string> downloads = {
     {"SQL", "https://www.mysql.com/downloads/"},
     {"MATLAB", "https://www.mathworks.com/downloads/"},
     {"VHDL/Verilog", "https://www.eda.org/"},
-    {"F# (FSharp)", "https://dotnet.microsoft.com/download/dotnet/5.0"},
-    {"C# (CSHARP)", "https://dotnet.microsoft.com/download/dotnet/5.0"},
+    {"FSharp", "https://dotnet.microsoft.com/download/dotnet/5.0"},
+    {"CSharp", "https://dotnet.microsoft.com/download/dotnet/5.0"},
     {"VBA", "https://www.microsoft.com/en-us/microsoft-365/access"},
     {"Fortran", "https://gcc.gnu.org/fortran/"},
     {"COBOL", "https://www.gnu.org/software/gcc/cobol/"},
@@ -54,12 +59,18 @@ static const std::unordered_map<std::string, std::string> downloads = {
     {"Eiffel", "https://www.eiffel.com/"},
     {"LabVIEW", "https://www.ni.com/en-us/support/downloads/software-products/download.labview.html"},
     {"Smalltalk", "https://www.squeak.org/"},
-    {"Standard ML (SML)", "https://www.standardml.org/"}
+    {"SML", "https://www.standardml.org/"},
+    {"Custom", ""} // if running custom, refer to the hasRules struct
 };
-
+/** --------------------------------------------------------------------------
+ * @brief A hardcoded map that is used immensly throughout this codebase
+ * @details Use grep -R 'downloads' ../ or ./ 
+ *
+ * ---------------------------------------------------------------------------
+*/
 static const std::unordered_map<std::string, std::vector<std::string>> languageExtensions = {
         {"C", {".c"}},
-        {"C++ (CPP)", {".cpp", ".cc", ".cxx"}},
+        {"CPP", {".cpp", ".cc", ".cxx"}},
         {"Java", {".java"}},
         {"Python", {".py"}},
         {"JavaScript", {".js"}},
@@ -82,8 +93,8 @@ static const std::unordered_map<std::string, std::vector<std::string>> languageE
         {"SQL", {".sql"}},
         {"MATLAB", {".m"}},
         {"VHDL/Verilog", {".vhd", ".vhdl", ".v", ".sv", ".svh"}},
-        {"F# (FSharp)", {".fs", ".fsx", ".fsscript"}},
-        {"C# (CSHARP)", {".cs"}},
+        {"FSharp", {".fs", ".fsx", ".fsscript"}},
+        {"CSharp", {".cs"}},
         {"VBA", {".vba"}},
         {"Fortran", {".f", ".f90", ".f95", ".f03", ".f08"}},
         {"COBOL", {".cob", ".cbl"}},
@@ -104,7 +115,64 @@ static const std::unordered_map<std::string, std::vector<std::string>> languageE
         {"Elm", {".elm"}},
         {"Eiffel", {".e"}},
         {"LabVIEW", {".vi"}},
-        {"Smalltalk", {".st"}}, // No specific extension, commonly ".st" or others
-        {"Standard ML (SML)", {".sml", ".ml"}}
+        {"Smalltalk", {".st"}}, 
+        {"SML", {".sml", ".ml"}},
+        {"Custom", {".custom"}}
     };
+/** --------------------------------------------------------------------------
+ * @brief A hardcoded map that is used immensly throughout this codebase
+ *
+ * @details Use grep -R 'languageTypes' ../ or ./ 
+ * ---------------------------------------------------------------------------
+*/
+static const std::unordered_map<std::string, std::string> languageTypes = {
+    {"C", "Compiled"},
+    {"CPP", "Compiled"},
+    {"Java", "Compiled"},
+    {"Python", "Interpreted"},
+    {"JavaScript", "Interpreted"},
+    {"Ruby", "Interpreted"},
+    {"Swift", "Compiled"},
+    {"Go", "Compiled"},
+    {"Kotlin", "Compiled"},
+    {"Scala", "Compiled"},
+    {"TypeScript", "Compiled"},
+    {"PHP", "Interpreted"},
+    {"Perl", "Interpreted"},
+    {"R", "Interpreted"},
+    {"Objective-C", "Compiled"},
+    {"Haskell", "Compiled"},
+    {"Rust", "Compiled"},
+    {"Dart", "Compiled"},
+    {"Lua", "Interpreted"},
+    {"Shell (Bash)", "Interpreted"},
+    {"HTML/CSS", "Interpreted"},
+    {"SQL", "Interpreted"},
+    {"MATLAB", "Compiled"},
+    {"VHDL/Verilog", "Compiled"},
+    {"FSharp", "Compiled"},
+    {"CSharp", "Compiled"},
+    {"VBA", "Compiled"},
+    {"Fortran", "Compiled"},
+    {"COBOL", "Compiled"},
+    {"Pascal", "Compiled"},
+    {"LISP/Scheme", "Interpreted"},
+    {"Groovy", "Compiled"},
+    {"Erlang", "Interpreted"},
+    {"Clojure", "Interpreted"},
+    {"Prolog", "Interpreted"},
+    {"Ada", "Compiled"},
+    {"AWK", "Interpreted"},
+    {"TCL", "Interpreted"},
+    {"D", "Compiled"},
+    {"Julia", "Compiled"},
+    {"Visual Basic", "Compiled"},
+    {"PowerShell", "Interpreted"},
+    {"Racket", "Interpreted"},
+    {"Elm", "Compiled"},
+    {"Eiffel", "Compiled"},
+    {"LabVIEW", "Compiled"},
+    {"Smalltalk", "Interpreted"}, 
+    {"SML", "Compiled"}
+};
 #endif 

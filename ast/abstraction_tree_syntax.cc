@@ -1,22 +1,29 @@
 #include <abstraction_tree_syntax.h>
 #include <lookup_language.h> // get the file extensions 
-// TODO: You need to check based on what the user types if the language needs to be interpreted or compiled 
-// For example, python cannot be compiled it needs to be interpreted 
+/** ------------------------------------------------------------------
+ * @brief this macro will be set to one if the executable that start with 'exec_debug_...' during compilation. Otherwise, will remain off
+ *
+*/
+#if ENABLE_TESTING
+    String file_name, user_choice;
+    int settings;
+#else 
+    //std::cout << "Testing is enabled!" << std::endl;
+#endif
+
 // Define static members for generateAst
 template<class T>
-logTable<std::map<std::string, std::vector<std::string>>> generateAst<T>::logs_;
+logTable<Map<String, Vector<String>>> generateAst<T>::logs_;
 template<class T>
-std::vector<treeEntry> generateAst<T>::compactedTreeNodes;
+Vector<treeEntry> generateAst<T>::compactedTreeNodes;
 template<class T>
-std::pair<std::vector<std::vector<std::string>>, std::vector<std::string>> generateAst<T>::ext;
+String generateAst<T>::ext;
 template<class T>
-std::string generateAst<T>::codeStr;
+String generateAst<T>::codeStr;
 template<class T>
-std::string generateAst<T>::compactedTreeStr;
-// declare the global variables types here
-std::string file_name, user_choice;
-template<typename T>
-struct std::tuple<int, std::pair<std::string, ExprTypes<ListOfType<T>>>>; // Explicit initialize the underyling of astTree type
+String generateAst<T>::compactedTreeStr;
+
+template struct std::tuple<int, std::pair<String, ExprVariant>>; // Explicit initialize the underyling of astTree type
 Table ast::table;
 
 
@@ -26,23 +33,37 @@ Table ast::table;
  * @param expr: The data structure that represents the compacted abstraction syntax tree 
  * -----------------------------------------------------------------------------------------
 */
-ast::ast(std::vector<treeEntry>& expr_) {
+ast::ast(Vector<treeEntry>& expr_) {
     generateAst<ast> gA;
-    //std::string ext_;
-    if (file_name.empty() || user_choice.empty()) {
+    String ext_;
+    if (user_choice.empty()) {
+        // Subject to change. Have not decided if I want to compile the custom languyage or not
+        ENABLE_COMPILER(); // set it to zero by default
+        ENABLE_INTERPRETER(); // set it to one by default
+        user_choice = "Custom";
         // TODO: This shouldn't be here, but for now, it will be used for the test cases 
         catcher<ast> c("User is running a custom language!");
         throw c;
     }
     else {
         table = initTable(languageExtensions, downloads); 
-        auto getPair = table.at(user_choice); // pair->first is the extensions, pair->ssecond is the download links for the program
-        ext = getPair.first.at(0);
+        auto getPair = table.at(user_choice);
+        ext = getPair.first;
+        if (auto search = languageTypes.find(user_choice); search != languageTypes.end()) {
+            if (search->first == "Compiled") {
+                settings = ENABLE_COMPILER(1); // Set it to true 
+                ENABLE_INTERPRETER(0); // Set it to false
+            }
+            else {
+                ENABLE_COMPILER(); // Set it to false
+                ENABLE_INTERPRETER(); // Set it to true
+            }
+        }
     }
     compactedTreeNodes = std::move(expr_);
     try {
         generateAst<ast> gA;
-        //ext = ext_;
+        ext_ = ext;
         gA.tree_(std::move(gA));
     }
     catch(catcher<ast>& e) {
@@ -69,7 +90,7 @@ void ast::writeFile(std::string& ext) {
     std::ofstream fAst(Ast);
     fAst << compactedTreeStr;
     fAst.close();
-    if (ext == "\0") { 
+    if (ext.empty() ) { 
         ext = std::string(".custom");
     }
     std::ofstream fs(file_name + ext);
@@ -79,12 +100,12 @@ void ast::writeFile(std::string& ext) {
 }
 
 void ast::tree_(const generateAst<ast>& gA)  {
-    /*try {
+    try {
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
-           auto temp = compactedTreeNodes.at(i);
+           auto temp = compactedTreeNodes.at(i); // Grab the tuple
             if (std::get<1>(temp).first == "Binary") { 
-                //auto value = static_cast<Binary&&>(std::any_cast<Binary>(std::get<1>(temp).second)).visit(std::any_cast<Binary>(std::get<1>(temp).second));
-                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
+                auto value = static_cast<Binary&&>(std::any_cast<Binary>(std::get<1>(temp).second)).visit(std::any_cast<Binary>(std::get<1>(temp).second));
+                compactedTreeStr += std::any_cast<std::string>(std::move(value));
             }
             else if (std::get<1>(temp).first == "Unary") { 
                 //auto value = static_cast<Unary&&>(std::any_cast<Unary>(std::get<1>(temp).second)).visit(std::any_cast<Unary>(std::get<1>(temp).second)); 
@@ -109,6 +130,6 @@ void ast::tree_(const generateAst<ast>& gA)  {
         logging<generateAst<ast>> logs(logs_, e.what());
         logs.update();
         logs.rotate();
-    }*/                           
+    }                           
     return writeFile(ext);
 }

@@ -2,6 +2,7 @@
 #ifndef MACROS_H
 #define MACROS_H
 #include <string>
+#include <addon.h>
 // This file creates a handleful of macros that are considered as strings that can be parsed by the scanner
 //
 /* Notes you should consider are: 

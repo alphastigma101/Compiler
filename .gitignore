@@ -45,3 +45,5 @@ debugging/db_ast.txt
 debugging/db_parser.txt
 # Executables to exclude
 exec_*
+.github/
+

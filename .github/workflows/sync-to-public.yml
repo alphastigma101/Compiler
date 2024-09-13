@@ -16,4 +16,3 @@ jobs:
           destination_repo:  "git@github.com:alphastigma101/Compiler.git"          
           destination_branch: "refs/heads/main"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}
-            #source_ssh_private_key: ${{ secrets.SOURCE_SSH_PRIVATE_KEY }} # overwrite SSH_PRIVATE_KEY

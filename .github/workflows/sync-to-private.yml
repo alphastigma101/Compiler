@@ -18,11 +18,9 @@ jobs:
       #persist-credentials: false
       - name: Sync to Private Repo
         uses: wei/git-sync@v3
-        env:
-          PUBLIC_REPO_PAT: ${{ secrets.PUBLIC_REPO_PAT }}
         with:
-          source_repo: "https://github.com/alphastigma101/Compiler.git"
+          source_repo: "git@github:alphastigma101/Compiler.git"
           source_branch: "AbstractionSyntaxTree"
-          destination_repo: "https://alphastigma101:${{ env.PUBLIC_REPO_PAT }}@github.com/alphastigma101/Private-Projects.git"
+          destination_repo: "https://alphastigma101:${{ secrets.PUBLIC_REPO_PAT }}@github.com/alphastigma101/Private-Projects.git"
           destination_branch: "compiler"
           ssh_private_key: ${{ secrets.SSH_PRIVATE_KEY }}

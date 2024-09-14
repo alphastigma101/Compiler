@@ -1,32 +1,32 @@
 #include <abstraction_tree_syntax.h>
 #include <lookup_language.h> // get the file extensions 
-/** ------------------------------------------------------------------
- * @brief this macro will be set to one if the executable that start with 'exec_debug_...' during compilation. Otherwise, will remain off
- *
-*/
-#if ENABLE_TESTING
-    String file_name, user_choice;
-    int settings;
-#else 
-    //std::cout << "Testing is enabled!" << std::endl;
-#endif
-
-// Define static members for generateAst
-template<class T>
-logTable<Map<String, Vector<String>>> generateAst<T>::logs_;
-template<class T>
-Vector<treeEntry> generateAst<T>::compactedTreeNodes;
-template<class T>
-String generateAst<T>::ext;
-template<class T>
-String generateAst<T>::codeStr;
-template<class T>
-String generateAst<T>::compactedTreeStr;
-
 template struct std::tuple<int, std::pair<String, ExprVariant>>; // Explicit initialize the underyling of astTree type
-Table ast::table;
 
-
+/** ------------------------------------
+ * @brief An abstraction class that checks to see if it allowed to create a .txt flie
+ * 
+ * --------------------------------------
+ */
+template<>
+generateAst<ast>::generateAst() {
+    // TODO: SegFault Occurs on Line 13
+    std::filesystem::path pp = std::filesystem::path(getenv("Private-Projects"));
+    // Check if the path exists and is in user space
+    if (std::filesystem::exists(pp)) {
+        auto hasPermission = [&](std::filesystem::perms perm) {
+            auto perms = std::filesystem::status(pp).permissions();
+            return (perms & perm) == perm;
+        };
+        // Check if we have write permissions
+        if (hasPermission(std::filesystem::perms::owner_write) && hasPermission(std::filesystem::perms::owner_read)) {
+            // Set the outputDir
+            outputDir_ = std::move(pp);
+        } else { 
+            catcher<generateAst<ast>> c("Failed to set the default path to write the ast to aka the file!");
+            throw c;
+        }
+    }
+}
 /** -----------------------------------------------------------------------------------------
  * @brief The default constructor that calls in generateAst to start creating the .txt file 
  * 
@@ -35,15 +35,11 @@ Table ast::table;
 */
 ast::ast(Vector<treeEntry>& expr_) {
     generateAst<ast> gA;
-    String ext_;
     if (user_choice.empty()) {
         // Subject to change. Have not decided if I want to compile the custom languyage or not
         ENABLE_COMPILER(); // set it to zero by default
         ENABLE_INTERPRETER(); // set it to one by default
         user_choice = "Custom";
-        // TODO: This shouldn't be here, but for now, it will be used for the test cases 
-        catcher<ast> c("User is running a custom language!");
-        throw c;
     }
     else {
         table = initTable(languageExtensions, downloads); 
@@ -62,9 +58,17 @@ ast::ast(Vector<treeEntry>& expr_) {
     }
     compactedTreeNodes = std::move(expr_);
     try {
-        generateAst<ast> gA;
-        ext_ = ext;
-        gA.tree_(std::move(gA));
+        //std::thread createTree;
+        if (settings) { 
+            ThreadTracker<generateAst<ast>> t([&]() { gA.tree_(std::move(gA)); });
+            //createTree.detach(); // detach it
+            analyzeSemantics aS(Shared<ast>(this));
+            //intermediateRepresentation iR(std::make_shared<analyzeSemantics>(aS));
+            t.join();
+        }
+        else {
+            //createTree = std::thread(gA.tree_(std::move(gA)));
+        }
     }
     catch(catcher<ast>& e) {
         std::cout << "Logs folder has been updated!" << std::endl;
@@ -75,6 +79,7 @@ ast::ast(Vector<treeEntry>& expr_) {
         logs.rotate();
     }
 }
+
 /** -------------------------------------------------------------------------
  * @brief Writes the code to target file
  *
@@ -85,7 +90,6 @@ ast::ast(Vector<treeEntry>& expr_) {
  * --------------------------------------------------------------------------
 */
 void ast::writeFile(std::string& ext) {
-    //codeStr += value.getLexeme();
     std::string Ast = "Ast.txt";
     std::ofstream fAst(Ast);
     fAst << compactedTreeStr;
@@ -98,14 +102,25 @@ void ast::writeFile(std::string& ext) {
     fs.close();
     return;
 }
-
+/** -------------------------------------------------------------------------
+ * @brief Writes the code to target file
+ *
+ * @param ext Is an string object that is implicitly initalized with the targeted extension
+ *
+ * @return None
+ *
+ * --------------------------------------------------------------------------
+*/
 void ast::tree_(const generateAst<ast>& gA)  {
     try {
+        // Need to check and see for every shared_ptr varaint the pointer that is stored in the vector is not null
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
            auto temp = compactedTreeNodes.at(i); // Grab the tuple
-            if (std::get<1>(temp).first == "Binary") { 
-                auto value = static_cast<Binary&&>(std::any_cast<Binary>(std::get<1>(temp).second)).visit(std::any_cast<Binary>(std::get<1>(temp).second));
-                compactedTreeStr += std::any_cast<std::string>(std::move(value));
+            if (std::get<1>(temp).first == "Binary") {
+                //auto binary = std::get<1>(temp).second.get();
+                //auto value = static_cast<Binary&&>(std::move(binary)); //.visit(std::any_cast<Binary>(std::get<1>(temp).second));
+                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
+                //codeStr += value.
             }
             else if (std::get<1>(temp).first == "Unary") { 
                 //auto value = static_cast<Unary&&>(std::any_cast<Unary>(std::get<1>(temp).second)).visit(std::any_cast<Unary>(std::get<1>(temp).second)); 
@@ -133,3 +148,29 @@ void ast::tree_(const generateAst<ast>& gA)  {
     }                           
     return writeFile(ext);
 }
+
+
+/** ----------------------------------------------------------------------------
+ * @brief Maps the characters from the source code string to a semantic map.
+ *
+ * @param Ast_ Alias for the abstract syntax tree (AST) instance, which is moved to this class for analysis.
+ *
+ * @details Semantic analysis involves interpreting the source code and mapping idioms (expressions) 
+ *          for further processing. Idioms represent meaningful expressions within the source code, 
+ *          and are not necessarily sequences of literal words.
+ *
+ * @return None
+ * -----------------------------------------------------------------------------
+*/
+analyzeSemantics::analyzeSemantics(Shared<ast> Ast_): ThreadTracker([this, Ast_]() { this->run(Ast_); }) {
+}
+/** -------------------------------------------------------------------------
+ * @brief Writes the code to target file
+ *
+ * @param ext Is an string object that is implicitly initalized with the targeted extension
+ *
+ * @return None
+ *
+ * --------------------------------------------------------------------------
+*/
+intermediateRepresentation::intermediateRepresentation(Shared<analyzeSemantics> as_): ThreadTracker([this, as_]() { this->run(as_); }) {}

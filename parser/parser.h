@@ -70,7 +70,7 @@ namespace Parser {
             static ExprTypes<Binary, Unary, Grouping, Literal> identifier();
             static ExprTypes<Binary, Unary, Grouping, Literal> arguments();
             ~parser() noexcept {};
-            static std::vector<std::tuple<int, std::pair<String, Shared<ExprVariant>>>> nodes; // passed into ast constructor
+            inline static std::vector<std::tuple<int, std::pair<String, Shared<ExprVariant>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();
         protected:
             /**----------------------------------------------------------------------------------------------------------
@@ -145,7 +145,7 @@ namespace Parser {
                 idx = 0;
             };
         private:
-            static std::vector<Token>&& tokens_;
+            inline static std::vector<Token> tokens_;
             static ExprTypes<Binary, Unary, Grouping, Literal> expr;
             static logTable<std::map<std::string, std::vector<std::string>>> logs_;
             inline static int current = 0;

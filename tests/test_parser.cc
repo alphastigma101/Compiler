@@ -2,7 +2,7 @@
 #include <parser.h>
 #include <scanner.h>
 // TODO optional: Use google test's input parameter generator to test input values
-logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare variable globally
+
 class ParserTest : public testing::Test {
     protected:
         void SetUp() override {

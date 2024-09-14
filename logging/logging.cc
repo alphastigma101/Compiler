@@ -6,6 +6,9 @@
 #include <fstream>
 #include <iomanip>
 #include <filesystem>
+
+
+
 template<typename T>
 std::string logging<T>::text;
 

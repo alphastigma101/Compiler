@@ -32,10 +32,12 @@ using Weak = std::weak_ptr<T>;
 // Threading/Atomic/Mutex
 template<typename T>
 using Atomic = std::atomic<T>;
+template<typename T>
+using Set = std::set<T>;
+
 //template<typename T>
 //using Mutex = std::mutex<T>;
-/*template<typename T>
-using Threading = std::threading<T>*/
+
 
 /** --------------------------------------------------------------------------
  * @brief Initialized in main.cc and is copy-initialized in abstraction_syntax_tree.cc

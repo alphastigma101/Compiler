@@ -1,0 +1,30 @@
+{
+    "environment": [
+        {
+            "name": "config",
+            "value": "Debug"
+        }
+    ],
+    "configurations": [
+        {
+            "name": "C/C++ Runner: Debug Session",
+            "type": "cppdbg",
+            "request": "launch",
+            "args": [],
+            "stopAtEntry": false,
+            "externalConsole": false,
+            "cwd": "/home/nerdsrawesome12/Public-Projects",
+            // NOTE: Replace 'exec_debug_parser' with the actual executable that you want to debug 
+            "program": "/home/nerdsrawesome12/Public-Projects/debugging/exec_debug_parser",
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

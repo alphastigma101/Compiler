@@ -1,6 +1,9 @@
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
 #include <definitions.h>
+#if ENABLE_LOGGING_TEST
+    logTable<std::map<std::string, std::vector<std::string>>> logEntries;
+#endif
 namespace Logging {
     template<class T>
     class logging {

@@ -24,15 +24,13 @@ static void run(std::string& source) {
     ct.setTokenLanguage(interpretLanguage); // set the language
     parser p(tokens);
     p.parse();
-    std::thread build_(ast, p.nodes);
-    if (ENABLE_INTERPRETER) {
-        interpreter interp(parser_.node, ct.getTokenLanguage());
-        ENABLE_COMPILER = 0;
+    std::thread build_(ast(p.nodes));
+    if (settings) {
+        //interpreter interp(p.nodes, ct.getTokenLanguage());
     }
-    else if (ENABLE_COMPILER) {
-        ENABLE_INTERPRETER = 0;
+    else {
         // TODO: This is just an example and it needs to be properly filled out
-        compiler c();
+        //compiler c();
     }
     if (hadError) return;
 }

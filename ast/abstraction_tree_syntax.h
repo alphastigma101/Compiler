@@ -1,6 +1,13 @@
 #ifndef _ABSTRACTION_TREE_SYNTAX_H_
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
+#include <threading.h>
+#if ENABLE_TESTING
+    String file_name, user_choice;
+    int settings;
+#else 
+    //std::cout << "Testing is enabled!" << std::endl;
+#endif
 extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>;
 typedef astTree<int, String, ExprVariant> treeEntry;
 namespace AbstractionTreeSyntax {
@@ -13,25 +20,8 @@ namespace AbstractionTreeSyntax {
         public:
             friend class ast;
             friend class catcher<Type>;
-            explicit generateAst<Type>() {
-                std::filesystem::path pp = std::filesystem::path(getenv("Public-Projects"));
-                // Check if the path exists and is in user space
-                if (std::filesystem::exists(pp)) {
-                    auto hasPermission = [&](std::filesystem::perms perm) {
-                        auto perms = std::filesystem::status(pp).permissions();
-                        return (perms & perm) == perm;
-                    };
-                    // Check if we have write permissions
-                    if (hasPermission(std::filesystem::perms::owner_write) && hasPermission(std::filesystem::perms::owner_read)) {
-                        // Set the outputDir
-                        outputDir_ = std::move(pp);
-                    } else { 
-                        catcher<Type> c("Failed to set the default path to write the ast to aka the file!");
-                        throw c;
-                    }
-                }
-            };
-            virtual ~generateAst() noexcept = default;
+            explicit generateAst<Type>();
+            virtual ~generateAst<Type>() noexcept = default;
             inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
         protected:
             inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
@@ -39,11 +29,11 @@ namespace AbstractionTreeSyntax {
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
             std::string outputDir_;
-            static String codeStr;
-            static String compactedTreeStr;
-            static logTable<Map<String, Vector<String>>> logs_;
-            static Vector<treeEntry> compactedTreeNodes;
-            static String ext;
+            inline static String codeStr;
+            inline static String compactedTreeStr;
+            inline static logTable<Map<String, Vector<String>>> logs_;
+            inline static Vector<treeEntry> compactedTreeNodes;
+            inline static String ext;
     };
     class ast: public generateAst<ast> {
         /* --------------------------------------------------------------------------------------------
@@ -55,41 +45,51 @@ namespace AbstractionTreeSyntax {
             ast(std::vector<treeEntry>& expr_);
             ~ast() noexcept = default;
             inline static Table getTable() { return table; };
-            /** ---------------------------------------------------------------
-             * @brief Is a simple getter method. but once used, it will move the resources over to the new variable 
-             *
-             * @param None
-             *
-             * @return compactedTreeNodes resources
-             *
-             * ----------------------------------------------------------------
-             */
-            inline static const std::vector<treeEntry>& getTree() { return std::move(compactedTreeNodes); };
+            inline static const String& getCode() { return codeStr; };
         private:
             static void tree_(const generateAst<ast>& gA);
             static void writeFile(std::string& ext);
-            static Table table;
+            inline static Table table;
     };
-    class analyzeSemantics: public catcher<analyzeSemantics> {
+    class analyzeSemantics: public catcher<analyzeSemantics>,  public ThreadTracker<analyzeSemantics> {
         // This class performs the semantic analysis 
         public: 
             friend class catcher<analyzeSemantics>;
-            explicit analyzeSemantics(ast &Ast_);
+            analyzeSemantics(Shared<ast> Ast_);
             ~analyzeSemantics() noexcept = default;
+            inline static Map<String, String> getAnalyzedCodeMap() { return std::move(analyzeCode); };
         protected:
             inline static const char* what(const char* msg = catcher<analyzeSemantics>::getMsg()) throw() { return msg; };
+            /** ---------------------------------------------------------------------------------
+                * @brief A method that creates a thread for the class analyzeSemantics
+                * 
+                * @details Spawns in the thread. Main thread will allow this thread to access it.
+                *          It targets a certain method called getCodeStr which returns a string type 
+                * 
+                * --------------------------------------------------------------------------------
+            */
+            inline static void run(Shared<ast> Ast) {
+                String temp = Ast->getCode();
+                for (int i = 0; i < temp.size(); i++) {
+                    // TODO: Start mapping the every character into the map or change the map into a vector 
+                } 
+            };
         private:
-            ast&& Ast; // Use list initializer to initialize this value 
+            inline static Map<String, String> analyzeCode;
     };
-    class intermediateRepresentation: public catcher<intermediateRepresentation> {
-        // This class Translates AST to intermediate representation (IR)
+    class intermediateRepresentation: public catcher<intermediateRepresentation>, public ThreadTracker<intermediateRepresentation> {
+        // This class Translates AST to intermediate representation (IR)public ThreadTracker<analyzeSemantics>
         public:
             friend class catcher<intermediateRepresentation>;
-            explicit intermediateRepresentation(analyzeSemantics &as_);
+            explicit intermediateRepresentation(Shared<analyzeSemantics> as_);
             ~intermediateRepresentation() noexcept = default;
             static void generate();
-        private:
-            analyzeSemantics&& as;
+        protected:
+            inline static const char* what(const char* msg = catcher<analyzeSemantics>::getMsg()) throw() { return msg; };
+            inline static void run(Shared<analyzeSemantics> as_) { 
+
+            };
+       
     };
 };
 using namespace AbstractionTreeSyntax;

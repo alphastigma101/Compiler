@@ -1,6 +1,7 @@
 #!bin/bash 
 
 INCLUDE=" -I ../types/ -I ../logging/ -I ../asm/ -I ../catch/ -I ../tokens/ -I ../languages/ -I ../interface/ -I ../ast/ -I ../cfg/ -I 
+<<<<<<< HEAD
              ../declarations/ -I ../definitions/ -I ../runtime/ -I ../interpreter/ -I ../scanner/ -I ../parser/ -I ../addon/"
 LDFLAGS=" -L $HOME/Public-Projects/logging -lgtest -lgtest_main -pthread"
 
@@ -10,11 +11,23 @@ g++ -g -w -std=c++17 -fconcepts $INCLUDE  -c ../logging/logging.cc -o logging.o
 #g++ -g -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 debug_logging.o logging.o -o exec_debug_logging
 #echo "Creating test object files and executables" 
 #g++ -g -std=c++17 -fconcepts -D RADNOM_EXTENSIONS=0 -D ENABLE_TESTING=1 $INCLUDE -c ../tests/test_logging.cc -o test_logging.o 
+=======
+             ../declarations/ -I ../definitions/ -I ../runtime/ -I ../interpreter/ -I ../scanner/ -I ../parser/ -I ../addon/ -I ../threading/"
+LDFLAGS=" -L $HOME/Public-Projects/logging -lgtest -lgtest_main -pthread"
+
+#echo "creating debugging object files and executables"
+g++ -g -w -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_LOGGING_TEST=1 $INCLUDE  -c ../logging/logging.cc -o logging.o 
+#g++ -g -std=c++17 -fconcepts $INCLUDE -c debug_logging.cc -o debug_logging.o
+#g++ -g debug_logging.o logging.o -o exec_debug_logging
+#echo "Creating test object files and executables" 
+#g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tests/test_logging.cc -o test_logging.o 
+>>>>>>> origin/main
 #echo "Linking the test object files together for the logger"
 #g++ -g -std=c++17 test_logging.o logging.o -o test_logging $LDFLAGS
 
 
 #echo "Creating debugging object files and executables"
+<<<<<<< HEAD
 g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -c ../languages/languages.cc -o languages.o
 #g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -c debug_languages.cc -o debug_languages.o
 #g++ -g -std=c++17 -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1  debug_languages.o languages.o -o exec_debug_languages
@@ -28,6 +41,21 @@ g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -
 #g++ -g -std=c++17 -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 token.o debug_tokens.o languages.o logging.o -o exec_debug_tokens
 #g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -c ../tests/test_token.cc -o test_token.o 
 #g++ -g -std=c++17 -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 test_token.o token.o languages.o logging.o -o test_tokens $LDFLAGS
+=======
+g++ -g -std=c++17 -fconcepts $INCLUDE -c ../languages/languages.cc -o languages.o
+#g++ -g -std=c++17 -fconcepts  $INCLUDE -c debug_languages.cc -o debug_languages.o
+#g++ -g -std=c++17 debug_languages.o languages.o -o exec_debug_languages
+#g++ -g -std=c++17 -fconcepts  $INCLUDE -c ../tests/test_languages.cc -o test_languages.o
+#g++ -g -std=c++17 test_languages.o languages.o -o test_languages $LDFLAGS
+
+
+#echo "Creating debugging object files and executables for token"
+g++ -g -std=c++17 -fconcepts $INCLUDE -c ../tokens/token.cc -o token.o
+#g++ -g -std=c++17 $INCLUDE -c debug_tokens.cc -o debug_tokens.o
+#g++ -g -std=c++17 token.o debug_tokens.o languages.o logging.o -o exec_debug_tokens
+#g++ -g -std=c++17 -fconcepts  $INCLUDE -c ../tests/test_token.cc -o test_token.o 
+#g++ -g -std=c++17  test_token.o token.o languages.o logging.o -o test_tokens $LDFLAGS
+>>>>>>> origin/main
 
 #echo "Creating debuging object files and executables for scanner"
 g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
@@ -37,6 +65,7 @@ g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
 #g++ -g -std=c++17 test_scanner.o token.o scanner.o languages.o logging.o -o test_scanner $LDFLAGS
 
 echo "Build object file for parser.cc"
+<<<<<<< HEAD
 g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -c ../parser/parser.cc -o parser.o
 
 echo "Creating debugging object files and executables for ast"
@@ -51,6 +80,22 @@ g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -
 g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 token.o scanner.o abstraction_tree_syntax.o parser.o  languages.o logging.o debug_parser.o -o exec_debug_parser
 g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -c ../tests/test_parser.cc -o test_parser.o
 g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0  -DENABLE_TESTING=1 scanner.o abstraction_tree_syntax.o parser.o languages.o token.o logging.o test_parser.o -o test_parser $LDFLAGS
+=======
+g++ -g -std=c++17 -fconcepts $INCLUDE -c ../parser/parser.cc -o parser.o
+
+echo "Creating debugging object files and executables for ast"
+g++ -g -std=c++17 -fconcepts  $INCLUDE -c ../ast/abstraction_tree_syntax.cc -o abstraction_tree_syntax.o 
+g++ -g -std=c++17 -fconcepts  -DENABLE_TESTING=1 $INCLUDE  -c ../debugging/debug_ast.cc -o debug_abstraction_tree_syntax.o
+g++ -g -std=c++17 -fconcepts -fsanitize=address scanner.o parser.o abstraction_tree_syntax.o debug_abstraction_tree_syntax.o languages.o token.o logging.o -o exec_abstraction_tree_syntax
+#g++ -g -std=c++17 -fconcepts -DENABLE_TESTING=1 $INCLUDE -c ../tests/test_ast.cc -o test_abstraction_tree_syntax.o 
+#g++ -g -std=c++17 -fconcepts -D RADNOM_EXTENSIONS=0 scanner.o test_abstraction_tree_syntax.o abstraction_tree_syntax.o languages.o token.o logging.o -o test_abstraction_tree_syntax $LDFLAGS
+
+#echo "Creating debugging object files and executables for parser"
+#g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -c ../debugging/debug_parser.cc -o debug_parser.o
+#g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 token.o scanner.o abstraction_tree_syntax.o parser.o  languages.o logging.o debug_parser.o -o exec_debug_parser
+#g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 $INCLUDE -c ../tests/test_parser.cc -o test_parser.o
+#g++ -g -std=c++17 -fconcepts -DRADNOM_EXTENSIONS=0  -DENABLE_TESTING=1 scanner.o abstraction_tree_syntax.o parser.o languages.o token.o logging.o test_parser.o -o test_parser $LDFLAGS
+>>>>>>> origin/main
 
 #echo "Creating debugging object files and executables for truthy"
 #g++ -g -std=c++17 -fconcepts $INCLUDE -c ../interpreter/language_specific_truthy_operations.cc -o language_specific_truthy_operations.o 

@@ -58,13 +58,13 @@ ast::ast(Vector<treeEntry>& expr_) {
     }
     compactedTreeNodes = std::move(expr_);
     try {
-        //std::thread createTree;
         if (settings) { 
-            ThreadTracker<generateAst<ast>> t([&]() { gA.tree_(std::move(gA)); });
-            //createTree.detach(); // detach it
-            analyzeSemantics aS(Shared<ast>(this));
+            ThreadTracker<generateAst<ast>> createTree([&]() { gA.tree_(std::move(gA)); });
+            createTree.detach(); // detach it
+            analyzeSemantics aS(Shared<ast>(this)); // Create thread one 
+            aS.detach(); // Detach it so it works on it's own 
             //intermediateRepresentation iR(std::make_shared<analyzeSemantics>(aS));
-            t.join();
+            //t.join();
         }
         else {
             //createTree = std::thread(gA.tree_(std::move(gA)));

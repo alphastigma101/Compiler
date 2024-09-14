@@ -5,8 +5,6 @@
 #if ENABLE_TESTING
     String file_name, user_choice;
     int settings;
-#else 
-    //std::cout << "Testing is enabled!" << std::endl;
 #endif
 extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>;
 typedef astTree<int, String, ExprVariant> treeEntry;
@@ -29,6 +27,7 @@ namespace AbstractionTreeSyntax {
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
             std::string outputDir_;
+            inline static Atomic<const char*> accessCodeStr;
             inline static String codeStr;
             inline static String compactedTreeStr;
             inline static logTable<Map<String, Vector<String>>> logs_;

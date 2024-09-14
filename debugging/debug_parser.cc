@@ -29,7 +29,6 @@ void runTest(const std::string& input) {
     std::cout << "------------------------" << std::endl;
 }
 
-logTable<std::map<std::string, std::vector<std::string>>> logEntries; // declare variable globally
 parser createParser(std::vector<Token>& tokens) { return parser(tokens);}
 
 static void debugEquality() {

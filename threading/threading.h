@@ -23,11 +23,14 @@ class ThreadTracker : public std::thread {
         {
             addThread();
         }
-        /** -----------------------------------------
+        /** ------------------------------------------------------------------
          * @brief This is a default constructor that allows you to add threads to it
          * 
-         * @param newThread Pass a thread instance, which will be kept track on 
-         * @param other Pass in a callable object such as a function, member function, or lambda 
+         * @param newThread Pass a thread instance, which will be kept track on. It is a universial object 
+         * @param other Pass in a callable object such as a function, member function, or lambda. It is a universal object 
+         *
+         * @details 
+         * -------------------------------------------------------------------
          */
         template<typename T, typename U = std::nullptr_t, typename = std::enable_if_t<std::is_base_of_v<ThreadTracker, std::remove_reference_t<T>>>>
         ThreadTracker(T&& newThread, U&& other = nullptr) noexcept : std::thread(std::forward<T>(newThread)) {
@@ -62,7 +65,10 @@ class ThreadTracker : public std::thread {
         inline void run(Args&&... args) { return static_cast<Derived*>(this)->run(std::forward<Args>(args)...); }
         
     private:
-
+        /** -----------------------------------------------------------------
+         * @brief Prvate method that the cons
+         *
+        */
         inline void addThread() {
             std::lock_guard<std::mutex> lock(thread_mutex);
             active_threads.push_back(get_id());

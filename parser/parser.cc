@@ -120,37 +120,38 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::unary() {
 */
 ExprTypes<Binary, Unary, Grouping, Literal> parser::primary() {
     if (match(TokenType::FALSE)) {
-        expr = std::make_shared<ExprVariant>(Literal(false)); // initialize it with Literal instance
+        expr = std::make_shared<ExprVariant>(Literal(false, previous())); // initialize it with Literal instance
         auto res = compressedAstTree(idx, std::string("Literal"), expr);
         nodes.push_back(std::move(res));
         idx++;
         return expr;
     }
     if (match(TokenType::TRUE)) {
-        expr = std::make_shared<ExprVariant>(Literal(true));
+        expr = std::make_shared<ExprVariant>(Literal(true, previous()));
         auto res = compressedAstTree(idx, std::string("Literal"), expr);
         nodes.push_back(std::move(res));
         idx++;
         return expr;
     }
     if (match(TokenType::NIL)) {
-        expr = std::make_shared<ExprVariant>(Literal(NULL));
+        expr = std::make_shared<ExprVariant>(Literal(NULL, previous()));
         auto res = compressedAstTree(idx, std::string("Literal"), expr);
         nodes.push_back(std::move(res));
         idx++;
         return expr;
     }
     if (match(TokenType::NUMBER, TokenType::STRING)) {
-        expr = std::make_shared<ExprVariant>(Literal(previous().getLiteral()));
+        expr = std::make_shared<ExprVariant>(Literal(previous().getLiteral(), previous()));
         auto res = compressedAstTree(idx, std::string("Literal"), expr); 
         nodes.push_back(std::move(res));
         idx++;
         return expr;
     }
     if (match(TokenType::LEFT_PAREN)) {
+        expr = std::make_shared<ExprVariant>(Grouping(expr, previous()));
         auto expr_ = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-        expr = std::make_shared<ExprVariant>(Grouping(expr_));
+        expr = std::make_shared<ExprVariant>(Grouping(expr_, previous()));
         auto res = compressedAstTree(idx, std::string("Grouping"), expr); 
         nodes.push_back(std::move(res));
         idx++;

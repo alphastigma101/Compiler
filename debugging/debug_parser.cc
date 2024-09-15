@@ -10,7 +10,7 @@ void runTest(const std::string& input) {
     // Print tokens for debugging
     std::cout << "Tokens:" << std::endl;
     for (auto& token : tokens) {
-        std::string temp = std::any_cast<std::string>(token.toString());
+        std::string temp = token.getLexeme(); //std::any_cast<std::string>(token.toString());
         std::cout << temp << std::endl;
     }
     
@@ -36,7 +36,7 @@ static void debugEquality() {
     temp += ">";
     temp += "'banana'";
     std::vector<std::string> testCases = {
-        "1 == 1",
+        "(1 == 1)",
         "2 != 3",
         "true == true",
         "false != true",

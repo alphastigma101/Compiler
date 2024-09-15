@@ -33,7 +33,7 @@ generateAst<ast>::generateAst() {
  * @param expr: The data structure that represents the compacted abstraction syntax tree 
  * -----------------------------------------------------------------------------------------
 */
-ast::ast(Vector<treeEntry>& expr_) {
+ast::ast(Vector<treeStructure>& expr_) {
     generateAst<ast> gA;
     if (user_choice.empty()) {
         // Subject to change. Have not decided if I want to compile the custom languyage or not
@@ -58,6 +58,7 @@ ast::ast(Vector<treeEntry>& expr_) {
     }
     compactedTreeNodes = std::move(expr_);
     try {
+        //ThreadTracker<generateAst<ast>> createTree;
         if (settings) { 
             ThreadTracker<generateAst<ast>> createTree([&]() { gA.tree_(std::move(gA)); });
             createTree.detach(); // detach it
@@ -93,9 +94,9 @@ void ast::writeFile(std::string& ext) {
     std::ofstream fAst(Ast);
     fAst << compactedTreeStr;
     fAst.close();
-    if (ext.empty() ) { 
-        ext = std::string(".custom");
-    }
+
+    if (ext.empty()) { ext = std::string(".custom");}
+    if (file_name.empty()) { file_name = std::string("change_name_please"); }
     std::ofstream fs(file_name + ext);
     fs << codeStr;
     fs.close();
@@ -112,18 +113,33 @@ void ast::writeFile(std::string& ext) {
 */
 void ast::tree_(const generateAst<ast>& gA)  {
     try {
-        // Need to check and see for every shared_ptr varaint the pointer that is stored in the vector is not null
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
-           auto temp = compactedTreeNodes.at(i); // Grab the tuple
+            auto temp = compactedTreeNodes.at(i); // Grab the tuple
             if (std::get<1>(temp).first == "Binary") {
-                //auto binary = std::get<1>(temp).second.get();
-                //auto value = static_cast<Binary&&>(std::move(binary)); //.visit(std::any_cast<Binary>(std::get<1>(temp).second));
-                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
-                //codeStr += value.
+                auto shr_binary = std::get<1>(temp).second; // Grabs the shared_ptr
+                if (auto binary = std::get_if<Binary>(std::move(shr_binary.get()))) {
+                    auto value = static_cast<Binary&&>(*binary).visit(static_cast<Binary&&>(*binary)); // create a temp object
+                    compactedTreeStr += static_cast<std::string>(std::move(value));
+                    String lexeme = !binary->getToken().getLexeme().empty() ? binary->getToken().getLexeme() : "";
+                    String literal = !binary->getToken().getLiteral().empty() ? binary->getToken().getLiteral() : "";
+                    if (!lexeme.empty() && !literal.empty()) {
+                        codeStr = lexeme + literal;
+                        accessCodeStr = std::make_unique<Atomic<const char*>>(codeStr.c_str());
+                    }
+                }
             }
-            else if (std::get<1>(temp).first == "Unary") { 
-                //auto value = static_cast<Unary&&>(std::any_cast<Unary>(std::get<1>(temp).second)).visit(std::any_cast<Unary>(std::get<1>(temp).second)); 
-                //compactedTreeStr += std::any_cast<std::string>(std::move(value));
+            else if (std::get<1>(temp).first == "Unary") {
+                auto shr_unary = std::get<1>(temp).second; // Grabs the shared_ptr
+                if (auto unary = std::get_if<Unary>(std::move(shr_unary.get()))) {
+                    auto value = static_cast<Unary&&>(*unary).visit(static_cast<Unary&&>(*unary)); // create a temp object
+                    compactedTreeStr += static_cast<std::string>(std::move(value));
+                    String lexeme = !unary->getToken().getLexeme().empty() ? unary->getToken().getLexeme() : "";
+                    String literal = !unary->getToken().getLiteral().empty() ? unary->getToken().getLiteral() : "";
+                    if (!lexeme.empty() && !literal.empty()) {
+                        codeStr = lexeme + literal;
+                        accessCodeStr = std::make_unique<Atomic<const char*>>(codeStr.c_str());
+                    }
+                }
             }
             else if (std::get<1>(temp).first == "Grouping") { 
                 //auto value = static_cast<Grouping&&>(std::any_cast<Grouping>(std::get<1>(temp).second)).visit(std::any_cast<Grouping>(std::get<1>(temp).second));
@@ -162,6 +178,9 @@ void ast::tree_(const generateAst<ast>& gA)  {
  * -----------------------------------------------------------------------------
 */
 analyzeSemantics::analyzeSemantics(Shared<ast> Ast_): ThreadTracker([this, Ast_]() { this->run(Ast_); }) {
+    if (!getActiveThreads().empty()) {
+        strToId["semanticThread"] = std::move(getActiveThreads()[1]); // tree_() is the main thread so move the element out 
+    }
 }
 /** -------------------------------------------------------------------------
  * @brief Writes the code to target file

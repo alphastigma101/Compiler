@@ -6,8 +6,8 @@
     String file_name, user_choice;
     int settings;
 #endif
-extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>;
-typedef astTree<int, String, ExprVariant> treeEntry;
+extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>; // Create the underlying of the astTree
+typedef astTree<int, String, ExprVariant> treeStructure;
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public catcher<Type> {
@@ -27,11 +27,11 @@ namespace AbstractionTreeSyntax {
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
             std::string outputDir_;
-            inline static Atomic<const char*> accessCodeStr;
+            inline static Unique<Atomic<const char*>> accessCodeStr;
             inline static String codeStr;
             inline static String compactedTreeStr;
             inline static logTable<Map<String, Vector<String>>> logs_;
-            inline static Vector<treeEntry> compactedTreeNodes;
+            inline static Vector<treeStructure> compactedTreeNodes;
             inline static String ext;
     };
     class ast: public generateAst<ast> {
@@ -41,10 +41,10 @@ namespace AbstractionTreeSyntax {
         */
         public:
             friend class generateAst<ast>; // Link the generateAst together with the ast 
-            ast(std::vector<treeEntry>& expr_);
+            ast(std::vector<treeStructure>& expr_);
             ~ast() noexcept = default;
             inline static Table getTable() { return table; };
-            inline static const String& getCode() { return codeStr; };
+            inline static Unique<Atomic<const char*>> getCode() { return std::move(accessCodeStr); };
         private:
             static void tree_(const generateAst<ast>& gA);
             static void writeFile(std::string& ext);
@@ -56,25 +56,34 @@ namespace AbstractionTreeSyntax {
             friend class catcher<analyzeSemantics>;
             analyzeSemantics(Shared<ast> Ast_);
             ~analyzeSemantics() noexcept = default;
-            inline static Map<String, String> getAnalyzedCodeMap() { return std::move(analyzeCode); };
+            inline static Map<int, String> getAnalyzedCodeMap() { return std::move(analyzeCode); };
         protected:
             inline static const char* what(const char* msg = catcher<analyzeSemantics>::getMsg()) throw() { return msg; };
             /** ---------------------------------------------------------------------------------
                 * @brief A method that creates a thread for the class analyzeSemantics
                 * 
                 * @details Spawns in the thread. Main thread will allow this thread to access it.
-                *          It targets a certain method called getCodeStr which returns a string type 
+                *          It uses a getter method to get an atomic object wrapped in a unique_ptr and loads gets the value
                 * 
                 * --------------------------------------------------------------------------------
             */
             inline static void run(Shared<ast> Ast) {
-                String temp = Ast->getCode();
-                for (int i = 0; i < temp.size(); i++) {
-                    // TODO: Start mapping the every character into the map or change the map into a vector 
-                } 
+                // Want this: memory_order_release or memory_order_relaxed
+                if (auto thread_id = strToId.find("semanticThread"); thread_id != strToId.end()) {
+                    int node = 0;
+                    // Expression that indexes at the specific thread 
+                    // Once removed this expression should break out
+                    std:thread::id default_id;
+                    while (thread_id->second != default_id) {
+                        // Might have to check and see if it is not null
+                        String stringLiteral = Ast.get()->getCode()->load(std::memory_order_release);
+                        analyzeCode[node] = stringLiteral;
+                        node++;
+                    }
+                }
             };
         private:
-            inline static Map<String, String> analyzeCode;
+            inline static Map<int, String> analyzeCode;
     };
     class intermediateRepresentation: public catcher<intermediateRepresentation>, public ThreadTracker<intermediateRepresentation> {
         // This class Translates AST to intermediate representation (IR)public ThreadTracker<analyzeSemantics>

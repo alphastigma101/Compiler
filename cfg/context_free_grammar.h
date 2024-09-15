@@ -18,28 +18,27 @@
 
 namespace ContextFreeGrammar {
     template<typename Derived>
-    class Expr: public logging<Derived>, public runtimeerror<Derived>, public catcher<Derived> {
+    class VisitExpr: public logging<Derived>, public runtimeerror<Derived>, public catcher<Derived> {
         /* ------------------------------------------------------------------------------------------
-         * A representation of an abstraction classs which is also considered as a disoriented object
-         * ------------------------(Additional Info Below)-------------------------------------------
-         * By creating an abstraction class, and allowing a class to inherit it, you basically are allowing them to communicate with eachother
-         * Which allows it to not be associated with any type of behavior which usually methods/functions etc are what defined the behavior of an object
+         * @brief A representation of an abstraction classs which is also considered as a disoriented object
+         *
+         * @details By creating an abstraction class, and allowing a class to inherit it, you basically are allowing them to communicate with eachother
+         *          Which allows it to not be associated with any type of behavior which usually methods/functions etc are what defined the behavior of an object
          * ------------------------------------------------------------------------------------------
-         */
+        */
         public:
             friend class Binary;
             friend class Unary;
             friend class Grouping;
             friend class Literal;
-            ~Expr() noexcept {};
+            ~VisitExpr() noexcept {};
             /**
              * @brief Accepts a visitor for processing this node.
              *
              * This method is part of the Visitor design pattern. It accepts a visitor instance that performs operations on this node.
              *
-             * @details
-             * When you call `Binary_1->accept(visitor)`, the traversal starts with the node `Binary_1`.
-             * Inside `Binary_1::accept(visitor)`, the `visit(*this)` call is made. Here, `*this` refers to `Binary_1`.
+             * @details When you call `Binary_1->accept(visitor)`, the traversal starts with the node `Binary_1`.
+             *          Inside `Binary_1::accept(visitor)`, the `visit(*this)` call is made. Here, `*this` refers to `Binary_1`.
              *
              * The method then recursively processes the left and right children:
              * - **Recursive Call to `expr.left`**:
@@ -69,7 +68,7 @@ namespace ContextFreeGrammar {
              *
              * The Visitor pattern is used to separate operations from the objects they operate on, allowing new operations to be added without modifying the objects.
              */
-            inline std::string accept(Expr& visitor) {
+            inline std::string accept(VisitExpr& visitor) {
                 try {
                     // Derived* points to whatever class was passed. Casts from std::any to Derived 
                     // If a bug occurs here, then potential cases as to why are:
@@ -82,59 +81,47 @@ namespace ContextFreeGrammar {
                     //TODO: Replace the nullptr with something else
                     //runtimeerror<Derived> r(nullptr, std::any_cast<std::string>(visitor.left->op->toString()) + std::any_cast<std::string>(visitor.right->op->toString()));
                     //throw r;
+                    return "\0";
                 }
+                return "\0";
             };
-            std::shared_ptr<ExprVariant> right;
-            std::shared_ptr<ExprVariant> left;
-            std::shared_ptr<Token> op;
         private:
-            logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            inline static logTable<std::map<std::string, std::vector<std::string>>> logs_;
             inline static const char* what(const char* msg = catcher<Derived>::getMsg()) throw() { return msg;};
      };
-    class Binary: public Expr<Binary> {
-        /*
-         * A class that represents a binary abstraction syntax tree
-         * ------------------------(Additional Info Below)-------------------------------------------
-         * The 'visiting design pattern' is crucial for the abstraction syntax tree to work as it will visit the nodes
-         * It relies on recrusion to visit every node in a graph or tree 
-         * ------------------------(Example of Ast Tree)---------------------------------------------
-                  *
-                 / \
-                /   \
-                -   ()
-               /      \
-              123      45.67
-         * Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
+    class Binary: public VisitExpr<Binary> {
+        /* --------------------------------------------------------------------
+             * @breif A class that represents a binary abstraction syntax tree
+             * 
+             * @details The 'visiting design pattern' is crucial for the abstraction syntax tree to work as it will visit the nodes
+             *          It relies on recrusion to visit every node in a graph or tree 
+             *          ---------------(Example of Ast Tree)--------------
+                                              *
+                                             / \
+                                            /   \
+                                            -   ()
+                                           /      \
+                                          123      45.67
+             *          Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            // List initalize initializes the variable this->left and this->right which there is no need for the copy initialization
-            Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_): Left(left_), Right(right_) {
-                try {
-                    left = std::shared_ptr<ExprVariant>(left_, Left.get()); // copy the resources to a new memory location
-                    Left = std::move(left_); // move the current left_ resources memory location into Left 
-                    right = std::shared_ptr<ExprVariant>(right_, Right.get());
-                    Right = std::move(right_);
-                    op = std::make_shared<Token>(op_);
-                }
-                catch(...) {
-                    catcher<Binary> cb("Undefined behavior occurred in Class Binary!");
-                    throw cb;
-                }
-            };
+            explicit Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_); 
             ~Binary() noexcept = default;
             /* ----------------------------------------------------------------------------------------------------------
-             * @brief visitor gets called finite amount of times and is placed on the call stack with it's own variables 
+             * @brief visitor will visit each binary node forming a tree of some sort 
              *
+             * @param expr is an rvalue that will get destroyed once it leaves the scope
              *
-             */
+             * @details visitor gets called finit amount of times and is placed on the call stack with it's own variables
+            */
             inline std::string visit(Binary&& expr) {
                 try {
-                    //std::string leftResult = (expr.Left.get() && std::get_if<Binary>(expr.left.get())) ? std::get_if<Binary>(expr.left.get())->accept(*this) : "";
-                    //std::string rightResult = expr.Right.get() ? std::get_if<Binary>(expr.right.get())->accept(*this) : "";
-                    //return " " + leftResult + " " + rightResult;
+                    std::string leftResult = (expr.Left.get() && std::get_if<Binary>(expr.Left.get())) ? std::get_if<Binary>(expr.Left.get())->accept(*this) : "";
+                    std::string rightResult = (expr.Right.get() && std::get_if<Binary>(expr.Left.get())) ? std::get_if<Binary>(expr.Right.get())->accept(*this) : "";
+                    return " " + leftResult + " " + rightResult;
                 }
                 catch(runtimeerror<Binary>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.op.get()->getLine()) + " " + e.what());
+                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
                     logging<Binary> logs(logs_, temp); 
                     logs.update();
                     logs.write();
@@ -142,33 +129,30 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline Token getToken() { return *op; };
+            inline static Token getToken() { return *op; };
         private:
-            std::shared_ptr<ExprVariant> Left;
-            std::shared_ptr<ExprVariant> Right;
-            std::shared_ptr<Token> op_;
+            inline static std::shared_ptr<ExprVariant> Left;
+            inline static std::shared_ptr<ExprVariant> Right;
+            inline static std::shared_ptr<Token> op;
     };
-    class Unary: public Expr<Unary> {
+    class Unary: public VisitExpr<Unary> {
         public:
-            Unary(std::shared_ptr<ExprVariant>& right_, const Token& op_): Right(right_), Op(std::make_shared<Token>(op_))  {
-                try {
-                    op = Op;
-                    right = std::shared_ptr<ExprVariant>(right_, Right.get());
-                    Right = std::move(right_);
-                }
-                catch(...) {
-                    catcher<Unary> cu("Undefined behavior occurred in Class Unary!");
-                    throw cu;
-                }
-            };
+            explicit Unary(std::shared_ptr<ExprVariant>& right_, const Token& op_);  
             ~Unary() noexcept = default;
+            /* ----------------------------------------------------------------------------------------------------------
+             * @brief visitor will visit each unary node forming a tree of some sort 
+             *
+             * @param expr is an rvalue that will get destroyed once it leaves the scope
+             *
+             * @details visitor gets called finit amount of times and is placed on the call stack with it's own variables
+            */
             inline std::string visit(Unary&& expr) {
                 try {
-                    //std::string rightResult = (std::get_if<Unary>(expr.right.get()) != nullptr) ? std::get_if<Unary>(expr.right.get())->accept(*this) : "";
-                    //return " " + rightResult;
+                    std::string rightResult = (expr.Right.get() && std::get_if<Unary>(expr.Right.get())) ? std::get_if<Unary>(expr.Right.get())->accept(*this) : "";
+                    return " " + rightResult;
                 }
                 catch(runtimeerror<Unary>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.Op.get()->getLine()) + " " + e.what());
+                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
                     logging<Unary> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
@@ -176,37 +160,30 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline Token getToken() { return *Op; };
+            inline static Token getToken() { return *op; };
         private:
-            std::shared_ptr<ExprVariant> Right;
-            std::shared_ptr<Token> Op;
+            inline static std::shared_ptr<ExprVariant> Right;
+            inline static std::shared_ptr<Token> op;
     };
-    class Grouping: public Expr<Grouping> {
+    class Grouping: public VisitExpr<Grouping> {
         public:
-            /** ---------------------------------------------------------------
-             * @brief Initializes the expression_ and moves the resources into it 
-             *
-             * @detials Moves left's stored pointer resources into data member Left 
-             * @detials with left's and Right with the
-             * @detials 1. A snippet of the ast tree would look like: ...., Binary, Grouping, Binary, Binary, Grouping
-             * @detials 2. A snippet of the ast tree would look like: ...., Binary, Grouping, Binary, Unary, Unary, Grouping
-             * @detials 3. A snippet of the ast tree would look like: ...., Binary, Grouping, Grouping, Unary, Unary, Grouping, Binary, Grouping, Grouping
-             * ----------------------------------------------------------------
-             */
-            explicit Grouping(std::shared_ptr<ExprVariant>& expression): expression_(std::move(expression)) {
-                // Access the pointers stored in left and right and move them to Left and Right
-                //expression_->left = expression->left;
-                //expression_->right = expression->right;
-            };
+            explicit Grouping(std::shared_ptr<ExprVariant>& expression, Token&& oP);
             ~Grouping() noexcept = default;
+            /* ----------------------------------------------------------------------------------------------------------
+             * @brief visitor will visit each unary node forming a tree of some sort 
+             *
+             * @param expr is an rvalue that will get destroyed once it leaves the scope
+             *
+             * @details visitor gets called finit amount of times and is placed on the call stack with it's own variables
+            */
             inline std::string visit(Grouping&& expr) {
                 try {
-                    //std::string leftResult = expr.left.get()->accept(*this);
-                    //std::string rightResult = expr.right.get()->accept(*this);
-                    //return "(" + leftResult + " " + rightResult + ")";
+                    std::string leftResult = (expr.Left.get() && std::get_if<Grouping>(expr.Left.get())) ? std::get_if<Grouping>(expr.Left.get())->accept(*this) : "";
+                    std::string rightResult = (expr.Right.get() && std::get_if<Grouping>(expr.Right.get())) ? std::get_if<Grouping>(expr.Right.get())->accept(*this) : "";
+                    return "(" + leftResult + " " + rightResult + ")";
                 }
                 catch(runtimeerror<Grouping>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.op->getLine()) + " " + e.what());
+                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
                     logging<Grouping> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
@@ -214,32 +191,32 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            //inline Expr<Grouping> getExpr() { return *expression_; 
+            inline static Token getToken() { return *op; };
         private:
-           std::shared_ptr<ExprVariant> expression_;
-           std::shared_ptr<ExprVariant> Left, Right; 
+           inline static std::shared_ptr<ExprVariant> expression_;
+           inline static std::shared_ptr<ExprVariant> Left, Right; 
+           inline static std::shared_ptr<Token> op;
     };
-    class Literal: public MemberConv<Literal>, public Expr<Literal> {
+    class Literal: public MemberConv<Literal>, public VisitExpr<Literal> {
         public:
-            friend class ::Parser::parser;
-            explicit Literal(const auto& value) {
+            explicit Literal(const auto& value, Token&& op_) {
                 try {
                     value_ = std::make_any<std::any>(value);
-                    op_ = op;
+                    op = std::make_shared<Token>(std::move(op_));
                 }
                 catch(...) {
                     catcher<Literal> cl("Undefined behavior occurred in Class Literal!");
                     throw cl;
                 }
             };
-            ~Literal() = default;
+            ~Literal() noexcept {};
             inline std::string visit(Literal&& expr) {
                 try {
                     std::string literal = std::any_cast<bool>(expr) ? expr.accept(*this) : "";
                     return literal;
                 }
                 catch(runtimeerror<Literal>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.op_->getLine()) + " " + e.what());
+                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
                     logging<Literal> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
@@ -252,8 +229,7 @@ namespace ContextFreeGrammar {
                     return std::any_cast<std::string>(value_);
                 } 
                 catch (std::bad_any_cast& e) {
-                    auto l = std::any_cast<Literal>(value_);
-                    std::string temp = std::to_string(l.op.get()->getLine());
+                    std::string temp = std::to_string(getToken().getLine());
                     logging<Literal> logs(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
                     logs.update();
                     logs.write();
@@ -261,13 +237,11 @@ namespace ContextFreeGrammar {
                     return "error:" + std::string(e.what());
                 }
             };
-            inline std::any getValue() { return value_; };
-            inline Token getToken() { return *op_; };
-        protected:
-            Literal() = default;
+            inline static std::any getValue() { return value_; };
+            inline static Token getToken() { return *op; };
         private:
-            std::any value_;
-            std::shared_ptr<Token> op_;
+            inline static std::any value_;
+            inline static std::shared_ptr<Token> op;
     };
 };
 using namespace ContextFreeGrammar;

@@ -148,10 +148,10 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::primary() {
         return expr;
     }
     if (match(TokenType::LEFT_PAREN)) {
-        expr = std::make_shared<ExprVariant>(Grouping(expr, previous()));
+        expr = std::make_shared<ExprVariant>(Grouping(expr, previous())); // Get the left
         auto expr_ = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-        expr = std::make_shared<ExprVariant>(Grouping(expr_, previous()));
+        expr = std::make_shared<ExprVariant>(Grouping(expr_, previous())); // Get the right
         auto res = compressedAstTree(idx, std::string("Grouping"), expr); 
         nodes.push_back(std::move(res));
         idx++;
@@ -247,7 +247,6 @@ std::string parser::error() {
 */            
 std::string parser::report(int line, const std::string where, const std::string message) throw() {
     std::string err = "[line " + std::to_string(line) + "] Error" + where +  ": " + message;
-    //std::cout << "[line " <<  line << "] Error" << where << ": " + message;
     logging<parser> logs(logs_, err); // Keep the logs updated throughout the whole codebase
     logs.update();
     logs.write();

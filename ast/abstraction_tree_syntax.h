@@ -11,9 +11,9 @@ typedef astTree<int, String, ExprVariant> treeStructure;
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public catcher<Type> {
-        /* ------------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------
          * @brief A disorienated class object isolating its behavior. It will write data to a file by getting the literals from each expression it visits. 
-         * ------------------------------------------------------------------------------------------
+         * ---------------------------------------------------------------------
          */
         public:
             friend class ast;
@@ -35,9 +35,10 @@ namespace AbstractionTreeSyntax {
             inline static String ext;
     };
     class ast: public generateAst<ast> {
-        /* --------------------------------------------------------------------------------------------
-         * @brief This class creates an abstraction syntax tree by storing each expression instance inside a vector, for the intepreter class to evaulaute each instance using the visitor technique
-         * -------------------------------------------------------------------------------------------
+        /* ---------------------------------------------------------------------
+         * @brief This class creates an abstraction syntax tree by storing each expression instance inside a vector. 
+         *        for the intepreter class to evaulaute each instance using the visitor technique
+         * ---------------------------------------------------------------------
         */
         public:
             friend class generateAst<ast>; // Link the generateAst together with the ast 
@@ -59,21 +60,21 @@ namespace AbstractionTreeSyntax {
             inline static Map<int, String> getAnalyzedCodeMap() { return std::move(analyzeCode); };
         protected:
             inline static const char* what(const char* msg = catcher<analyzeSemantics>::getMsg()) throw() { return msg; };
-            /** ---------------------------------------------------------------------------------
+            /** ----------------------------------------------------------------
                 * @brief A method that creates a thread for the class analyzeSemantics
                 * 
                 * @details Spawns in the thread. Main thread will allow this thread to access it.
                 *          It uses a getter method to get an atomic object wrapped in a unique_ptr and loads gets the value
-                * 
-                * --------------------------------------------------------------------------------
+                * @details The average/worse case for this method would be O(n)
+                * --------------------------------------------------------------
             */
             inline static void run(Shared<ast> Ast) {
                 // Want this: memory_order_release or memory_order_relaxed
-                if (auto thread_id = strToId.find("semanticThread"); thread_id != strToId.end()) {
+                if (auto thread_id = strToId.find("treeThread"); thread_id != strToId.end()) {
                     int node = 0;
                     // Expression that indexes at the specific thread 
                     // Once removed this expression should break out
-                    std:thread::id default_id;
+                    std::thread::id default_id; // default constructor id 
                     while (thread_id->second != default_id) {
                         // Might have to check and see if it is not null
                         String stringLiteral = Ast.get()->getCode()->load(std::memory_order_release);
@@ -89,15 +90,39 @@ namespace AbstractionTreeSyntax {
         // This class Translates AST to intermediate representation (IR)public ThreadTracker<analyzeSemantics>
         public:
             friend class catcher<intermediateRepresentation>;
-            explicit intermediateRepresentation(Shared<analyzeSemantics> as_);
+            explicit intermediateRepresentation(Weak<analyzeSemantics> as_);
             ~intermediateRepresentation() noexcept = default;
             static void generate();
         protected:
-            inline static const char* what(const char* msg = catcher<analyzeSemantics>::getMsg()) throw() { return msg; };
-            inline static void run(Shared<analyzeSemantics> as_) { 
-
+            inline static const char* what(const char* msg = catcher<intermediateRepresentation>::getMsg()) throw() { return msg; };
+            inline static void run(Weak<analyzeSemantics> as_weak) { 
+                if (auto thread_id = strToId.find("semanticThread"); thread_id != strToId.end()) {
+                    int node = 0;
+                    // Expression that indexes at the specific thread 
+                    // Once removed this expression should break out
+                    std::thread::id default_id;
+                    while (thread_id->second != default_id) {
+                        if (auto aSLocked = as_weak.lock()) {
+                            // Might have to check and see if it is not null
+                            //String stringLiteral = Ast.get()->getCode()->load(std::memory_order_release);
+                            //analyzeCode[node] = stringLiteral;
+                            node++;
+                        } else {
+                            // If the analyzeSemantic thread dies before this is done 
+                            // Move the map over and continue creating the graph
+                        }
+                    }
+                }
             };
-       
+        private:
+            void adjacent(auto& G, int x, int y);
+            void neighbors(auto& G, int x);
+            void add_vertex(auto& G, int x);
+            void remove_vertex(auto& G, int x);
+            void add_edge(auto& G, int x, int y, int z);
+            void remove_edge(auto& G, int x, int y);
+            void get_vertex_value(auto& G, int x);
+            void set_vertex_value(auto& G, int x, int v);
     };
 };
 using namespace AbstractionTreeSyntax;

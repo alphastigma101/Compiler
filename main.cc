@@ -1,14 +1,17 @@
-#include <scanner.h> // includes token.h, languages.h 
-#include <parser.h> // includes abstraction_syntax_tree.h, context_free_grammar.h, token.h, languages.h
-#include <interpreter.h> // includes: token.h, definitions.h, declarations.h, catch.h, runtimeerror.h  
+#include <scanner.h> 
+#include <parser.h>
+#include <interpreter.h>
 #include <filesystem>
 #include <system_error>
 #include <fstream>
 static bool hadError = false;
+// Declare the external types here 
 static LanguageTokenTypes interpretLanguage;
-currentType<LanguageTokenTypes> ct;
 String file_name, user_choice;
 int settings;
+//LanguageType<LanguageTokenTypes> type;
+//void setTokenLanguage(const LanguageType<LanguageTokenTypes>& value);
+//LanguageType<LanguageTokenTypes> getTokenLanguage();
 
 
 /* -------------------------------------------------------------------------
@@ -21,12 +24,13 @@ int settings;
 static void run(std::string& source) {
     Scanner scanner(source); // Create a new scanner instance
     std::vector<Token> tokens = scanner.ScanTokens();
-    ct.setTokenLanguage(interpretLanguage); // set the language
+    setTokenLanguage(interpretLanguage); // set the language
     parser p(tokens);
     p.parse();
     std::thread build_(ast(p.nodes));
     if (settings) {
-        //interpreter interp(p.nodes, ct.getTokenLanguage());
+        auto temp = p.nodes; // Make a copy 
+        interpreter interp(std::move(temp), getTokenLanguage());
     }
     else {
         // TODO: This is just an example and it needs to be properly filled out

@@ -2,6 +2,8 @@
 #define _TOKEN_H_
 #include <interface.h>
 #include <catch.h>
+#include <enum_types.h>
+//#include <definitions.h>
 class Token: public MemberConv<Token>, catcher<Token>  {
     public:
         /**

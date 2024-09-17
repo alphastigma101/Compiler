@@ -7,26 +7,29 @@
     int settings;
 #endif
 extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>; // Create the underlying of the astTree
-typedef astTree<int, String, ExprVariant> treeStructure;
 namespace AbstractionTreeSyntax {
     template<class Type>
-    class generateAst: public catcher<Type> {
-        /* ---------------------------------------------------------------------
-         * @brief A disorienated class object isolating its behavior. It will write data to a file by getting the literals from each expression it visits. 
-         * ---------------------------------------------------------------------
-         */
+    class generateAst: public catcher<Type>, public runtimeerror<Type> {
+        /** ---------------------------------------------------------------------
+            * @brief A disorienated class object isolating its behavior. It will write data to a file by getting the literals from each expression it visits. 
+            * ---------------------------------------------------------------------
+        */
         public:
             friend class ast;
             friend class catcher<Type>;
+            friend class runtimeerror<Type>;
             explicit generateAst<Type>();
-            virtual ~generateAst<Type>() noexcept = default;
+            ~generateAst<Type>() noexcept = default;
             inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
         protected:
             inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
-            std::string nameOfFile = std::move(file_name);
+            inline static const char* what(TokenType&& type = runtimeerror<Type>::getType(), const char* msg = runtimeerror<Type>::getMsg()) throw() {
+                return msg;
+            };
+            inline static std::string nameOfFile = std::move(file_name);
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
-            std::string outputDir_;
+            inline static std::string outputDir_;
             inline static Unique<Atomic<const char*>> accessCodeStr;
             inline static String codeStr;
             inline static String compactedTreeStr;
@@ -36,9 +39,9 @@ namespace AbstractionTreeSyntax {
     };
     class ast: public generateAst<ast> {
         /* ---------------------------------------------------------------------
-         * @brief This class creates an abstraction syntax tree by storing each expression instance inside a vector. 
-         *        for the intepreter class to evaulaute each instance using the visitor technique
-         * ---------------------------------------------------------------------
+            * @brief This class creates an abstraction syntax tree by storing each expression instance inside a vector. 
+            *        for the intepreter class to evaulaute each instance using the visitor technique
+            * ---------------------------------------------------------------------
         */
         public:
             friend class generateAst<ast>; // Link the generateAst together with the ast 
@@ -52,7 +55,12 @@ namespace AbstractionTreeSyntax {
             inline static Table table;
     };
     class analyzeSemantics: public catcher<analyzeSemantics>,  public ThreadTracker<analyzeSemantics> {
-        // This class performs the semantic analysis 
+        /** ------------------------------------------------------------------
+            * @brief A class that inherits a crtp threading class that has mutex embeded into it
+            *
+            * @details It makes a copy of the ast class which it will access a certain object using atomic, and builds a map.
+            *          This map will be used by the intermediateRepresentation class which strictly only be used with the compiler
+        */
         public: 
             friend class catcher<analyzeSemantics>;
             analyzeSemantics(Shared<ast> Ast_);
@@ -61,7 +69,7 @@ namespace AbstractionTreeSyntax {
         protected:
             inline static const char* what(const char* msg = catcher<analyzeSemantics>::getMsg()) throw() { return msg; };
             /** ----------------------------------------------------------------
-                * @brief A method that creates a thread for the class analyzeSemantics
+                * @brief A method that creates a thread for the class analyzeSemantics.
                 * 
                 * @details Spawns in the thread. Main thread will allow this thread to access it.
                 *          It uses a getter method to get an atomic object wrapped in a unique_ptr and loads gets the value
@@ -76,7 +84,13 @@ namespace AbstractionTreeSyntax {
                     // Once removed this expression should break out
                     std::thread::id default_id; // default constructor id 
                     while (thread_id->second != default_id) {
+                        //Symbol resolution: Linking identifiers to their declarations
+                        //Type checking: Verifying and inferring types of expressions
+                        //Scope analysis: Ensuring variables are used in the correct scope
+                        //Checking language-specific semantic rules: e.g., ensuring break is only used inside loops
+
                         // Might have to check and see if it is not null
+                        // Or make the this thread wait until the atomic value is a new one
                         String stringLiteral = Ast.get()->getCode()->load(std::memory_order_release);
                         analyzeCode[node] = stringLiteral;
                         node++;
@@ -87,7 +101,13 @@ namespace AbstractionTreeSyntax {
             inline static Map<int, String> analyzeCode;
     };
     class intermediateRepresentation: public catcher<intermediateRepresentation>, public ThreadTracker<intermediateRepresentation> {
-        // This class Translates AST to intermediate representation (IR)public ThreadTracker<analyzeSemantics>
+        /** ------------------------------------------------------------------
+            * @brief A class that takes analyzeSemantics semantic map and converts it into a undirected graph.
+            *
+            * @details Using a undirected graph will be very benefitical for supporting multitple modern programming languages
+            *
+            * -------------------------------------------------------------------
+        */
         public:
             friend class catcher<intermediateRepresentation>;
             explicit intermediateRepresentation(Weak<analyzeSemantics> as_);
@@ -115,14 +135,14 @@ namespace AbstractionTreeSyntax {
                 }
             };
         private:
-            void adjacent(auto& G, int x, int y);
-            void neighbors(auto& G, int x);
-            void add_vertex(auto& G, int x);
-            void remove_vertex(auto& G, int x);
-            void add_edge(auto& G, int x, int y, int z);
-            void remove_edge(auto& G, int x, int y);
-            void get_vertex_value(auto& G, int x);
-            void set_vertex_value(auto& G, int x, int v);
+            static void adjacent(auto& G, int x, int y);
+            static void neighbors(auto& G, int x);
+            static void add_vertex(auto& G, int x);
+            static void remove_vertex(auto& G, int x);
+            static void add_edge(auto& G, int x, int y, int z);
+            static void remove_edge(auto& G, int x, int y);
+            static void get_vertex_value(auto& G, int x);
+            static void set_vertex_value(auto& G, int x, int v);
     };
 };
 using namespace AbstractionTreeSyntax;

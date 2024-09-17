@@ -6,10 +6,13 @@ namespace TruthyOperations {
         public:
             friend class interpreter;
             truthyOperations() = default;
-            ~truthyOperations() noexcept {};
+            ~truthyOperations() noexcept = default;
         private:
             bool isTruthy(auto& object);
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
+            cT* user_language;
+        protected:
+            inline static const char* what(const char* msg = catcher<truthyOperations>::getMsg()) throw() { return msg; }; 
     };
 };
 using namespace TruthyOperations;

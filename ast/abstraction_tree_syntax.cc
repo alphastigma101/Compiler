@@ -171,16 +171,16 @@ void ast::tree_(const generateAst<ast>& gA)  {
                 }
             }
             else {
-                catcher<generateAst<ast>> c("Unexpected behavior in ast!");
+                catcher<ast> c("Unexpected behavior in ast!");
                 throw c;
             }
         }
     } 
-    catch (runtimeerror<generateAst<ast>>& e) {
+    catch (runtimeerror<ast>& e) {
         std::cout << "Logs have been updated!" << std::endl;
-        logging<generateAst<ast>> logs(logs_, e.what());
-        logs.update();
-        logs.rotate();
+        //logging<ast> logs(logs_, e.what());
+        //logs.update();
+        //logs.rotate();
     }                           
     return writeFile(ext);
 }

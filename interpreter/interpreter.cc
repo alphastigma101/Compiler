@@ -1,90 +1,75 @@
 #include <interpreter.h>
-#include <languages_types.h>
-/*
- *
- *
-*/ 
-template<typename T>
-static std::shared_ptr<T> currentExpression;
-void interpreter::setExpr(const std::any& visitor) {
-    if (visitor.type() == typeid(Binary)) {
-        auto binary = std::any_cast<Binary>(visitor);
-        currentExpression<Binary> = std::make_shared<Binary>(binary);
-        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Binary>->getToken().getLine()) +  " at '" + currentExpression<Binary>->getToken().getLexeme());
-        logging<interpreter>update;
-        logging<interpreter>rotate;
-        throw runtimeerror<interpreter>(
-                                        currentExpression<Binary>->getToken().getType(), 
-                                        "Line" + std::to_string(currentExpression<Binary>->getToken().getLine()) + " at '" + currentExpression<Binary>->getToken().getLexeme());
-    } else if (visitor.type() == typeid(Unary)) {
-        auto unary = std::any_cast<Unary>(visitor);
-        currentExpression<Unary> = std::make_shared<Unary>(unary);
-        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Unary>->getToken().getLine()) +  " at '" + currentExpression<Unary>->getToken().getLexeme());
-        logging<interpreter>update;
-        logging<interpreter>rotate;
-        throw runtimeerror<interpreter>(
-                                        currentExpression<Unary>->getToken().getType(), 
-                                        "Line" + std::to_string(currentExpression<Unary>->getToken().getLine()) + " at '" + currentExpression<Unary>->getToken().getLexeme());
-    } else if (visitor.type() == typeid(Grouping)) {
-        auto grouping = std::any_cast<Grouping>(visitor);
-        currentExpression<Grouping> = std::make_shared<Grouping>(grouping);
-        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Grouping>->getExpr()->op->getLine()) +  " at '" + currentExpression<Grouping>->getExpr()->op->getLexeme());
-        logging<interpreter>update;
-        logging<interpreter>rotate;
-        throw runtimeerror<interpreter>(
-                                        currentExpression<Grouping>->getExpr()->op->getType(), 
-                                        "Line" + std::to_string(currentExpression<Grouping>->getExpr()->op->getLine()) + " at '" + currentExpression<Grouping>->getExpr()->op->getLexeme());
-    } else if (visitor.type() == typeid(Literal)) {
-        auto literal = std::any_cast<Literal>(visitor);
-        currentExpression<Literal> = std::make_shared<Literal>(literal);
-        logging<interpreter>(logs_, "Line" + std::to_string(currentExpression<Literal>->getToken()->getLine()) +  " at '" + currentExpression<Literal>->getToken()->getLexeme());
-        logging<interpreter>update;
-        logging<interpreter>rotate;
-        throw runtimeerror<interpreter>(
-                                        currentExpression<Literal>->getToken()->getType(), 
-                                        "Line" + std::to_string(currentExpression<Binary>->getToken().getLine()) + " at '" + currentExpression<Literal>->getToken()->getLexeme());
-    }
-    return;
-}
+#include <abstraction_tree_syntax.h>
 /*
  *
  * 
 */
-interpreter::interpreter(std::vector<std::tuple<int, std::pair<std::string, std::any>>>& expr, const LanguageTokenTypes lang): expr(this->expr), currentLanguage(lang) {
+interpreter::interpreter(Vector<treeStructure>&& expr, const LanguageTokenTypes lang): currentLanguage(lang) {
+    String value;
     try {
         for (int i = 0; i < expr.size(); i++) {
             auto temp = expr.at(i);
-            if (std::get<1>(temp).first == "Binary") { 
-                auto value = evaluate(std::get<1>(temp).second); 
-            }
-            else if (std::get<1>(temp).first == "Unary") { 
-                auto value = evaluate(std::get<1>(temp).second); 
-            }
-            else if (std::get<1>(temp).first == "Grouping") { 
-                auto value = evaluate(std::get<1>(temp).second); 
-            }
-            else if (std::get<1>(temp).first == "Literal") { 
-                auto value = evaluate(std::get<1>(temp).second); 
-            }
-            else {
-                try {
-                    setExpr(std::get<1>(temp).second);                    
+            if (std::get<1>(temp).first == "Binary") {
+                auto binaryU = std::get<1>(temp).second;
+                if (binaryU != nullptr) {
+                    value = evaluate(*binaryU); 
                 }
-                catch(runtimeerror<interpreter>& e) {
-                    std::cout << "Logs have been updated!" << std::endl;
-                    logging<interpreter> logs(logs_, e.what());
-                    logs.update();
-                    logs.rotate();
+                /*else if (std::get<1>(temp).first == "Unary") { 
+                    value = evaluate(std::get<1>(temp).second.get()); 
                 }
+                else if (std::get<1>(temp).first == "Grouping") { 
+                     value = evaluate(std::get<1>(temp).second.get()); 
+                }
+                else if (std::get<1>(temp).first == "Literal") { 
+                    value = evaluate(std::get<1>(temp).second.get()); 
+                }
+                else {
+                    try {
+                        catcher<interpreter> ci("Error, could not find node!");
+                        throw ci;
+                    }
+                    catch(runtimeerror<interpreter>& e) {
+                        std::cout << "Logs have been updated!" << std::endl;
+                        //logging<interpreter> logs(logs_, e.what());
+                        //logs.update();
+                        //logs.rotate();
+                    }
+                }*/
             }
         }
-    } catch (runtimeerror<interpreter>& e) {
+    } catch (catcher<interpreter>& e) {
         std::cout << "Logs have been updated!" << std::endl;
         logging<interpreter> logs(logs_, e.what());
         logs.update();
         logs.rotate();
     }                              
 }
+String interpreter::evaluate(ExprVariant& temp) {
+    const std::type_info& ti = typeid(temp);
+    if (ti == static_cast<const std::type_info&>(typeid(Binary))) {
+        // check to see if place holder is Binary
+        auto binary = std::get_if<Binary>(&temp);
+        return binary->accept(*binary);
+    }
+    /*else if (ti == static_cast<const std::type_info&>(typeid(Unary))) { 
+        auto unary = std::any_cast<Unary*>(temp);
+        auto exprUnaryPtr = std::any_cast<VisitExpr<Unary>*>(temp);
+        return unary->accept(*exprUnaryPtr); 
+    }
+    else if (ti == static_cast<const std::type_info&>(typeid(Grouping))) {
+        auto grouping = std::any_cast<Grouping*>(temp);
+        auto exprGroupingPtr = std::any_cast<VisitExpr<Grouping>*>(temp);
+        return grouping->accept(*exprGroupingPtr); 
+    }
+    else if (ti == static_cast<const std::type_info&>(typeid(Literal))) { 
+        auto literal = std::any_cast<Literal*>(temp);
+        auto exprLiteralPtr = std::any_cast<VisitExpr<Literal>*>(temp);
+        return literal->accept(*exprLiteralPtr); 
+    }*/
+    else { throw catcher<interpreter>("Unexpected type in evaluate function"); }
+    return nullptr;
+}
+
 /* ---------------------------------------------------------------------------
  * @brief A method that visits the unary abstract syntax tree
  * @param right: Is a fancy pointer that will point to Expr<Unary> at run time.

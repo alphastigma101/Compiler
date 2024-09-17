@@ -1,31 +1,7 @@
 #pragma once
 #ifndef _LANGUAGE_TYPES_H_
 #define _LANGUAGE_TYPES_H_
-#include <any>
-#include <cstdint>
-#include <optional>
-#include <variant>
-#include <complex>
-#include <functional>
-#include <set>
-#include <chrono>
-#include <regex>
-#include <time.h>
-#include <tuple>
-#include <memory>
-#include <unordered_map>
-#include <map>
-#include <unordered_set>
-#include <queue>
-#include <stack>
-#include <list>
-#include <deque>
-#include <future>
-#include <iostream>
-#include <initializer_list>
-#include <atomic>
-#include <mutex>
-#include <cstdarg>
+#include <declarations.h>
 /** ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
  * @details This header file is designed to be used in conjunction with `enum_types.h` at the end. This separation helps to better organize the code and its definitions.
  *
@@ -674,6 +650,4 @@ namespace LanguageTypes {
         };
     };
 };
-using namespace LanguageTypes;
-#include <enum_types.h>
 #endif

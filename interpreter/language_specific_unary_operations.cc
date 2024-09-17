@@ -1,4 +1,5 @@
 #include <language_specific_unary_operations.h>
+#include <languages_types.h>
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------
  * checkNumberOperand Description: 
     Is a method that calls in isNumeric, the helper function
@@ -28,8 +29,8 @@ auto unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes& lang, auto& 
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<Python::Int>(&right)) { return -(*val); }
-            if (auto val = std::any_cast<Python::Float>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::Python::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::Python::Float>(&right)) { return -(*val); }
             else { throw runtimeerror(right.getType(), "Unknown Type! in uPython"); }
         }
     }
@@ -51,11 +52,11 @@ auto unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes& lang, auto& 
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uJavaScript(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uJavaScript(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<JavaScript::Float>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::JavaScript::Float>(&right)) { return -(*val); }
             else { throw runtimeerror(right.getType(), "Unknown Type! in uJavaScript"); }
         }
     }
@@ -64,7 +65,7 @@ auto unaryOperations::dynamicLanguages::uJavaScript(LanguageTokenTypes& lang, au
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Ruby Description:
     This method will convert a Ruby type into a C++ representation type
@@ -76,12 +77,12 @@ auto unaryOperations::dynamicLanguages::uJavaScript(LanguageTokenTypes& lang, au
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uRuby(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uRuby(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<Ruby::Int>(&right)) { return -(*val); }
-            if (auto val = std::any_cast<Ruby::Float>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::Ruby::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::Ruby::Float>(&right)) { return -(*val); }
             else {
                 throw runtimeerror(right.getType(), "Unknown Type! in uRuby");
             }
@@ -92,7 +93,7 @@ auto unaryOperations::dynamicLanguages::uRuby(LanguageTokenTypes& lang, auto& ri
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * C Description:
     This method will convert a C type into a C++ representation type
@@ -104,7 +105,7 @@ auto unaryOperations::dynamicLanguages::uRuby(LanguageTokenTypes& lang, auto& ri
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uC(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uC(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -120,7 +121,7 @@ auto unaryOperations::staticLanguages::uC(LanguageTokenTypes& lang, auto& right)
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * CPP Description:
     This method will convert a C++ type into a C++ representation type
@@ -132,12 +133,12 @@ auto unaryOperations::staticLanguages::uC(LanguageTokenTypes& lang, auto& right)
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uCPP(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uCPP(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<CPP::Int>(&right)) { return -(*val); }
-            if (auto val = std::any_cast<CPP::Double>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::CPP::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::CPP::Double>(&right)) { return -(*val); }
             else { throw runtimeerror(right.getType(), "Unknown Type! in uCPP"); }
         }
     }
@@ -146,7 +147,7 @@ auto unaryOperations::staticLanguages::uCPP(LanguageTokenTypes& lang, auto& righ
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Java Description:
     This method will convert a Java type into a C++ representation type
@@ -158,12 +159,12 @@ auto unaryOperations::staticLanguages::uCPP(LanguageTokenTypes& lang, auto& righ
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uJava(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uJava(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<Java::Int>(&right)) { return -(*val); }
-            if (auto val = std::any_cast<Java::Double>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::Java::Int>(&right)) { return -(*val); }
+            if (auto val = std::any_cast<LanguageTypes::Java::Double>(&right)) { return -(*val); }
             else { throw runtimeerror(right.getType(), "Unknown Type! in uJava"); }
         }
     }
@@ -172,7 +173,7 @@ auto unaryOperations::staticLanguages::uJava(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Go Description:
     This method will convert a Go type into a C++ representation type
@@ -184,7 +185,7 @@ auto unaryOperations::staticLanguages::uJava(LanguageTokenTypes& lang, auto& rig
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uGo(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uGo(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -198,7 +199,7 @@ auto unaryOperations::staticLanguages::uGo(LanguageTokenTypes& lang, auto& right
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Kotlin Description:
     This method will convert a Kotlin type into a C++ representation type
@@ -210,7 +211,7 @@ auto unaryOperations::staticLanguages::uGo(LanguageTokenTypes& lang, auto& right
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uKotlin(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uKotlin(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -225,7 +226,7 @@ auto unaryOperations::staticLanguages::uKotlin(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Swift Description:
     This method will convert a Swift type into a C++ representation type
@@ -237,7 +238,7 @@ auto unaryOperations::staticLanguages::uKotlin(LanguageTokenTypes& lang, auto& r
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uSwift(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uSwift(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -251,7 +252,7 @@ auto unaryOperations::staticLanguages::uSwift(LanguageTokenTypes& lang, auto& ri
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Rust Description:
     This method will convert a Rust type into a C++ representation type
@@ -263,7 +264,7 @@ auto unaryOperations::staticLanguages::uSwift(LanguageTokenTypes& lang, auto& ri
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uRust(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uRust(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -285,7 +286,7 @@ auto unaryOperations::staticLanguages::uRust(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * CSharp Description:
     This method will convert a CSharp type into a C++ representation type
@@ -297,7 +298,7 @@ auto unaryOperations::staticLanguages::uRust(LanguageTokenTypes& lang, auto& rig
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uCSharp(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uCSharp(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -320,7 +321,7 @@ auto unaryOperations::staticLanguages::uCSharp(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * FSharp Description:
     This method will convert a FSharp type into a C++ representation type
@@ -332,7 +333,7 @@ auto unaryOperations::staticLanguages::uCSharp(LanguageTokenTypes& lang, auto& r
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uFSharp(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uFSharp(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -347,7 +348,7 @@ auto unaryOperations::staticLanguages::uFSharp(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * ObjectiveC Description:
     This method will convert a ObjectiveC type into a C++ representation type
@@ -359,7 +360,7 @@ auto unaryOperations::staticLanguages::uFSharp(LanguageTokenTypes& lang, auto& r
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uObjectiveC(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uObjectiveC(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -373,7 +374,7 @@ auto unaryOperations::staticLanguages::uObjectiveC(LanguageTokenTypes& lang, aut
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Scala Description:
     This method will convert a Scala type into a C++ representation type
@@ -385,7 +386,7 @@ auto unaryOperations::staticLanguages::uObjectiveC(LanguageTokenTypes& lang, aut
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uScala(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uScala(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -400,7 +401,7 @@ auto unaryOperations::staticLanguages::uScala(LanguageTokenTypes& lang, auto& ri
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * TypeScript Description:
     This method will convert a TypeScript type into a C++ representation type
@@ -412,7 +413,7 @@ auto unaryOperations::staticLanguages::uScala(LanguageTokenTypes& lang, auto& ri
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uTypeScript(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uTypeScript(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -427,7 +428,7 @@ auto unaryOperations::dynamicLanguages::uTypeScript(LanguageTokenTypes& lang, au
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Dart Description:
     This method will convert a Dart type into a C++ representation type
@@ -439,7 +440,7 @@ auto unaryOperations::dynamicLanguages::uTypeScript(LanguageTokenTypes& lang, au
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::staticLanguages::uDart(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uDart(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -454,7 +455,7 @@ auto unaryOperations::staticLanguages::uDart(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * PHP Description:
     This method will convert a PHP type into a C++ representation type
@@ -466,7 +467,7 @@ auto unaryOperations::staticLanguages::uDart(LanguageTokenTypes& lang, auto& rig
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uPHP(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uPHP(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -481,7 +482,7 @@ auto unaryOperations::dynamicLanguages::uPHP(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * R Description:
     This method will convert a R type into a C++ representation type
@@ -493,7 +494,7 @@ auto unaryOperations::dynamicLanguages::uPHP(LanguageTokenTypes& lang, auto& rig
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uR(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uR(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -508,7 +509,7 @@ auto unaryOperations::dynamicLanguages::uR(LanguageTokenTypes& lang, auto& right
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Lua Description:
     This method will convert a Lua type into a C++ representation type
@@ -520,7 +521,7 @@ auto unaryOperations::dynamicLanguages::uR(LanguageTokenTypes& lang, auto& right
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uLua(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uLua(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -534,7 +535,7 @@ auto unaryOperations::dynamicLanguages::uLua(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * MATLAB Description:
     This method will convert a MATLAB  type into a C++ representation type
@@ -546,7 +547,7 @@ auto unaryOperations::dynamicLanguages::uLua(LanguageTokenTypes& lang, auto& rig
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uMATLAB(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uMATLAB(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -561,7 +562,7 @@ auto unaryOperations::dynamicLanguages::uMATLAB(LanguageTokenTypes& lang, auto& 
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * VBA Description:
     This method will convert a VBA type into a C++ representation type
@@ -573,7 +574,7 @@ auto unaryOperations::dynamicLanguages::uMATLAB(LanguageTokenTypes& lang, auto& 
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uVBA(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uVBA(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -591,7 +592,7 @@ auto unaryOperations::dynamicLanguages::uVBA(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Groovy Description:
     This method will convert a Groovy type into a C++ representation type
@@ -603,7 +604,7 @@ auto unaryOperations::dynamicLanguages::uVBA(LanguageTokenTypes& lang, auto& rig
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uGroovy(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uGroovy(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -620,7 +621,7 @@ auto unaryOperations::dynamicLanguages::uGroovy(LanguageTokenTypes& lang, auto& 
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Julia Description:
     This method will convert a Julia type into a C++ representation type
@@ -632,7 +633,7 @@ auto unaryOperations::dynamicLanguages::uGroovy(LanguageTokenTypes& lang, auto& 
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uJulia(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uJulia(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -647,7 +648,7 @@ auto unaryOperations::dynamicLanguages::uJulia(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * PowerShell Description:
     This method will convert a PowerShell type into a C++ representation type
@@ -659,7 +660,7 @@ auto unaryOperations::dynamicLanguages::uJulia(LanguageTokenTypes& lang, auto& r
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uPowerShell(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uPowerShell(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -673,7 +674,7 @@ auto unaryOperations::dynamicLanguages::uPowerShell(LanguageTokenTypes& lang, au
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * VisualBasics Description:
     This method will convert a VisualBasics type into a C++ representation type
@@ -685,7 +686,7 @@ auto unaryOperations::dynamicLanguages::uPowerShell(LanguageTokenTypes& lang, au
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::dynamicLanguages::uVisualBasic(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uVisualBasic(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -701,7 +702,7 @@ auto unaryOperations::dynamicLanguages::uVisualBasic(LanguageTokenTypes& lang, a
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /* ----------------------------------------------------------------------------
  * Dlang Description:
     This method will convert a Dlang type into a C++ representation type
@@ -713,7 +714,7 @@ auto unaryOperations::dynamicLanguages::uVisualBasic(LanguageTokenTypes& lang, a
     Otherwise return the explicited converted object 
  * ----------------------------------------------------------------------------
 */
-auto unaryOperations::otherLanguages::uDlang(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uDlang(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -727,10 +728,11 @@ auto unaryOperations::otherLanguages::uDlang(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
+/*
 auto unaryOperations::dynamicLanguages::uHaskell(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
@@ -746,11 +748,11 @@ auto unaryOperations::dynamicLanguages::uHaskell(LanguageTokenTypes& lang, auto&
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uErlang(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uErlang(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -764,11 +766,11 @@ auto unaryOperations::otherLanguages::uErlang(LanguageTokenTypes& lang, auto& ri
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::dynamicLanguages::uClojure(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uClojure(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else if (auto val = std::any_cast<LanguageTypes::Clojure::Number>(&right)) { return -(*val); }
@@ -780,11 +782,11 @@ auto unaryOperations::dynamicLanguages::uClojure(LanguageTokenTypes& lang, auto&
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uStandardML(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uStandardML(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -800,11 +802,11 @@ auto unaryOperations::otherLanguages::uStandardML(LanguageTokenTypes& lang, auto
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uElm(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uElm(LanguageTokenTypes& lang, auto& right) {
     // TODO: needs to be redone
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
@@ -819,11 +821,11 @@ auto unaryOperations::otherLanguages::uElm(LanguageTokenTypes& lang, auto& right
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::staticLanguages::uVHDLVerilog(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uVHDLVerilog(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -840,11 +842,11 @@ auto unaryOperations::staticLanguages::uVHDLVerilog(LanguageTokenTypes& lang, au
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::staticLanguages::uFortran(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uFortran(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -859,11 +861,11 @@ auto unaryOperations::staticLanguages::uFortran(LanguageTokenTypes& lang, auto& 
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::staticLanguages::uCOBOL(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uCOBOL(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -877,11 +879,11 @@ auto unaryOperations::staticLanguages::uCOBOL(LanguageTokenTypes& lang, auto& ri
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::staticLanguages::uPascal(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uPascal(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -896,11 +898,11 @@ auto unaryOperations::staticLanguages::uPascal(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::staticLanguages::uAda(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uAda(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -915,11 +917,11 @@ auto unaryOperations::staticLanguages::uAda(LanguageTokenTypes& lang, auto& righ
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::dynamicLanguages::uPerl(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uPerl(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -935,11 +937,11 @@ auto unaryOperations::dynamicLanguages::uPerl(LanguageTokenTypes& lang, auto& ri
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::dynamicLanguages::uAWK(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uAWK(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -953,11 +955,11 @@ auto unaryOperations::dynamicLanguages::uAWK(LanguageTokenTypes& lang, auto& rig
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uTCL(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uTCL(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -971,11 +973,11 @@ auto unaryOperations::otherLanguages::uTCL(LanguageTokenTypes& lang, auto& right
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::dynamicLanguages::uShell(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uShell(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -990,11 +992,11 @@ auto unaryOperations::dynamicLanguages::uShell(LanguageTokenTypes& lang, auto& r
     }
     return NULL;
 
-}
+}*/
 /*
  *
 */
-auto unaryOperations::dynamicLanguages::uLISPScheme(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uLISPScheme(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {    
@@ -1008,11 +1010,11 @@ auto unaryOperations::dynamicLanguages::uLISPScheme(LanguageTokenTypes& lang, au
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::dynamicLanguages::uRacket(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uRacket(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) {return NULL;}
         else {
@@ -1026,11 +1028,11 @@ auto unaryOperations::dynamicLanguages::uRacket(LanguageTokenTypes& lang, auto& 
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uProlog(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uProlog(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -1045,11 +1047,11 @@ auto unaryOperations::otherLanguages::uProlog(LanguageTokenTypes& lang, auto& ri
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::dynamicLanguages::uSmallTalk(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::dynamicLanguages::uSmallTalk(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -1063,11 +1065,11 @@ auto unaryOperations::dynamicLanguages::uSmallTalk(LanguageTokenTypes& lang, aut
     catch(runtimeerror& e) {
         std::cout << e.what() << std::endl;
     }
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uHTMLCSS(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uHTMLCSS(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -1081,11 +1083,11 @@ auto unaryOperations::otherLanguages::uHTMLCSS(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uSQL(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uSQL(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -1101,11 +1103,11 @@ auto unaryOperations::otherLanguages::uSQL(LanguageTokenTypes& lang, auto& right
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::otherLanguages::uLabVIEW(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::otherLanguages::uLabVIEW(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -1129,11 +1131,11 @@ auto unaryOperations::otherLanguages::uLabVIEW(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl; 
     }
     return NULL;
-}
+}*/
 /*
  *
 */
-auto unaryOperations::staticLanguages::uEiffel(LanguageTokenTypes& lang, auto& right) {
+/*auto unaryOperations::staticLanguages::uEiffel(LanguageTokenTypes& lang, auto& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
@@ -1149,16 +1151,16 @@ auto unaryOperations::staticLanguages::uEiffel(LanguageTokenTypes& lang, auto& r
         std::cout << e.what() << std::endl;
     }
     return NULL;
-}
+}*/
 /*
  *
 */
 auto unaryOperations::otherLanguages::uCustom(LanguageTokenTypes& lang, auto& right) {
-    try {
+    /*try {
         if (auto val = std::any_cast<Custom::numeric>(&right)) { return -(*val); }
         else {
             throw std::runtime_error(right.getType(), "Unsupported type for unary operation");
-        }
+        *///}
         /*else if (right.isType<Custom::tokens>()) {
             // Handle token types (char, std::string)
             auto token = right.getValue<Custom::tokens>();
@@ -1199,9 +1201,9 @@ auto unaryOperations::otherLanguages::uCustom(LanguageTokenTypes& lang, auto& ri
             // Apply special rules based on the language
             // This could modify the result of the operation
         }*/
-    }
-    catch(runtimeerror& e) {
-        std::cout << e.what() << std::endl;
-    }
+    //}
+    //catch(runtimeerror& e) {
+        //std::cout << e.what() << std::endl;
+    //}
     return NULL;
 }

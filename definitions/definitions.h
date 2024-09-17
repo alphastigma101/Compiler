@@ -3,29 +3,27 @@
 #define _DEFINITIONS_H_
 #include <experimental/random>
 #include <declarations.h>
-/**---------------------------------------------------------------------------
- * @brief ...
- *
- * ---------------------------------------------------------------------------
-*/
-template<>
-struct currentType<LanguageTokenTypes> {
-    void setTokenLanguage(const LanguageTokenTypes& value);
-    LanguageTokenTypes getTokenLanguage();
-    LanguageType<LanguageTokenTypes> currentLanguage;
-};                                                                                
-/**---------------------------------------------------------------------------
- * @brief ...
- *
- * ---------------------------------------------------------------------------
-*/
-inline void currentType<LanguageTokenTypes>::setTokenLanguage(const LanguageTokenTypes& value) { currentLanguage = value; };
-/**---------------------------------------------------------------------------
- * @brief ...
- *
- * ---------------------------------------------------------------------------
-*/
-inline LanguageTokenTypes currentType<LanguageTokenTypes>::getTokenLanguage() { return currentLanguage; };
+#include <enum_types.h>
+typedef currentType<LanguageTokenTypes> cT;
+#if ENABLE_GENERATION
+    template<>
+    struct currentType<LanguageTokenTypes> {
+        void setTokenLanguage(const LanguageTokenTypes& value);
+        LanguageTokenTypes getTokenLanguage();
+        LanguageTokenTypes currentLanguage;
+    };
+    void cT::setTokenLanguage(const LanguageTokenTypes& value) { currentLanguage = value; };
+    LanguageType<LanguageTokenTypes> cT::getTokenLanguage() { return currentLanguage; };
+#else 
+    /*struct testCurrentLanguageType {
+        void setTokenLanguage(const LanguageTokenTypes& value);
+        LanguageTokenTypes getTokenLanguage();
+        LanguageTokenTypes currentLanguage;
+    };
+    void testCurrentLanguageType::setTokenLanguage(const LanguageTokenTypes& value) { currentLanguage = value; };
+    LanguageType<LanguageTokenTypes> testCurrentLanguageType::getTokenLanguage() { return currentLanguage; };*/
+#endif 
+
 /**---------------------------------------------------------------------------
  * @brief Custom function that creates a tuple for later use.
  * ----------------Generic Arguments------------------------------------------

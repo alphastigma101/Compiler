@@ -200,21 +200,44 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::identifier() {
     // LAL is the same thing but it looks ahead to the left
     // https://www.gnu.org/software/bison/manual/bison.html#Grammar-File 
     // 
+    auto expr_ = methods();
     if(match(TokenType::IDENTIFIER)) {
-        auto expr_ = arguments(); // Look to the right
-
+        auto right = arguments(); // Look to the right
+        // TODO: Gotta call in methods() rule 
     }
-    
     return primary(); // indentifier has a literal 
 }
-/**---------------------------------------------------------------
+/**---------------------------------------------------------------------------
+ * @brief A rule that will call to the left and to the right to parse. 
  * 
- * 
- */
+ * ---------------------------------------------------------------------------
+*/
 ExprTypes<Binary, Unary, Grouping, Literal> parser::arguments() {
     auto expr_ = arguments(); // Look to the left
     while(TokenType::IDENTIFIER, TokenType::LEFT_BRACE, TokenType::RIGHT_BRACE, TokenType::LEFT_PAREN, TokenType::RIGHT_PAREN) {
         auto right = arguments(); // Look ahead to the right
+
+    }
+    return expr;
+}
+/**---------------------------------------------------------------------------
+ * @brief A rule that will call to the left and to the right to parse. 
+ * 
+ * ---------------------------------------------------------------------------
+*/
+ExprTypes<Binary, Unary, Grouping, Literal> parser::methods() {
+    while(TokenType::DOT, TokenType::IDENTIFIER) {
+
+    }
+    return expr;
+}
+/**---------------------------------------------------------------------------
+ * @brief A rule that will call to the left and to the right to parse. 
+ * 
+ * ---------------------------------------------------------------------------
+*/
+ExprTypes<Binary, Unary, Grouping, Literal> parser::ecosystem() {
+    while(TokenType::IMPORT) {
 
     }
 

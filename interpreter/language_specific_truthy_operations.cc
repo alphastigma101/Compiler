@@ -1,5 +1,5 @@
 #include <language_specific_truthy_operations.h>
-
+#include <languages_types.h>
 /* ---------------------------------------------------------------------------------------------------------
  * isTruthy Description:
     Is a method that will return an concrete type if the language the user specifies supports truthy/falsy
@@ -12,7 +12,7 @@
  * ---------------------------------------------------------------------------------------------------------
 */
 bool truthyOperations::isTruthy(auto& object) {
-    const auto lang = ct.getTokenLanguage();
+    const auto lang = user_language->getTokenLanguage();
     switch(lang) {
         case LanguageTokenTypes::Python:
             if (std::any_cast<LanguageTypes::Python::None>(object.getValue()) != nullptr) return false;
@@ -23,7 +23,7 @@ bool truthyOperations::isTruthy(auto& object) {
             else if (auto l = std::any_cast<LanguageTypes::Python::List>(object.getValue())) return !l->empty();
             else if (auto d = std::any_cast<LanguageTypes::Python::Dict>(object.getValue())) return !d->empty();
             return true;
-        case LanguageTokenTypes::JavaScript:
+        /*case LanguageTokenTypes::JavaScript:
             if (std::any_cast<LanguageTypes::JavaScript::Null>(object.getValue()) != nullptr) return false;
             else if (std::any_cast<LanguageTypes::JavaScript::Undefined>(object.getValue()) != nullptr) return false;
             else if (auto b = std::any_cast<LanguageTypes::JavaScript::Bool>(object.getValue())) return *b;
@@ -128,6 +128,7 @@ bool truthyOperations::isTruthy(auto& object) {
             else if (auto f = std::any_cast<float>(object.getValue())) return *f != 0.0f;
             else if (auto s = std::any_cast<std::string>(object.getValue())) return !s->empty();
             return true;
+        */
         default:
             //TODO: Implement Custom language here
             return NULL;

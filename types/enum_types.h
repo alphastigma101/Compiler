@@ -1,7 +1,7 @@
 #pragma once
 #ifndef _TOKEN_TYPES_H_
 #define _TOKEN_TYPES_H_
-#include <languages_types.h>
+#include <declarations.h>
 /**---------------------------------------------------------------------------
  * @brief The underlying are representations of literals
  *
@@ -20,7 +20,7 @@ enum TokenType {
     LESS, LESS_EQUAL,
     // Literals.
     IDENTIFIER, STRING, NUMBER, INT, FLOAT, CHAR, VOID, 
-    AUTO, BOOL, UNDEFINED,
+    AUTO, BOOL, UNDEFINED, METHODS,
     // General Keywords.
     AND, CLASS, ELSE, FALSE, FUN, FOR, IF, NIL, OR,
     PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE, PUBLIC, 

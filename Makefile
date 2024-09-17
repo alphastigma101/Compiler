@@ -7,43 +7,38 @@ LDFLAGS :=  -L $(HOME)/Public-Projects/tests -lgtest -lgtest_main -pthread
 INCLUDES := -I ../types/ -I logging/ -I asm/ -I catch/ -I tokens/ \
             -I languages/ -I interface/ -I ast/ -I cfg/ \
             -I declarations/ -I definitions/ -I runtime/ -I interpreter/ \
-            -I scanner/ -I parser/
+            -I scanner/ -I parser/ -I threading/ -I compiler/
 
+FEATURES := -DRADNOM_EXTENSIONS=0 -DENABLE_TESTING=1 -DENABLE_LOGGING_TEST=1
 ########
 # Variables for debugging the code
-SRC_FILES_DEBUG_LOGGING := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/debug_logging.cc
+SRC_FILES_DEBUG_LOGGING := logging/logging.cc debugging/debug_logging.cc
 
-SRC_FILES_DEBUG_TOKENS := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/debug_tokens.cc
+SRC_FILES_DEBUG_TOKENS := logging/logging.cc tokens/token.cc debugging/debug_tokens.cc
 
-SRC_FILES_DEBUG_SCANNER := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/debug_scanner.cc
+SRC_FILES_DEBUG_SCANNER := logging/logging.cc tokens/token.cc scanner/scanner.cc debugging/debug_scanner.cc
 
-SRC_FILES_DEBUG_AST := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/debug_ast.cc
+SRC_FILES_DEBUG_AST := logging/logging.cc tokens/token.cc scanner/scanner.cc cfg/context_free_grammar.cc parser/parser.cc \
+                       languages/languages.cc debugging/debug_ast.cc
 
-SRC_FILES_DEBUG_PARSER := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
+SRC_FILES_DEBUG_PARSER := logging/logging.cc tokens/token.cc parser/parser.cc scanner/scanner.cc \
                          debugging/debug_parser.cc
 
-SRC_FILES_DEBUG_INTERPRETER := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
+SRC_FILES_DEBUG_INTERPRETER := logging/logging.cc tokens/token.cc cfg/context_free_grammar.cc parser/parser.cc languages/languages.cc scanner/scanner.cc \
                          debugging/debug_interpreter.cc
 ########
 
 
 ########
 # Variables for testing the code
-SRC_FILES_TEST_LOGGING := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/test_logging.cc
+SRC_FILES_TEST_LOGGING := logging/logging.cc debugging/test_logging.cc
 
-SRC_FILES_TEST_TOKENS := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/test_tokens.cc
+SRC_FILES_TEST_TOKENS := logging/logging.cc tokens/token.cc debugging/test_tokens.cc
 
-SRC_FILES_TEST_SCANNER := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/test_scanner.cc
+SRC_FILES_TEST_SCANNER := logging/logging.cc tokens/token.cc scanner/scanner.cc debugging/test_scanner.cc
 
-SRC_FILES_TEST_AST := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
-                         debugging/test_ast.cc
+SRC_FILES_TEST_AST := logging/logging.cc tokens/token.cc cfg/context_free_grammar.cc parser/parser.cc ast/abstraction_syntax_tree.cc \
+                      languages/languages.cc scanner/scanner.cc debugging/test_ast.cc
 
 SRC_FILES_TEST_PARSER := logging/logging.cc tokens/token.cc languages/languages.cc scanner/scanner.cc \
                          debugging/test_parser.cc

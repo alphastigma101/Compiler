@@ -7,7 +7,7 @@ namespace UnaryOperations {
         public:
             friend class interpreter;
             explicit unaryOperations() = default;
-            ~unaryOperations() noexcept {};
+            ~unaryOperations() noexcept = default;
             /* -----------------------------------------------------------------------------
              * isNumeric Description:
                 Is a helper function for (checkNumberOperands) and (checkNumberOperands)
@@ -17,7 +17,7 @@ namespace UnaryOperations {
                 Otherwise, return false
              * ----------------------------------------------------------------------------
             */
-            inline bool isNumeric(const std::any value) override {
+            inline static bool isNumeric(const std::any value) {
                 return value.type() == typeid(int) ||
                 value.type() == typeid(int64_t) ||
                 value.type() == typeid(float) ||
@@ -82,7 +82,9 @@ namespace UnaryOperations {
             static bool checkNumberOperand(auto& right);
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
         protected:
-            inline bool isString(const std::any value) override { return value.type() == typeid(std::string);};
+            inline static bool isString(const std::any value) { return value.type() == typeid(std::string);};
+            inline static const char* what(const char* msg = catcher<unaryOperations>::getMsg()) throw() { return msg; };
+
     };
 };
 using namespace UnaryOperations;

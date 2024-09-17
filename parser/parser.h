@@ -69,6 +69,8 @@ namespace Parser {
             static ExprTypes<Binary, Unary, Grouping, Literal> primary();
             static ExprTypes<Binary, Unary, Grouping, Literal> identifier();
             static ExprTypes<Binary, Unary, Grouping, Literal> arguments();
+            static ExprTypes<Binary, Unary, Grouping, Literal> methods();
+            static ExprTypes<Binary, Unary, Grouping, Literal> ecosystem();
             ~parser() noexcept {};
             inline static std::vector<std::tuple<int, std::pair<String, Shared<ExprVariant>>>> nodes; // passed into ast constructor
             ExprTypes<Binary, Unary, Grouping, Literal> parse();

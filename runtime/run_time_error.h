@@ -1,27 +1,33 @@
+#pragma once
 #ifndef _RUN_TIME_ERROR_H_
 #define _RUN_TIME_ERROR_H_
-#include <token.h>
+//#include <enum_types.h>
 namespace RunTimeError {
     template<class Type>
     class runtimeerror {
         public:
             // Constructor with token and message
-            explicit runtimeerror(const TokenType& type, const std::string& message): type_(type), message_(message) {};
-
+            explicit runtimeerror(const TokenType& type, const char* message) {
+                message_ = std::move(message);
+                type_ = std::move(type);
+            };
             // Default constructor
-            runtimeerror() : message_("Unspecified runtime error") {};
+            explicit runtimeerror() {
+                //message_ = "Unspecified runtime error"; 
+            };
 
-            // Virtual destructor
-            virtual ~runtimeerror() = default;
+            inline static char* getMsg() { return message_; };
+            // Default deconstructor
+            ~runtimeerror() = default;
 
             // Get the error message
-            virtual const char* what() const throw() { return message_.c_str(); };
-
+            inline const char* what(TokenType&& type = getType(), const char* msg = getMsg()) throw() { return static_cast<Type*>(this)->what(type, msg); };
+            
             // Get the token associated with the error
-            const TokenType& getType() const { return type_; };
+            inline static const TokenType getType() { return type_; };
         private:
-            TokenType type_;
-            std::string message_;
+            inline static TokenType type_;
+            inline static char* message_;
     };
 };
 using namespace RunTimeError;

@@ -1,37 +1,39 @@
+#pragma once
 #ifndef _LOGGING_H_
 #define _LOGGING_H_
-#include <definitions.h>
+#include <interface.h>
 #if ENABLE_LOGGING_TEST
-    logTable<std::map<std::string, std::vector<std::string>>> logEntries;
+    logTable<Map<String, Vector<String>>> logEntries;
 #endif
 namespace Logging {
     template<class T>
     class logging {
         public:
             logging() = default;
-            logging<T>(const logTable<std::map<std::string, std::vector<std::string>>>& old_logs, const std::string& text): currentEntries(logEntries) {
+            logging<T>(const logTable<Map<String, Vector<String>>>& old_logs, const String& text): currentEntries(logEntries) {
                 this->text = text;
             };
             ~logging() noexcept = default;
-            static std::string getCurrentTimeString();
+            static String getCurrentTimeString();
             static void rotate();             
             static void update();             
             static bool write();
             void printLogs();
-            static std::string getText() {
+            static String getText() {
                 return text;
             };
-            inline std::map<std::string, std::vector<std::string>> getLogs() { return currentEntries; };
+            inline Map<String, Vector<String>> getLogs() { return currentEntries; };
         private:
-            logTable<std::map<std::string, std::vector<std::string>>> currentEntries;
-            static std::string text;
-            static void create(std::string& filename);
-            static std::string read();
+            logTable<Map<String, Vector<String>>> currentEntries;
+            static String text;
+            static void create(String& filename);
+            static String read();
 
     };  
 };
 using namespace Logging;
 #include <logging.cc>
+#include <run_time_error.h>
 #endif
 
 

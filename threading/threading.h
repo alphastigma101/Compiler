@@ -68,7 +68,7 @@ class ThreadTracker : public std::thread {
          * -------------------------------------------------------------------
          */
         template<typename... Args>
-        inline void run(Args&&... args) { return static_cast<Derived*>(this)->run(std::forward<Args>(args)...); }
+        inline void run(Args&&... args) { return static_cast<Derived*>(this)->run(std::forward<Args>(args)...); };
         /** ------------------------------------------------------------------
          * @brief Retrieve a vector full of active threads which you can loop through to successfully clean them up 
          *

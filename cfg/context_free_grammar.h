@@ -1,6 +1,7 @@
 #ifndef _CONTEXT_FREE_GRAMMAR_H_
 #define _CONTEXT_FREE_GRAMMAR_H_
-#include <run_time_error.h>
+#include <logging.h>
+#include <token.h>
 #include <filesystem>
 /*
  * A Context Free Grammar consists of a head and a body, which describes what it can generate.
@@ -31,6 +32,8 @@ namespace ContextFreeGrammar {
             friend class Unary;
             friend class Grouping;
             friend class Literal;
+            friend class runtimeerror<Derived>;
+            friend class catcher<Derived>;
             ~VisitExpr() noexcept {};
             /**
              * @brief Accepts a visitor for processing this node.
@@ -88,6 +91,9 @@ namespace ContextFreeGrammar {
         private:
             inline static logTable<std::map<std::string, std::vector<std::string>>> logs_;
             inline static const char* what(const char* msg = catcher<Derived>::getMsg()) throw() { return msg;};
+            inline const char* what(TokenType&& type = runtimeerror<Derived>::getType(), const char* msg = runtimeerror<Derived>::getMsg()) throw() { 
+                return static_cast<Derived*>(this)->what(type, msg); 
+            }; 
      };
     class Binary: public VisitExpr<Binary> {
         /* --------------------------------------------------------------------
@@ -121,11 +127,11 @@ namespace ContextFreeGrammar {
                     return " " + leftResult + " " + rightResult;
                 }
                 catch(runtimeerror<Binary>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    logging<Binary> logs(logs_, temp); 
-                    logs.update();
-                    logs.write();
-                    logs.rotate();
+                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
+                    //logging<Binary> logs(logs_, temp); 
+                    //logs.update();
+                    //logs.write();
+                    //logs.rotate();
                 }
                 return "\0";
             };
@@ -152,11 +158,11 @@ namespace ContextFreeGrammar {
                     return " " + rightResult;
                 }
                 catch(runtimeerror<Unary>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    logging<Unary> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    logs.update();
-                    logs.write();
-                    logs.rotate();
+                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
+                    //logging<Unary> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    //logs.update();
+                    //logs.write();
+                    //logs.rotate();
                 }
                 return "\0";
             };
@@ -183,11 +189,11 @@ namespace ContextFreeGrammar {
                     return "(" + leftResult + " " + rightResult + ")";
                 }
                 catch(runtimeerror<Grouping>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    logging<Grouping> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    logs.update();
-                    logs.write();
-                    logs.rotate();
+                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
+                    //logging<Grouping> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    //logs.update();
+                    //logs.write();
+                    //logs.rotate();
                 }
                 return "\0";
             };
@@ -209,18 +215,18 @@ namespace ContextFreeGrammar {
                     throw cl;
                 }
             };
-            ~Literal() noexcept {};
+            ~Literal() noexcept = default;
             inline std::string visit(Literal&& expr) {
                 try {
                     std::string literal = std::any_cast<bool>(expr) ? expr.accept(*this) : "";
                     return literal;
                 }
                 catch(runtimeerror<Literal>& e) {
-                    std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    logging<Literal> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    logs.update();
-                    logs.write();
-                    logs.rotate();
+                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
+                    //logging<Literal> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+                    //logs.update();
+                    //logs.write();
+                    //logs.rotate();
                 }
                 return "\0";
             };
@@ -243,6 +249,28 @@ namespace ContextFreeGrammar {
             inline static std::any value_;
             inline static std::shared_ptr<Token> op;
     };
+    /*class Methods: public VisitExpr<Methods>, public catcher<Methods>, public logging<Methods> {
+        public:
+            explicit Methods(std::shared_ptr<ExprVariant> methods_, const Token& op_);
+            ~Methods() noexcept = default;
+        private:
+            inline static Shared<Token> op;
+    };
+    class Arguments: VisitExpr<Arguments>, public catcher<Arguments>, public logging<Arguments> {
+        public:
+            explicit Arguments(std::shared_ptr<ExprVariant> arg, const Token& op_);
+            ~Arguments() noexcept = default;
+        private:
+            inline static Shared<Token> op;
+        
+    };
+    class EcoSystem: public VisitExpr<EcoSystem>, public catcher<Arguments>, public logging<EcoSystem> {
+        public:
+            explicit EcoSystem(std::shared_ptr<ExprVariant> ecoSystem, const Token& op_);
+            ~EcoSystem() noexcept = default;
+        private:
+            inline static Shared<Token> op;
+    };*/
 };
 using namespace ContextFreeGrammar;
 #endif 

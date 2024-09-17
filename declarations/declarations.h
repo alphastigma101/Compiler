@@ -2,16 +2,47 @@
 #ifndef _DECLARATIONS_H_
 #define _DECLARATIONS_H_
 #include <utility>
-#include <languages.h>
+#include <any>
+#include <cstdint>
+#include <optional>
+#include <variant>
+#include <complex>
+#include <functional>
+#include <set>
+#include <chrono>
+#include <regex>
+#include <time.h>
+#include <tuple>
+#include <memory>
+#include <unordered_map>
+#include <map>
+#include <unordered_set>
+#include <queue>
+#include <stack>
+#include <list>
+#include <deque>
+#include <future>
+#include <iostream>
+#include <initializer_list>
+#include <atomic>
+#include <mutex>
+#include <cstdarg>
+#include <addon.h>
 /** ------------------------------------------------------------------------
  * @brief Used to control the programs behavior based on the user choice of language
  *
  * @details setI and setC are declared in declarations.h and defined in definitions.h.
+ *
+ * -------------------------------------------------------------------------
 */
 static int setI(const int val...);
 static int setC(const int val...); 
 extern int settings;
-
+/** --------------------------------------------------------------------------
+ * @brief All this alias templates are needed to avoid 
+ *        using namespace std repetiviely which will make the code look more cleaner.
+ * ---------------------------------------------------------------------------       
+*/        
 typedef std::string String;
 template<typename K, typename V>
 // Containers
@@ -34,27 +65,53 @@ template<typename T>
 using Atomic = std::atomic<T>;
 template<typename T>
 using Set = std::set<T>;
-
-//template<typename T>
-//using Mutex = std::mutex<T>;
-
-
 /** --------------------------------------------------------------------------
  * @brief Initialized in main.cc and is copy-initialized in abstraction_syntax_tree.cc
  * ---------------------------------------------------------------------------
 */
-extern String user_choice; // get the user choice of language from the begining 
+extern String user_choice;
 extern String file_name;
 /** ---------------------------------------------------------------------------
- * @brief Used in abstranction_tree_syntax.h
- * -----------------Templates Objects-----------------------------------------
- * @detials 'InitializerListType' is represents a container type using an initializer list
- * @detials 'ListOfType' is an alias template to InitalizerListType
- * @detials 'externalList' is a external declare of a template variable
- * @detials 'ExprTypes' used alot in parser.cc 
+ * @brief Defined in context_free_grammar.h
+ *
+ * @details This is a forward declaration which will be very useful for later on.
+ *
+ * --------------------------------------------------------------------------
+*/
+namespace ContextFreeGrammar {
+    template<class Derived>
+    class VisitExpr;
+    class Binary;
+    class Unary;
+    class Grouping;
+    class Literal;
+    class Methods;
+    class Arguments;
+    class EcoSystem;
+};
+/** --------------------------------------------------------------------------
+ * @brief Used in context_free_grammar.h and in parser.cc
+ *
+ * @details Used immensly in parser.cc for recrusive parsing 
  * ---------------------------------------------------------------------------
- *  ----------------Data structures------------------------------------------
- * @detials 'astTree' Represents a tree structure with a type T, a pair of type U and ListOfType<V>
+*/
+typedef std::variant<
+    ContextFreeGrammar::Binary,
+    ContextFreeGrammar::Unary,
+    ContextFreeGrammar::Grouping,
+    ContextFreeGrammar::Literal
+> ExprVariant;
+/** ---------------------------------------------------------------------------
+ * @detials 'ExprTypes' used alot in parser.cc and context_free_grammar.h
+ *                      Needed for returning multiple user defined class instances
+ *
+ * @brief Details that explain the custom data structures and there purpose
+ *
+ * @detials 'astTree' Represents a tree structure with a type T, a pair of type U and Shared<V>
+ * @details 'Vertices' Known as nodes which represent the lines/links of a directed/undirected graph
+ *                     It will use templates so it can be reused somewhere in the codebase if needed
+ * @details 'Vertex' Known as the dot/point in a directed/undirected graph
+ *                   It will use templates so it can be reused somewhere else in the codebase if needed
  * ---------------------------------------------------------------------------
 */
 template<typename... Derived>
@@ -63,8 +120,11 @@ template<typename T, typename U, typename V>
 using astTree = std::tuple<T, std::pair<U, Shared<V>>>;
 template<typename T, typename U, typename V>
 static astTree<T, U, Shared<V>> compressedAstTree(T first, U second, V third);
-//TODO: Make an expanded astTree struct. so something like: expandAstTree(T firstNode, U secondNode, V thirdNode, X fourthNode, W stringLiteral, Y ExprTypes)
-
+using treeStructure = astTree<int, String, ExprVariant>;
+//template<typename X, typename Y, typename Z>
+//using Vertices =
+//template<typename X, typename Y, typename Z>
+//using Vertex = std::tuple<
 
 /** ---------------------------------------------------------------------------
  * @brief setTokenLanguage method is initialized in main.cc
@@ -79,19 +139,13 @@ static astTree<T, U, Shared<V>> compressedAstTree(T first, U second, V third);
 template<typename T>
 using LanguageType = T;
 template<typename T>
-extern LanguageType<T> currentLanguage; 
-template<class T>
 struct currentType;
 template<typename T>
-static void setTokenLanguage(const T& value);
+extern T currentLanguage;
 template<typename T>
-static T getTokenLanguage();
-extern currentType<LanguageTokenTypes> ct;
-/**---------------------------------------------------------------------------
- * @brief Defined in languages.cc 
- * ---------------------------------------------------------------------------
-*/
-extern languages type;
+static void setTokenLanguage(const LanguageType<T>& value);
+template<typename T>
+static LanguageType<T> getTokenLanguage();
 /**---------------------------------------------------------------------------
  * @brief static logger. It is used by every single concrete class that is avialable
  *
@@ -119,33 +173,6 @@ namespace Parser {
     class parser;
 };
 
-/**---------------------------------------------------------------------------
- * @brief Defined in context_free_grammar.h
- *
- * @details This is a forward declaration which will be very useful for later on.
- *
- * --------------------------------------------------------------------------
-*/
-namespace ContextFreeGrammar {
-    template<class Derived>
-    class Expr;
-    class Binary;
-    class Unary;
-    class Grouping;
-    class Literal;
-};
-/** --------------------------------------------------------------------------
- * @brief Used in context_free_grammar.h and in parser.cc
- *
- * @details Used immensly in parser.cc for recrusive parsing 
- * ---------------------------------------------------------------------------
-*/
-typedef std::variant<
-    ContextFreeGrammar::Binary,
-    ContextFreeGrammar::Unary,
-    ContextFreeGrammar::Grouping,
-    ContextFreeGrammar::Literal
-> ExprVariant;
 
 
 #endif 

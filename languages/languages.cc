@@ -1,6 +1,12 @@
 #include <languages.h>
 #include <iostream>
-std::string operations::replace(std::string &code, const std::string for_loop, const std::string while_loop, const std::string if_block, const std::string function, const std::unordered_map<std::string, std::pair<int,int>> values) {
+
+/** --------------------------------------------------------------------------
+ * @brief a simple struct that creates code based on the user choice
+ *
+ *
+*/
+String operations::replace(String &code, const String for_loop, const String while_loop, const String if_block, const String function, const Unordered<String, std::pair<int,int>> values) {
     try {
         if (code.compare(code.find("FUNCTION"), std::string("FUNCTION").length(), "FUNCTION") == 0) {
             auto val = values.at("FUNCTION");

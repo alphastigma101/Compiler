@@ -12,16 +12,25 @@ interpreter::interpreter(Vector<treeStructure>&& expr, const LanguageTokenTypes 
             if (std::get<1>(temp).first == "Binary") {
                 auto binaryU = std::get<1>(temp).second;
                 if (binaryU != nullptr) {
-                    value = evaluate(*binaryU); 
+                    value += evaluate(*binaryU); 
                 }
-                /*else if (std::get<1>(temp).first == "Unary") { 
-                    value = evaluate(std::get<1>(temp).second.get()); 
+                else if (std::get<1>(temp).first == "Unary") {
+                    auto unaryU = std::get<1>(temp).second;
+                    if (unaryU != nullptr) {
+                        value += evaluate(*unaryU); 
+                    }
                 }
                 else if (std::get<1>(temp).first == "Grouping") { 
-                     value = evaluate(std::get<1>(temp).second.get()); 
+                    auto groupingU = std::get<1>(temp).second;
+                    if (groupingU != nullptr) {
+                         value += evaluate(*groupingU); 
+                    }
                 }
-                else if (std::get<1>(temp).first == "Literal") { 
-                    value = evaluate(std::get<1>(temp).second.get()); 
+                else if (std::get<1>(temp).first == "Literal") {
+                    auto literalU = std::get<1>(temp).second;
+                    if (literalU != nullptr) {
+                        value += evaluate(*literalU); 
+                    }
                 }
                 else {
                     try {
@@ -34,7 +43,7 @@ interpreter::interpreter(Vector<treeStructure>&& expr, const LanguageTokenTypes 
                         //logs.update();
                         //logs.rotate();
                     }
-                }*/
+                }
             }
         }
     } catch (catcher<interpreter>& e) {
@@ -51,21 +60,18 @@ String interpreter::evaluate(ExprVariant& temp) {
         auto binary = std::get_if<Binary>(&temp);
         return binary->accept(*binary);
     }
-    /*else if (ti == static_cast<const std::type_info&>(typeid(Unary))) { 
-        auto unary = std::any_cast<Unary*>(temp);
-        auto exprUnaryPtr = std::any_cast<VisitExpr<Unary>*>(temp);
-        return unary->accept(*exprUnaryPtr); 
+    else if (ti == static_cast<const std::type_info&>(typeid(Unary))) { 
+        auto unary = std::get_if<Unary>(&temp);
+        return unary->accept(*unary); 
     }
     else if (ti == static_cast<const std::type_info&>(typeid(Grouping))) {
-        auto grouping = std::any_cast<Grouping*>(temp);
-        auto exprGroupingPtr = std::any_cast<VisitExpr<Grouping>*>(temp);
-        return grouping->accept(*exprGroupingPtr); 
+        auto grouping = std::get_if<Grouping>(&temp);
+        return grouping->accept(*grouping); 
     }
     else if (ti == static_cast<const std::type_info&>(typeid(Literal))) { 
-        auto literal = std::any_cast<Literal*>(temp);
-        auto exprLiteralPtr = std::any_cast<VisitExpr<Literal>*>(temp);
-        return literal->accept(*exprLiteralPtr); 
-    }*/
+        auto literal = std::get_if<Literal>(&temp);
+        return literal->accept(*literal); 
+    }
     else { throw catcher<interpreter>("Unexpected type in evaluate function"); }
     return nullptr;
 }

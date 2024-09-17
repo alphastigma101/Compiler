@@ -172,6 +172,14 @@ namespace Parser {
     class parseError;
     class parser;
 };
+/** --------------------------------------------------------------------------
+ * @brief A forward declaration of the namespace Interpreter
+ * 
+ * ---------------------------------------------------------------------------
+*/
+namespace Interpreter {
+    class interpreter;
+};
 
 
 

@@ -1,96 +1,83 @@
 #include <interpreter.h>
 #include <abstraction_tree_syntax.h>
-/*
- *
+/** -------------------------------------------------
+ * @brief Calls in evaluate mehtod to begin the evaluation 
  * 
 */
 interpreter::interpreter(Vector<treeStructure>&& expr, const LanguageTokenTypes lang): currentLanguage(lang) {
     String value;
     try {
         for (int i = 0; i < expr.size(); i++) {
-            auto temp = expr.at(i);
-            if (std::get<1>(temp).first == "Binary") {
-                auto binaryU = std::get<1>(temp).second;
-                if (binaryU != nullptr) {
-                    value += evaluate(*binaryU); 
+            if (std::get<1>(expr.at(i)).first == "Binary") {
+                auto binaryU = std::get<1>(expr.at(i)).second;
+                if (binaryU != nullptr) { value += std::any_cast<String>(visitBinaryExpr(*binaryU));  }
+            }
+            if (std::get<1>(expr.at(i)).first == "Unary") {
+                auto unaryU = std::get<1>(expr.at(i)).second;
+                if (unaryU != nullptr) { value += std::any_cast<String>(visitUnaryExpr(*unaryU));  }
+            }
+            if (std::get<1>(expr.at(i)).first == "Grouping") { 
+                auto groupingU = std::get<1>(expr.at(i)).second;
+                if (groupingU != nullptr) { value += std::any_cast<String>(visitGroupingExpr(*groupingU));  }
+            }
+            if (std::get<1>(expr.at(i)).first == "Literal") {
+                auto literalU = std::get<1>(expr.at(i)).second;
+                if (literalU != nullptr) { value += std::any_cast<String>(visitLiteralExpr(*literalU));  }
+            }
+            else {
+                try {
+                    catcher<interpreter> ci("Error, could not find node!");
+                    throw ci;
                 }
-                else if (std::get<1>(temp).first == "Unary") {
-                    auto unaryU = std::get<1>(temp).second;
-                    if (unaryU != nullptr) {
-                        value += evaluate(*unaryU); 
-                    }
-                }
-                else if (std::get<1>(temp).first == "Grouping") { 
-                    auto groupingU = std::get<1>(temp).second;
-                    if (groupingU != nullptr) {
-                         value += evaluate(*groupingU); 
-                    }
-                }
-                else if (std::get<1>(temp).first == "Literal") {
-                    auto literalU = std::get<1>(temp).second;
-                    if (literalU != nullptr) {
-                        value += evaluate(*literalU); 
-                    }
-                }
-                else {
-                    try {
-                        catcher<interpreter> ci("Error, could not find node!");
-                        throw ci;
-                    }
-                    catch(runtimeerror<interpreter>& e) {
-                        std::cout << "Logs have been updated!" << std::endl;
-                        //logging<interpreter> logs(logs_, e.what());
-                        //logs.update();
-                        //logs.rotate();
-                    }
+                catch(runtimeerror<interpreter>& e) {
+                    std::cout << "Logs have been updated!" << std::endl;
+                    //logging<interpreter> logs(logs_, e.what());
+                    //logs.update();
+                    //logs.rotate();
                 }
             }
         }
-    } catch (catcher<interpreter>& e) {
+    } 
+    catch (catcher<interpreter>& e) {
         std::cout << "Logs have been updated!" << std::endl;
         logging<interpreter> logs(logs_, e.what());
         logs.update();
         logs.rotate();
     }                              
 }
+/** ------------------------------------------------
+ * @brief Calls the accept method to begin the recrusive tree walk
+ * 
+ * @param temp A type safe union that is useful to return multiple types inside a conatinaer 
+ * 
+ */
 String interpreter::evaluate(ExprVariant& temp) {
-    const std::type_info& ti = typeid(temp);
-    if (ti == static_cast<const std::type_info&>(typeid(Binary))) {
-        // check to see if place holder is Binary
-        auto binary = std::get_if<Binary>(&temp);
-        return binary->accept(*binary);
-    }
-    else if (ti == static_cast<const std::type_info&>(typeid(Unary))) { 
-        auto unary = std::get_if<Unary>(&temp);
-        return unary->accept(*unary); 
-    }
-    else if (ti == static_cast<const std::type_info&>(typeid(Grouping))) {
-        auto grouping = std::get_if<Grouping>(&temp);
-        return grouping->accept(*grouping); 
-    }
-    else if (ti == static_cast<const std::type_info&>(typeid(Literal))) { 
-        auto literal = std::get_if<Literal>(&temp);
-        return literal->accept(*literal); 
-    }
+    if (auto* binary = std::get_if<Binary>(&temp)) { return binary->accept(*binary); }
+    else if (auto* unary = std::get_if<Unary>(&temp)) {  return unary->accept(*unary);  }
+    else if (auto* grouping = std::get_if<Grouping>(&temp)) { return grouping->accept(*grouping);  }
+    else if (auto* literal = std::get_if<Literal>(&temp)) {  return literal->accept(*literal);  }
     else { throw catcher<interpreter>("Unexpected type in evaluate function"); }
     return nullptr;
 }
-
-/* ---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief A method that visits the unary abstract syntax tree
+ *
  * @param right: Is a fancy pointer that will point to Expr<Unary> at run time.
+ * 
  * @return A Unary abstraction tree syntax node in the form of a string 
  * ---------------------------------------------------------------------------
 */
 std::any interpreter::visitUnaryExpr(auto& expr) {
-    auto right = evaluate(expr.right);
-    switch (right.op.getType()) {
+    auto unaryR = std::get_if<Unary>(&expr);
+    auto right = evaluate(*unaryR->getRight());
+    switch (unaryR->getToken().getType()) {
         case TokenType::BANG:
             return !isTruthy(right);
         case TokenType::MINUS:
             switch(currentLanguage) {
                 case LanguageTokenTypes::Python:
-                    return uPython(LanguageTokenTypes::Python, right);
+                    return unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes::Python, right);
+                /*    
                 case LanguageTokenTypes::JavaScript:
                     return uJavaScript(LanguageTokenTypes::JavaScript, right);
                 case LanguageTokenTypes::Ruby:
@@ -187,16 +174,17 @@ std::any interpreter::visitUnaryExpr(auto& expr) {
                     return uEiffel(LanguageTokenTypes::Eiffel, right);
                 case LanguageTokenTypes::Custom:
                     return uCustom(LanguageTokenTypes::Custom, right);
+                */
                 default:
-                    throw runtimeerror<interpreter>(right.op.getType(), "Operand must be a number.");           
+                    throw runtimeerror<interpreter>(unaryR->getToken().getType(), "Operand must be a number.");           
             }
         default:
-            throw runtimeerror<interpreter>(right.op.getType(), "Operand must be a number.");
+            throw runtimeerror<interpreter>(unaryR->getToken().getType(), "Operand must be a number.");
     }
     // Unreachable.
     return NULL;
 }
-/* ---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief visits the Binary abstraction syntax tree 
  * @param auto expr: Is a generic type that must have a concrete type during run time and the tree it will visit at run time
  * @return A Binary abstraction syntax tree node in the form of a string
@@ -204,15 +192,17 @@ std::any interpreter::visitUnaryExpr(auto& expr) {
 */
 std::any interpreter::visitBinaryExpr(auto& expr) {
     // In go, := makes a object. It must be represented in c++ as = 
-    auto left = evaluate(expr.left);
-    auto right = evaluate(expr.right);
+    auto binaryL = std::get_if<Binary>(&expr);
+    auto left = evaluate(*binaryL->getLeft());
+    auto binaryR = std::get_if<Binary>(&expr);
+    auto right = evaluate(*binaryR->getRight());
     switch (currentLanguage) {
         case LanguageTokenTypes::Python:
             if (arithmeticOperations(currentLanguage, expr, left, right) != NULL) {
 
             }
             break;
-        case LanguageTokenTypes::JavaScript:
+        /*case LanguageTokenTypes::JavaScript:
             arithmeticOperations(currentLanguage, expr, left, right);
             break;
         case LanguageTokenTypes::Ruby:
@@ -353,6 +343,7 @@ std::any interpreter::visitBinaryExpr(auto& expr) {
             // TODO: This needs to be redone
             // This should be defined as a struct using templates for the objects to add flexibility 
             break;
+        */
         default:
             throw catcher<interpreter>("Operand must be a number.");           
     }

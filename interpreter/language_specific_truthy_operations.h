@@ -4,7 +4,7 @@
 namespace TruthyOperations {
     class truthyOperations: public runtimeerror<truthyOperations> {
         public:
-            friend class interpreter;
+            friend class ::Interpreter::interpreter;
             truthyOperations() = default;
             ~truthyOperations() noexcept = default;
         private:

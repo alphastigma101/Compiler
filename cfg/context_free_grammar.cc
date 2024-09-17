@@ -1,5 +1,4 @@
 #include <context_free_grammar.h>
-
 /** --------------------------------------------------------------------------
  * @brief This class will represent the Binary node tree in a absraction syntax tree
  *

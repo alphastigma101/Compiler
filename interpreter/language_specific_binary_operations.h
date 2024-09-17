@@ -6,13 +6,13 @@
 namespace BinaryOperations {
     class binaryOperations: public Check<binaryOperations>, public catcher<binaryOperations>, public NonMemberConv<binaryOperations>, public runtimeerror<binaryOperations> {
         public:
-            friend class interpreter;
+            friend class ::Interpreter::interpreter;
             friend class runtimeerror<binaryOperations>;
             friend class catcher<binaryOperations>;
             // Default constructor
             binaryOperations() = default;
             ~binaryOperations() noexcept {};
-            auto arithmeticOperations(auto& expr, auto& left, auto& right);
+            auto arithmeticOperations(auto& cl, auto& expr, auto& left, auto& right);
             bool isEqual(auto& a, auto& b);
         private:
             void checkNumberOperands(auto& expr, auto& left, auto& right);

@@ -5,7 +5,7 @@
 namespace UnaryOperations {
     class unaryOperations: public Check<unaryOperations>, public runtimeerror<unaryOperations> {
         public:
-            friend class interpreter;
+            friend class ::Interpreter::interpreter;
             explicit unaryOperations() = default;
             ~unaryOperations() noexcept = default;
             /* -----------------------------------------------------------------------------

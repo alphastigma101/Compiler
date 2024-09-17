@@ -73,12 +73,13 @@ namespace ContextFreeGrammar {
              */
             inline std::string accept(VisitExpr& visitor) {
                 try {
+                    
                     // Derived* points to whatever class was passed. Casts from std::any to Derived 
                     // If a bug occurs here, then potential cases as to why are:
                     // the correct class was not passed 
                     // this referencing the abstract class 
                     // so basically, it is going from reference (this) to pointy (Derived*) which is why the ->visit works 
-                    return std::any_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
+                    return static_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
                 }
                 catch(...) {
                     //TODO: Replace the nullptr with something else
@@ -122,7 +123,8 @@ namespace ContextFreeGrammar {
             */
             inline std::string visit(Binary&& expr) {
                 try {
-                    std::string leftResult = (expr.Left.get() && std::get_if<Binary>(expr.Left.get())) ? std::get_if<Binary>(expr.Left.get())->accept(*this) : "";
+
+                    std::string leftResult = (std::get_if<Binary>(expr.Left.get()) != nullptr) ? std::get_if<Binary>(expr.Left.get())->accept(*this) : "";
                     std::string rightResult = (expr.Right.get() && std::get_if<Binary>(expr.Left.get())) ? std::get_if<Binary>(expr.Right.get())->accept(*this) : "";
                     return " " + leftResult + " " + rightResult;
                 }
@@ -136,6 +138,8 @@ namespace ContextFreeGrammar {
                 return "\0";
             };
             inline static Token getToken() { return *op; };
+            inline static Shared<ExprVariant> getLeft() { return Left; };
+            inline static Shared<ExprVariant> getRight() { return Right; };
         private:
             inline static std::shared_ptr<ExprVariant> Left;
             inline static std::shared_ptr<ExprVariant> Right;
@@ -167,6 +171,7 @@ namespace ContextFreeGrammar {
                 return "\0";
             };
             inline static Token getToken() { return *op; };
+            inline static Shared<ExprVariant> getRight() { return Right; };
         private:
             inline static std::shared_ptr<ExprVariant> Right;
             inline static std::shared_ptr<Token> op;
@@ -198,16 +203,21 @@ namespace ContextFreeGrammar {
                 return "\0";
             };
             inline static Token getToken() { return *op; };
+            inline static Shared<ExprVariant> getExpr() { return expression_; };
+            inline static Shared<ExprVariant> getLeft() { return Left; };
+            inline static Shared<ExprVariant> getRight() { return Right; };
         private:
            inline static std::shared_ptr<ExprVariant> expression_;
            inline static std::shared_ptr<ExprVariant> Left, Right; 
            inline static std::shared_ptr<Token> op;
     };
-    class Literal: public MemberConv<Literal>, public VisitExpr<Literal> {
+    class Literal: public VisitExpr<Literal> {
         public:
             explicit Literal(const auto& value, Token&& op_) {
                 try {
-                    value_ = std::make_any<std::any>(value);
+                    std::stringstream ss;
+                    ss << value;
+                    value_ = ss.str();
                     op = std::make_shared<Token>(std::move(op_));
                 }
                 catch(...) {
@@ -216,10 +226,9 @@ namespace ContextFreeGrammar {
                 }
             };
             ~Literal() noexcept = default;
-            inline std::string visit(Literal&& expr) {
+            inline String visit(Literal&& expr) {
                 try {
-                    std::string literal = std::any_cast<bool>(expr) ? expr.accept(*this) : "";
-                    return literal;
+                   return value_;
                 }
                 catch(runtimeerror<Literal>& e) {
                     //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
@@ -230,23 +239,10 @@ namespace ContextFreeGrammar {
                 }
                 return "\0";
             };
-            inline std::any toString() {
-                try {
-                    return std::any_cast<std::string>(value_);
-                } 
-                catch (std::bad_any_cast& e) {
-                    std::string temp = std::to_string(getToken().getLine());
-                    logging<Literal> logs(logs_, "on line:" + temp + " " + e.what()); // Keep the logs updated throughout the whole codebase
-                    logs.update();
-                    logs.write();
-                    logs.rotate();
-                    return "error:" + std::string(e.what());
-                }
-            };
-            inline static std::any getValue() { return value_; };
+            inline static String getValue() { return value_; };
             inline static Token getToken() { return *op; };
         private:
-            inline static std::any value_;
+            inline static String value_;
             inline static std::shared_ptr<Token> op;
     };
     /*class Methods: public VisitExpr<Methods>, public catcher<Methods>, public logging<Methods> {

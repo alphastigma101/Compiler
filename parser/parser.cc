@@ -148,12 +148,17 @@ ExprTypes<Binary, Unary, Grouping, Literal> parser::primary() {
         return expr;
     }
     if (match(TokenType::LEFT_PAREN)) {
+        // get the left most ( 
         expr = std::make_shared<ExprVariant>(Grouping(expr, previous())); // Get the left
+        auto l_res = compressedAstTree(idx, std::string("Grouping"), expr);
+        nodes.push_back(std::move(l_res));
+        idx++; 
         auto expr_ = expression();
+        // Get the right most )
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
         expr = std::make_shared<ExprVariant>(Grouping(expr_, previous())); // Get the right
-        auto res = compressedAstTree(idx, std::string("Grouping"), expr); 
-        nodes.push_back(std::move(res));
+        auto r_res = compressedAstTree(idx, std::string("Grouping"), expr); 
+        nodes.push_back(std::move(r_res));
         idx++;
         return expr;
     }

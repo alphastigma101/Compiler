@@ -1,33 +1,30 @@
 #include <language_specific_binary_operations.h>
 #include <languages_types.h>
-/* ----------------------------------------------------------------------------------------------------------------------------------------------------
- * checkNumberOperands Description: 
-    Is a method that calls in isNumeric, the helper function
- * Arguments:
-    * auto& expr: It is an place holder type object that references the abstraction syntax, (ast) that is currently being used. In this case, it would be the Binary ast
-    * auto& left: Is a generic type that must have a concrete type during run time, and will visit the binary abstract syntax tree left side (lh)
-    * auto& right: Is a generic type that must have a concrete type during run time, and will visit the binary abstract syntax tree right side (rh)
- * Returns:
-    True if a and b are equal
-    Otherwise, return false 
+/** ----------------------------------------------------------------------------------------------------------------------------------------------------
+ * @brief Is a method that calls in isNumeric, the helper function
+ * 
+ * @param expr: It is an place holder type object that references the abstraction syntax, (ast) that is currently being used. 
+ *              In this case, it would be the Binary ast
+ * @param left: Is a generic type that must have a concrete type during run time, and will visit the binary abstract syntax tree left side (lh)
+ * @param right: Is a generic type that must have a concrete type during run time, and will visit the binary abstract syntax tree right side (rh)
+ * 
+ * @return True if a and b are equal. Otherwise, return false 
  * ----------------------------------------------------------------------------------------------------------------------------------------------------
 */
 void binaryOperations::checkNumberOperands(auto& expr, auto& left, auto& right) {
     if ((isNumeric(left) == true) && (isNumeric(right) == true)) return;
     throw new runtimeerror(expr.op.getType(), "Operands must be numbers.");
 }
-
-
-
-/* -----------------------------------------------------------------------------------------------------------------------------------------------
- * isEqual Description: 
-    Is a method that checks to see if one object equals the other
- * Arguments:
-    * Visitor a: Is a generic type that must have a concrete type during run time, and will visit the binary abstract syntax tree left side (lh)
-    * Visitor b: Is a generic type that must have a concrete type during run time, and will visit the binary abstract syntax tree right side (rh)
- * Returns:
-    True if a and b are equal
-    Otherwise, return false 
+/** -----------------------------------------------------------------------------------------------------------------------------------------------
+ * @brief Is a method that checks to see if one object equals the other
+ * 
+ * @param a: Is a fancy pointer that points to the object that is passed to at run time. 
+ *           If not careful with this, it could lead to segfault
+ * @param b: Is a fancy pointer that points to the object that is passed to at run time.
+ *           If not careful with this, it could lead to segfault.
+ * 
+ * @return True if a and b are equal. Otherwise, return false 
+ * 
  * -----------------------------------------------------------------------------------------------------------------------------------------------
 */
 bool binaryOperations::isEqual(auto& a, auto& b) {
@@ -35,9 +32,22 @@ bool binaryOperations::isEqual(auto& a, auto& b) {
     if (a == NULL) return false;
     return a.equals(b);
 }
-
-// return trailing type is a template called Binary 
-auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right) -> auto {
+/** -----------------------------------------------------------------------------------------------------------------------------------------------
+ * @brief Is a method that checks to see if there is arithmetic operations
+ * 
+ * @param cl Is another enum type which represents what the user has chosen
+ * @param expr: Is a fancy pointer that points to the object that is passed to at run time. 
+ *           If not careful with this, it could lead to segfault
+ * @param left: Is a fancy pointer that points to the object that is passed to at run time.
+ *           If not careful with this, it could lead to segfault.
+ * @param right Is a fancy pointer that points to the object that is passed to at run time.
+ *           If not careful with this, it could lead to segfault.
+ * 
+ * @return True if a and b are equal. Otherwise, return false 
+ * 
+ * -----------------------------------------------------------------------------------------------------------------------------------------------
+*/
+auto binaryOperations::arithmeticOperations(auto& cl, auto& expr, auto& left, auto& right) -> auto {
     switch (expr->op->getType()) {
         case TokenType::PLUS:
             try {
@@ -111,4 +121,3 @@ auto binaryOperations::arithmeticOperations(auto& expr, auto& left, auto& right)
         default: return NULL;
     }
 }
-

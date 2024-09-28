@@ -1,6 +1,6 @@
 #include <abstraction_tree_syntax.h>
 #include <lookup_language.h> // get the file extensions 
-template struct std::tuple<int, std::pair<String, ExprVariant>>; // Explicit initialize the underyling of astTree type
+//template struct std::tuple<int, std::pair<String, Expr>>; // Explicit initialize the underyling of astTree type
 
 /** ------------------------------------
  * @brief An abstraction class that checks to see if it allowed to create a .txt flie
@@ -8,24 +8,9 @@ template struct std::tuple<int, std::pair<String, ExprVariant>>; // Explicit ini
  * --------------------------------------
  */
 template<>
-generateAst<ast>::generateAst() {
-    // TODO: SegFault Occurs on Line 13
-    std::filesystem::path pp = std::filesystem::path(getenv("Private-Projects"));
-    // Check if the path exists and is in user space
-    if (std::filesystem::exists(pp)) {
-        auto hasPermission = [&](std::filesystem::perms perm) {
-            auto perms = std::filesystem::status(pp).permissions();
-            return (perms & perm) == perm;
-        };
-        // Check if we have write permissions
-        if (hasPermission(std::filesystem::perms::owner_write) && hasPermission(std::filesystem::perms::owner_read)) {
-            // Set the outputDir
-            outputDir_ = std::move(pp);
-        } else { 
-            catcher<generateAst<ast>> c("Failed to set the default path to write the ast to aka the file!");
-            throw c;
-        }
-    }
+//generateAst<ast>::generateAst(Expr& expr) 
+generateAst<ast>::generateAst() noexcept {
+    
 }
 /** -----------------------------------------------------------------------------------------
  * @brief The default constructor that calls in generateAst to start creating the .txt file 
@@ -114,7 +99,7 @@ void ast::writeFile(std::string& ext) {
  * --------------------------------------------------------------------------
 */
 void ast::tree_(const generateAst<ast>& gA)  {
-    try {
+    /*try {
         for (int i = 0; i < compactedTreeNodes.size(); i++) {
             auto temp = compactedTreeNodes.at(i); // Grab the tuple
             if (std::get<1>(temp).first == "Binary") {
@@ -181,7 +166,7 @@ void ast::tree_(const generateAst<ast>& gA)  {
         //logging<ast> logs(logs_, e.what());
         //logs.update();
         //logs.rotate();
-    }                           
+    }*/                           
     return writeFile(ext);
 }
 

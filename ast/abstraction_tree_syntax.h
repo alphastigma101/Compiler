@@ -6,10 +6,10 @@
     String file_name, user_choice;
     int settings;
 #endif
-extern template struct std::tuple<int, std::pair<String, Shared<ExprVariant>>>; // Create the underlying of the astTree
+//extern template struct std::tuple<int, std::pair<String, Unique<ExprVariant>>>; // Create the underlying of the astTree
 namespace AbstractionTreeSyntax {
     template<class Type>
-    class generateAst: public catcher<Type>, public runtimeerror<Type> {
+    class generateAst: /*public Visitor<generateAst<Expr>>*/ public catcher<Type>, public runtimeerror<Type> {
         /** ---------------------------------------------------------------------
             * @brief A disorienated class object isolating its behavior. It will write data to a file by getting the literals from each expression it visits. 
             * ---------------------------------------------------------------------
@@ -18,8 +18,10 @@ namespace AbstractionTreeSyntax {
             friend class ast;
             friend class catcher<Type>;
             friend class runtimeerror<Type>;
-            explicit generateAst<Type>();
+            //explicit generateAst<Type>(Expr& expr) noexcept;
+            explicit generateAst<Type>() noexcept;
             ~generateAst<Type>() noexcept = default;
+            String parenthesize(String& name, Expr exprs);
             inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
         protected:
             inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
@@ -46,6 +48,7 @@ namespace AbstractionTreeSyntax {
         public:
             friend class generateAst<ast>; // Link the generateAst together with the ast 
             ast(std::vector<treeStructure>& expr_);
+            //ast(const ast&);
             ~ast() noexcept = default;
             inline static Table getTable() { return table; };
             inline static Unique<Atomic<const char*>> getCode() { return std::move(accessCodeStr); };

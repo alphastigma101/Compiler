@@ -15,12 +15,9 @@
     * Quoted strings which represent the "terminal"
     * Lowercase letters that are  "nonterminal"
 */
-
-
 namespace ContextFreeGrammar {
-    template<typename Derived>
-    class VisitExpr: public logging<Derived>, public runtimeerror<Derived>, public catcher<Derived> {
-        /* ------------------------------------------------------------------------------------------
+    class Expr {
+        /** ------------------------------------------------------------------------------------------
          * @brief A representation of an abstraction classs which is also considered as a disoriented object
          *
          * @details By creating an abstraction class, and allowing a class to inherit it, you basically are allowing them to communicate with eachother
@@ -29,76 +26,45 @@ namespace ContextFreeGrammar {
         */
         public:
             friend class Binary;
-            friend class Unary;
-            friend class Grouping;
             friend class Literal;
-            friend class runtimeerror<Derived>;
-            friend class catcher<Derived>;
-            ~VisitExpr() noexcept {};
-            /**
-             * @brief Accepts a visitor for processing this node.
-             *
-             * This method is part of the Visitor design pattern. It accepts a visitor instance that performs operations on this node.
-             *
-             * @details When you call `Binary_1->accept(visitor)`, the traversal starts with the node `Binary_1`.
-             *          Inside `Binary_1::accept(visitor)`, the `visit(*this)` call is made. Here, `*this` refers to `Binary_1`.
-             *
-             * The method then recursively processes the left and right children:
-             * - **Recursive Call to `expr.left`**:
-             *   - `expr.left` points to `Binary_2`. So, `expr.left->accept(*this)` translates to `Binary_2->accept(visitor)`.
-             *   - Inside `Binary_2::accept(visitor)`, `visit(*this)` is called, where `*this` refers to `Binary_2`.
-             * - **Processing `Binary_2`**:
-             *   - Inside `Binary_2::accept(visitor)`, `visit(*this)` processes `Binary_2`.
-             *   - Since `Binary_2` has no children (both `left` and `right` are `nullptr`), the `visit` method returns an empty string for both `leftResult` and `rightResult`.
-             * - **Returning to `Binary_1`**:
-             *   - The result from `Binary_2` is returned to `Binary_1`, setting `leftResult` to this result.
-             *   - Similarly, `expr.right->accept(*this)` is called for `Binary_3`, following the same process.
-             * - **Processing `Binary_3`**:
-             *   - The process for `Binary_3` is similar: `visit(*this)` processes `Binary_3`, and since it has no children, empty strings are returned for `leftResult` and `rightResult`.
-             * - **Combining Results**:
-             *   - After processing both children, `Binary_1` combines the results from `Binary_2` and `Binary_3`, and returns the final result.
-             *
-             * @param visitor The visitor instance used to process this node.
-             *
-             * @return A `std::string` representing the result of processing this node and its children.
-             *
-             * @note Potential Issues:
-             * - **Dereferencing Null Pointers**: Ensure that child pointers (`left` and `right`) are checked for `nullptr` before dereferencing to avoid undefined behavior.
-             * - **Infinite Recursion**: If the tree structure is not properly maintained (e.g., cycles or incorrect pointers), it may lead to infinite recursion.
-             * - **Stack Overflow**: Because c++ uses a call stack. Regardless if the previous call is the same thing. It stil pushes the function call onto the stack with it's own local variables.
-             *      - It pushes main on the stack and then followed by other functions which are dynamically allocated using new. 
-             *      - Stack overflow can occur if the call stack exceeds the limited size which you could most likely increase for your compiler.
-             *
-             * The Visitor pattern is used to separate operations from the objects they operate on, allowing new operations to be added without modifying the objects.
-             */
-            inline std::string accept(VisitExpr& visitor) {
-                try {
-                    
-                    // Derived* points to whatever class was passed. Casts from std::any to Derived 
-                    // If a bug occurs here, then potential cases as to why are:
-                    // the correct class was not passed 
-                    // this referencing the abstract class 
-                    // so basically, it is going from reference (this) to pointy (Derived*) which is why the ->visit works 
-                    return static_cast<Derived*>(this)->visit(std::move(static_cast<Derived&>(visitor)));
-                }
-                catch(...) {
-                    //TODO: Replace the nullptr with something else
-                    //runtimeerror<Derived> r(nullptr, std::any_cast<std::string>(visitor.left->op->toString()) + std::any_cast<std::string>(visitor.right->op->toString()));
-                    //throw r;
-                    return "\0";
-                }
-                return "\0";
-            };
-        private:
-            inline static logTable<std::map<std::string, std::vector<std::string>>> logs_;
-            inline static const char* what(const char* msg = catcher<Derived>::getMsg()) throw() { return msg;};
-            inline const char* what(TokenType&& type = runtimeerror<Derived>::getType(), const char* msg = runtimeerror<Derived>::getMsg()) throw() { 
-                return static_cast<Derived*>(this)->what(type, msg); 
-            }; 
-     };
-    class Binary: public VisitExpr<Binary> {
-        /* --------------------------------------------------------------------
-             * @breif A class that represents a binary abstraction syntax tree
+            friend class Grouping;
+            friend class Unary;
+            friend class Methods;
+            friend class Arguments;
+            friend class EcoSystem;
+            /** --------------------------------------------------------
+             * @brief left represents the left binary node.
+             * ---------------------------------------------------------
+            */
+            Unique<Expr> left;
+            /** --------------------------------------------------------
+             * @brief right represents the left binary node.
+             * ---------------------------------------------------------
+            */
+            Unique<Expr> right;
+            /** --------------------------------------------------------
+             * @brief A token class instance wrapped in a unique_ptr. 
+             *        It is included with the node that was created
+             * ---------------------------------------------------------
+            */
+            Unique<Token> op;
+            /** --------------------------------------------------------
+             * @brief expression represents the left/right binary nodes.
+             *        It does not represent its own nodes. Used with Grouping class
+             * ---------------------------------------------------------
+            */
+            Unique<Expr> expression;
+            ~Expr() noexcept = default;
+        protected:
+            Expr() = default;
+            Expr(const Expr&) = default;
+            Expr(Expr&&) = default;
+            Expr& operator=(const Expr&) = default;
+            Expr& operator=(Expr&&) = default;
+    };
+    class Binary: public Expr,  public logging<Binary>, public runtimeerror<Binary>, public catcher<Binary> {
+        /** --------------------------------------------------------------------
+             * @brief A class that represents a binary abstraction syntax tree
              * 
              * @details The 'visiting design pattern' is crucial for the abstraction syntax tree to work as it will visit the nodes
              *          It relies on recrusion to visit every node in a graph or tree 
@@ -112,161 +78,388 @@ namespace ContextFreeGrammar {
              *          Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            explicit Binary(std::shared_ptr<ExprVariant>& left_, const Token& op_, std::shared_ptr<ExprVariant>& right_); 
+            friend ::Parser::parser;
+            friend class runtimeerror<Binary>; // Use to output TokenType and message
+            friend class catcher<Binary>; // Use to output a message
+            explicit Binary(Unique<Expr> left_, const Token& op_, Unique<Expr> right_);
+            explicit Binary(Unique<Expr> expr) noexcept;
+            Binary(Binary&&) = default;
             ~Binary() noexcept = default;
-            /* ----------------------------------------------------------------------------------------------------------
-             * @brief visitor will visit each binary node forming a tree of some sort 
-             *
-             * @param expr is an rvalue that will get destroyed once it leaves the scope
-             *
-             * @details visitor gets called finit amount of times and is placed on the call stack with it's own variables
-            */
-            inline std::string visit(Binary&& expr) {
-                try {
-
-                    std::string leftResult = (std::get_if<Binary>(expr.Left.get()) != nullptr) ? std::get_if<Binary>(expr.Left.get())->accept(*this) : "";
-                    std::string rightResult = (expr.Right.get() && std::get_if<Binary>(expr.Left.get())) ? std::get_if<Binary>(expr.Right.get())->accept(*this) : "";
-                    return " " + leftResult + " " + rightResult;
-                }
-                catch(runtimeerror<Binary>& e) {
-                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    //logging<Binary> logs(logs_, temp); 
-                    //logs.update();
-                    //logs.write();
-                    //logs.rotate();
-                }
-                return "\0";
-            };
-            inline static Token getToken() { return *op; };
-            inline static Shared<ExprVariant> getLeft() { return Left; };
-            inline static Shared<ExprVariant> getRight() { return Right; };
+            inline Token getToken() { return *op; };
+        protected:
+            Binary() = default;
+            Binary(const Binary&) = default;
+            Binary& operator=(const Binary&) = default;
+            Binary& operator=(Binary&&) = default;
         private:
-            inline static std::shared_ptr<ExprVariant> Left;
-            inline static std::shared_ptr<ExprVariant> Right;
-            inline static std::shared_ptr<Token> op;
-    };
-    class Unary: public VisitExpr<Unary> {
-        public:
-            explicit Unary(std::shared_ptr<ExprVariant>& right_, const Token& op_);  
-            ~Unary() noexcept = default;
-            /* ----------------------------------------------------------------------------------------------------------
-             * @brief visitor will visit each unary node forming a tree of some sort 
-             *
-             * @param expr is an rvalue that will get destroyed once it leaves the scope
-             *
-             * @details visitor gets called finit amount of times and is placed on the call stack with it's own variables
+            inline static logTable<std::map<String, Vector<String>>> logs_;
+            /** --------------------------------------
+             * @brief A method that is overloaded by this class 
+             * 
+             * @details It is a method that is defined here which gets called by the definition method inside catcher 
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output the error message
+             * 
+             * @return a string literal. Usually will be ub. Something that you do not want to get
+             * 
+             * ---------------------------------------
             */
-            inline std::string visit(Unary&& expr) {
-                try {
-                    std::string rightResult = (expr.Right.get() && std::get_if<Unary>(expr.Right.get())) ? std::get_if<Unary>(expr.Right.get())->accept(*this) : "";
-                    return " " + rightResult;
-                }
-                catch(runtimeerror<Unary>& e) {
-                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    //logging<Unary> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    //logs.update();
-                    //logs.write();
-                    //logs.rotate();
-                }
-                return "\0";
-            };
-            inline static Token getToken() { return *op; };
-            inline static Shared<ExprVariant> getRight() { return Right; };
-        private:
-            inline static std::shared_ptr<ExprVariant> Right;
-            inline static std::shared_ptr<Token> op;
-    };
-    class Grouping: public VisitExpr<Grouping> {
-        public:
-            explicit Grouping(std::shared_ptr<ExprVariant>& expression, Token&& oP);
-            ~Grouping() noexcept = default;
-            /* ----------------------------------------------------------------------------------------------------------
-             * @brief visitor will visit each unary node forming a tree of some sort 
-             *
-             * @param expr is an rvalue that will get destroyed once it leaves the scope
-             *
-             * @details visitor gets called finit amount of times and is placed on the call stack with it's own variables
+            inline static const char* what(const char* msg = catcher<Binary>::getMsg()) throw() { return msg;};
+            /** --------------------------------------
+             * @brief A method that is overloaded here from this class 
+             * 
+             * @details The runtimeerror class will call this method and it will output something to the temrinal
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output error message
+             * @param type A temp object that will eventually be destroyed once it leaves the scope. 
+             *             It also calls in a statically inlined method to get the TokenType
+             * 
+             * @return a concated string back to the caller method
+             * 
+             * ---------------------------------------
             */
-            inline std::string visit(Grouping&& expr) {
+            inline static const char* what(TokenType&& type = runtimeerror<Binary>::getType(), const char* msg = runtimeerror<Binary>::getMsg()) throw() {
+                static String output;
                 try {
-                    std::string leftResult = (expr.Left.get() && std::get_if<Grouping>(expr.Left.get())) ? std::get_if<Grouping>(expr.Left.get())->accept(*this) : "";
-                    std::string rightResult = (expr.Right.get() && std::get_if<Grouping>(expr.Right.get())) ? std::get_if<Grouping>(expr.Right.get())->accept(*this) : "";
-                    return "(" + leftResult + " " + rightResult + ")";
-                }
-                catch(runtimeerror<Grouping>& e) {
-                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    //logging<Grouping> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    //logs.update();
-                    //logs.write();
-                    //logs.rotate();
-                }
-                return "\0";
-            };
-            inline static Token getToken() { return *op; };
-            inline static Shared<ExprVariant> getExpr() { return expression_; };
-            inline static Shared<ExprVariant> getLeft() { return Left; };
-            inline static Shared<ExprVariant> getRight() { return Right; };
-        private:
-           inline static std::shared_ptr<ExprVariant> expression_;
-           inline static std::shared_ptr<ExprVariant> Left, Right; 
-           inline static std::shared_ptr<Token> op;
-    };
-    class Literal: public VisitExpr<Literal> {
-        public:
-            explicit Literal(const auto& value, Token&& op_) {
-                try {
-                    std::stringstream ss;
-                    ss << value;
-                    value_ = ss.str();
-                    op = std::make_shared<Token>(std::move(op_));
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
                 }
                 catch(...) {
-                    catcher<Literal> cl("Undefined behavior occurred in Class Literal!");
-                    throw cl;
+                    std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
-            ~Literal() noexcept = default;
-            inline String visit(Literal&& expr) {
+    };
+    class Unary: public Expr, public logging<Unary>, public runtimeerror<Unary>, public catcher<Unary> {
+        public:
+            explicit Unary(Unique<Expr> right_, const Token& op_);
+            explicit Unary(Unique<Expr> expr) noexcept;
+            Unary(Unary&&) = default;
+            ~Unary() noexcept = default;
+            inline Token getToken() { return *op; };
+        protected:
+            Unary() = default;
+            Unary(const Unary&) = default;
+            Unary& operator=(const Unary&) = default;
+            Unary& operator=(Unary&&) = default;
+        private:
+            /** --------------------------------------
+             * @brief A method that is overloaded by this class 
+             * 
+             * @details It is a method that is defined here which gets called by the definition method inside catcher 
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output the error message
+             * 
+             * @return a string literal. Usually will be ub. Something that you do not want to get
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(const char* msg = catcher<Unary>::getMsg()) throw() { return msg;};
+            /** --------------------------------------
+             * @brief A method that is overloaded here from this class 
+             * 
+             * @details The runtimeerror class will call this method and it will output something to the temrinal
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output error message
+             * @param type A temp object that will eventually be destroyed once it leaves the scope. 
+             *             It also calls in a statically inlined method to get the TokenType
+             * 
+             * @return a concated string back to the caller method
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(TokenType&& type = runtimeerror<Unary>::getType(), const char* msg = runtimeerror<Unary>::getMsg()) throw() {
+                static String output;
                 try {
-                   return value_;
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
                 }
-                catch(runtimeerror<Literal>& e) {
-                    //std::string temp = std::string("on line:" + std::to_string(expr.getToken().getLine()) + " " + e.what());
-                    //logging<Literal> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
-                    //logs.update();
-                    //logs.write();
-                    //logs.rotate();
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
                 }
-                return "\0";
             };
-            inline static String getValue() { return value_; };
-            inline static Token getToken() { return *op; };
-        private:
-            inline static String value_;
-            inline static std::shared_ptr<Token> op;
     };
-    /*class Methods: public VisitExpr<Methods>, public catcher<Methods>, public logging<Methods> {
+    class Grouping: public Expr,  public logging<Grouping>, public runtimeerror<Grouping>, public catcher<Grouping> {
         public:
-            explicit Methods(std::shared_ptr<ExprVariant> methods_, const Token& op_);
+            friend class runtimeerror<Grouping>; // Use to output TokenType and message
+            friend class catcher<Grouping>; // Use to output a message
+            /** ----------------------------------------------------------------------------------------------------------
+             * @brief constructor for creating the memory addresses that will later on be accessed by a vector 
+             *
+             * @param expression is an rvalue that will get destroyed once it leaves the scope
+             *
+             * 
+             * @details expression is used to represent grouping class. 
+             *          It points to the left and right binary node trees
+            */
+            explicit Grouping(Unique<Expr> expression);
+            ~Grouping() noexcept = default;
+            Grouping(Grouping&&) = default;
+            inline Token getToken() { return *op; };
+        //protected:
+            Grouping() = default;
+            Grouping(const Grouping&) = default;
+            Grouping& operator=(const Grouping&) = default;
+            Grouping& operator=(Grouping&&) = default;
+        private:
+           inline static logTable<std::map<String, Vector<String>>> logs_;
+            /** --------------------------------------
+             * @brief A method that is overloaded by this class 
+             * 
+             * @details It is a method that is defined here which gets called by the definition method inside catcher 
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output the error message
+             * 
+             * @return a string literal. Usually will be ub. Something that you do not want to get
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(const char* msg = catcher<Grouping>::getMsg()) throw() { return msg;};
+            /** --------------------------------------
+             * @brief A method that is overloaded here from this class 
+             * 
+             * @details The runtimeerror class will call this method and it will output something to the temrinal
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output error message
+             * @param type A temp object that will eventually be destroyed once it leaves the scope. 
+             *             It also calls in a statically inlined method to get the TokenType
+             * 
+             * @return a concated string back to the caller method
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(TokenType&& type = runtimeerror<Grouping>::getType(), const char* msg = runtimeerror<Grouping>::getMsg()) throw() {
+                static String output;
+                try {
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
+                }
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
+                }
+            };
+    };
+    class Literal: public Expr, public logging<Literal>, public runtimeerror<Literal>, public catcher<Literal> {
+        public:
+            friend ::Parser::parser;
+            friend class runtimeerror<Expr>; // Use to output TokenType and message
+            friend class catcher<Expr>; // Use to output a message
+            explicit Literal(const Token&& oP);
+            ~Literal() noexcept = default;
+            inline Token getToken() { return *op; };
+        private:
+            inline static logTable<std::map<String, Vector<String>>> logs_;
+            /** --------------------------------------
+             * @brief A method that is overloaded by this class 
+             * 
+             * @details It is a method that is defined here which gets called by the definition method inside catcher 
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output the error message
+             * 
+             * @return a string literal. Usually will be ub. Something that you do not want to get
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(const char* msg = catcher<Literal>::getMsg()) throw() { return msg;};
+            /** --------------------------------------
+             * @brief A method that is overloaded here from this class 
+             * 
+             * @details The runtimeerror class will call this method and it will output something to the temrinal
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output error message
+             * @param type A temp object that will eventually be destroyed once it leaves the scope. 
+             *             It also calls in a statically inlined method to get the TokenType
+             * 
+             * @return a concated string back to the caller method
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(TokenType&& type = runtimeerror<Literal>::getType(), const char* msg = runtimeerror<Literal>::getMsg()) throw() {
+                static String output;
+                try {
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
+                }
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
+                }
+            };
+        protected:
+            Literal() = default;
+            Literal(const Literal&) = default;
+            Literal(Literal&&) = default;
+            Literal& operator=(const Literal&) = default;
+            Literal& operator=(Literal&&) = default;
+           
+    };
+    class Methods: public Expr, public logging<Methods>, public runtimeerror<Methods>, public catcher<Methods> {
+        public:
+            friend ::Parser::parser;
+            friend class runtimeerror<Expr>; // Use to output TokenType and message
+            friend class catcher<Expr>; // Use to output a message
+            explicit Methods(Unique<Expr> meth, const Token& op_);
             ~Methods() noexcept = default;
+        protected:
+            Methods() = default;
+            Methods(const Methods&) = default;
+            Methods(Methods&&) = default;
+            Methods& operator=(const Methods&) = default;
+            Methods& operator=(Methods&&) = default;
         private:
-            inline static Shared<Token> op;
+            inline static logTable<std::map<String, Vector<String>>> logs_;
+            /** --------------------------------------
+             * @brief A method that is overloaded by this class 
+             * 
+             * @details It is a method that is defined here which gets called by the definition method inside catcher 
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output the error message
+             * 
+             * @return a string literal. Usually will be ub. Something that you do not want to get
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(const char* msg = catcher<Methods>::getMsg()) throw() { return msg;};
+            /** --------------------------------------
+             * @brief A method that is overloaded here from this class 
+             * 
+             * @details The runtimeerror class will call this method and it will output something to the temrinal
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output error message
+             * @param type A temp object that will eventually be destroyed once it leaves the scope. 
+             *             It also calls in a statically inlined method to get the TokenType
+             * 
+             * @return a concated string back to the caller method
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(TokenType&& type = runtimeerror<Expr>::getType(), const char* msg = runtimeerror<Methods>::getMsg()) throw() {
+                static String output;
+                try {
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
+                }
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
+                }
+            };
     };
-    class Arguments: VisitExpr<Arguments>, public catcher<Arguments>, public logging<Arguments> {
+    class Arguments: public Expr, public logging<Arguments>, public runtimeerror<Arguments>, public catcher<Arguments> {
         public:
-            explicit Arguments(std::shared_ptr<ExprVariant> arg, const Token& op_);
+            friend ::Parser::parser;
+            friend class runtimeerror<Expr>; // Use to output TokenType and message
+            friend class catcher<Expr>; // Use to output a message
+            explicit Arguments(Unique<Expr> arg, const Token& op_);
             ~Arguments() noexcept = default;
         private:
-            inline static Shared<Token> op;
-        
+            Unique<Token> op;
+            inline static logTable<std::map<String, Vector<String>>> logs_;
+            /** --------------------------------------
+             * @brief A method that is overloaded by this class 
+             * 
+             * @details It is a method that is defined here which gets called by the definition method inside catcher 
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output the error message
+             * 
+             * @return a string literal. Usually will be ub. Something that you do not want to get
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(const char* msg = catcher<Arguments>::getMsg()) throw() { return msg;};
+            /** --------------------------------------
+             * @brief A method that is overloaded here from this class 
+             * 
+             * @details The runtimeerror class will call this method and it will output something to the temrinal
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output error message
+             * @param type A temp object that will eventually be destroyed once it leaves the scope. 
+             *             It also calls in a statically inlined method to get the TokenType
+             * 
+             * @return a concated string back to the caller method
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(TokenType&& type = runtimeerror<Expr>::getType(), const char* msg = runtimeerror<Arguments>::getMsg()) throw() {
+                static String output;
+                try {
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
+                }
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
+                }
+            };
+        protected:
+            Arguments() = default;
+            Arguments(const Arguments&) = default;
+            Arguments(Arguments&&) = default;
+            Arguments& operator=(const Arguments&) = default;
+            Arguments& operator=(Arguments&&) = default;
     };
-    class EcoSystem: public VisitExpr<EcoSystem>, public catcher<Arguments>, public logging<EcoSystem> {
+    class EcoSystem: public Expr, public logging<EcoSystem>, public runtimeerror<EcoSystem>, public catcher<EcoSystem> {
         public:
-            explicit EcoSystem(std::shared_ptr<ExprVariant> ecoSystem, const Token& op_);
+            friend ::Parser::parser;
+            friend class runtimeerror<Expr>; // Use to output TokenType and message
+            friend class catcher<Expr>; // Use to output a message
+            explicit EcoSystem(Unique<Expr> ecoSystem, const Token& op_);
             ~EcoSystem() noexcept = default;
         private:
-            inline static Shared<Token> op;
-    };*/
+            Unique<Token> op;
+            inline static logTable<std::map<String, Vector<String>>> logs_;
+            /** --------------------------------------
+             * @brief A method that is overloaded by this class 
+             * 
+             * @details It is a method that is defined here which gets called by the definition method inside catcher 
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output the error message
+             * 
+             * @return a string literal. Usually will be ub. Something that you do not want to get
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(const char* msg = catcher<EcoSystem>::getMsg()) throw() { return msg;};
+            /** --------------------------------------
+             * @brief A method that is overloaded here from this class 
+             * 
+             * @details The runtimeerror class will call this method and it will output something to the temrinal
+             * 
+             * @param msg A default argument that calls in a statically inlined method to output error message
+             * @param type A temp object that will eventually be destroyed once it leaves the scope. 
+             *             It also calls in a statically inlined method to get the TokenType
+             * 
+             * @return a concated string back to the caller method
+             * 
+             * ---------------------------------------
+            */
+            inline static const char* what(TokenType&& type = runtimeerror<EcoSystem>::getType(), const char* msg = runtimeerror<EcoSystem>::getMsg()) throw() {
+                static String output;
+                try {
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
+                }
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
+                }
+            };
+        protected:
+            EcoSystem() = default;
+            EcoSystem(const EcoSystem&) = default;
+            EcoSystem(EcoSystem&&) = default;
+            EcoSystem& operator=(const EcoSystem&) = default;
+            EcoSystem& operator=(EcoSystem&&) = default;
+    };
 };
 using namespace ContextFreeGrammar;
 #endif 

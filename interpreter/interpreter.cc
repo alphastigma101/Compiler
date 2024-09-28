@@ -4,7 +4,8 @@
  * @brief Calls in evaluate mehtod to begin the evaluation 
  * 
 */
-interpreter::interpreter(Vector<treeStructure>&& expr, const LanguageTokenTypes lang): currentLanguage(lang) {
+interpreter::interpreter(Vector<treeStructure>&& expr, const LanguageTokenTypes lang) {
+    currentLanguage = lang;
     String value;
     try {
         for (int i = 0; i < expr.size(); i++) {
@@ -12,15 +13,15 @@ interpreter::interpreter(Vector<treeStructure>&& expr, const LanguageTokenTypes 
                 auto binaryU = std::get<1>(expr.at(i)).second;
                 if (binaryU != nullptr) { value += std::any_cast<String>(visitBinaryExpr(*binaryU));  }
             }
-            if (std::get<1>(expr.at(i)).first == "Unary") {
+            else if (std::get<1>(expr.at(i)).first == "Unary") {
                 auto unaryU = std::get<1>(expr.at(i)).second;
                 if (unaryU != nullptr) { value += std::any_cast<String>(visitUnaryExpr(*unaryU));  }
             }
-            if (std::get<1>(expr.at(i)).first == "Grouping") { 
+            else if (std::get<1>(expr.at(i)).first == "Grouping") { 
                 auto groupingU = std::get<1>(expr.at(i)).second;
                 if (groupingU != nullptr) { value += std::any_cast<String>(visitGroupingExpr(*groupingU));  }
             }
-            if (std::get<1>(expr.at(i)).first == "Literal") {
+            else if (std::get<1>(expr.at(i)).first == "Literal") {
                 auto literalU = std::get<1>(expr.at(i)).second;
                 if (literalU != nullptr) { value += std::any_cast<String>(visitLiteralExpr(*literalU));  }
             }
@@ -72,11 +73,11 @@ std::any interpreter::visitUnaryExpr(auto& expr) {
     auto right = evaluate(*unaryR->getRight());
     switch (unaryR->getToken().getType()) {
         case TokenType::BANG:
-            return !isTruthy(right);
+            return !isTruthy(*unaryR->getRight(), currentLanguage);
         case TokenType::MINUS:
             switch(currentLanguage) {
                 case LanguageTokenTypes::Python:
-                    return unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes::Python, right);
+                    return dynamicLanguages::uPython(currentLanguage, *unaryR->getRight());
                 /*    
                 case LanguageTokenTypes::JavaScript:
                     return uJavaScript(LanguageTokenTypes::JavaScript, right);
@@ -186,8 +187,11 @@ std::any interpreter::visitUnaryExpr(auto& expr) {
 }
 /** ---------------------------------------------------------------------------
  * @brief visits the Binary abstraction syntax tree 
+ * 
  * @param auto expr: Is a generic type that must have a concrete type during run time and the tree it will visit at run time
+ * 
  * @return A Binary abstraction syntax tree node in the form of a string
+ * 
  * ---------------------------------------------------------------------------
 */
 std::any interpreter::visitBinaryExpr(auto& expr) {
@@ -198,7 +202,7 @@ std::any interpreter::visitBinaryExpr(auto& expr) {
     auto right = evaluate(*binaryR->getRight());
     switch (currentLanguage) {
         case LanguageTokenTypes::Python:
-            if (arithmeticOperations(currentLanguage, expr, left, right) != NULL) {
+            if (arithmeticOperations(currentLanguage, expr, *binaryL->getLeft(), *binaryL->getRight()).has_value()) {
 
             }
             break;

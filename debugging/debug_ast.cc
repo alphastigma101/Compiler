@@ -2,29 +2,15 @@
 #include <abstraction_tree_syntax.h>
 #include <scanner.h>
 #include <parser.h>
-
+ Vector<deepCopy<treeStructure>> temp;
 static void debugTree() {
+    Vector<String> test_strs = {
+        "(((45 > 67) + (67 / 70)) * ((99 <= 100) - (88 == 88)) + ((34 * 2) / (16 % 5)) + ((23 != 24) && (56 >= 12)) || ((15 + 19) < (7 * 3)))"
+    };
     Scanner scanner("((45 > 67) + (67 / 70))");
     Vector<Token> tokens = scanner.ScanTokens();
     parser p(tokens);
-    p.parse();
-    for (size_t i = 0; i < p.nodes.size(); ++i) {
-        const auto& [intValue, pairValue] = p.nodes[i];
-        const auto& [stringValue, exprValue] = pairValue;
-
-        std::cout << "Node " << i << ":\n";
-        std::cout << "  Int value: " << intValue << "\n";
-        std::cout << "  String value: " << stringValue << "\n";
-        std::cout << "  ExprVariant address: " << exprValue.get() << "\n";
-        
-        // If ExprVariant has a method to represent itself as a string, use it here
-        // For example: std::cout << "  ExprVariant value: " << exprValue->toString() << "\n";
-        
-        std::cout << "\n";
-        if (p.nodes.empty()) {
-            std::cout << "Not good!" << std::endl;
-        }
-    }
+    p.beginParse();
     return;
 }
 

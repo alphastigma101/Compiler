@@ -13,7 +13,7 @@ class NonMemberConv {
 template<class Type>
 class Check {
     public:
-         ~Check() noexcept = default;
+        ~Check() noexcept = default;
         inline bool isNumeric(const std::any value) { return static_cast<Type*>(this)->isNumeric(value); };
         inline bool isString(const std::any value) {return static_cast<Type*>(this)->isString(value); };
 };
@@ -23,5 +23,11 @@ class MemberConv {
     public:
         ~MemberConv() noexcept = default;
         inline std::any toString() { return static_cast<Type*>(this)->toString(); };
+};
+template<class Type>
+class Visitor {
+    public:
+        inline String visit(Type&& visitor) { return static_cast<Type*>(this)->accept(*this); }
+        inline String accept(Type&) { return static_cast<Type*>(this)->visit(this); }
 };
 #endif 

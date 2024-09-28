@@ -4,49 +4,89 @@
 #include <experimental/random>
 #include <declarations.h>
 #include <enum_types.h>
-typedef currentType<LanguageTokenTypes> cT;
-#if ENABLE_GENERATION
-    template<>
-    struct currentType<LanguageTokenTypes> {
-        void setTokenLanguage(const LanguageTokenTypes& value);
-        LanguageTokenTypes getTokenLanguage();
-        LanguageTokenTypes currentLanguage;
+/** -------------------------------------------------------
+ * 
+ * @brief Gernic structs that perform deepy copying and shallow copying
+ * 
+ * @details Deep copying is useful when you're allocating memory dynamically.
+ *          There are multiple cases as to why deep copying is needed.
+ * 
+ * @details Is friends with certain classes that need to deep copy a unique data structure.
+ * 
+ * @details Pass in an object that isn't a smart pointer or a raw pointer and it could convert it into a unique_ptr.
+ *          
+*/
+template<typename T>
+struct deepCopy {
+    // In order to use this struct, classes or other structs must be friends
+    // Because the default constructor is inside the private interface
+    friend class ::Parser::parseError<Parser::parser>;
+    friend class ::Parser::parser;
+    deepCopy(const deepCopy&) noexcept = default;
+    deepCopy(deepCopy&&) noexcept = default;
+    deepCopy& operator=(const deepCopy&) = default;
+    deepCopy& operator=(deepCopy&&) noexcept = default;
+    explicit deepCopy(const T& other) 
+            : data(other) 
+        {}
+    /** --------------------------------------------- 
+     * @brief  Method that will set the data from an rvalue reference
+     * 
+    */
+    inline void setData(T&& other) {
+        data = std::move(other);
     };
-    void cT::setTokenLanguage(const LanguageTokenTypes& value) { currentLanguage = value; };
-    LanguageType<LanguageTokenTypes> cT::getTokenLanguage() { return currentLanguage; };
-#else 
-    /*struct testCurrentLanguageType {
-        void setTokenLanguage(const LanguageTokenTypes& value);
-        LanguageTokenTypes getTokenLanguage();
-        LanguageTokenTypes currentLanguage;
+    /** ----------------------------------------------------
+     * @brief Method to get a const reference to the data
+     * 
+     * -----------------------------------------------------
+    */
+    inline const T& getData() const {
+        if (!data) {
+            throw std::runtime_error("Accessing uninitialized data");
+        }
+        return *data;
     };
-    void testCurrentLanguageType::setTokenLanguage(const LanguageTokenTypes& value) { currentLanguage = value; };
-    LanguageType<LanguageTokenTypes> testCurrentLanguageType::getTokenLanguage() { return currentLanguage; };*/
-#endif 
-
-/**---------------------------------------------------------------------------
+    /** -------------------------------------------------
+     * @brief Method to get a mutable reference to the data
+     * 
+     * 
+     * --------------------------------------------------
+    */
+    inline T& getData() {
+        if (!data) {
+            throw std::runtime_error("Accessing uninitialized data");
+        }
+        return *data;
+    };
+    private:
+        T data;
+        deepCopy() = default;
+};
+/** ---------------------------------------------------------------------------
  * @brief Custom function that creates a tuple for later use.
  * ----------------Generic Arguments------------------------------------------
  * @param T: Is a type int to indicate the position of the tree (first)
  * @param U: The name of the node which is paired with a initializer_list (second)
  * @param V: Object type variants  (third)
  * --------------------Detials-------------------------------------------------
- * @detials The arguments are generic, therefore they can be reused with other types. Templates are more flexible than any
+ * @details The arguments are generic, therefore they can be reused with other types. Templates are more flexible than any
  *
  * @return tuple(int, string, shared_ptr(initializer_list(variant)))
  *
  * ---------------------------------------------------------------------------
 */
 template<typename T, typename U, typename V>
-astTree<T, U, V> compressedAstTree(T first, U second, Shared<V> third) {
+inline astTree<T, U, V> compressedAstTree(T first, U second, V third) {
     return std::make_tuple(
-        first,
+        std::move(first),
         std::make_pair(
-            second,
-            Shared<V>(third)
+            std::move(second),
+            std::make_unique<V>(third)
         )
     );
-};
+}
+
 /**---------------------------------------------------------------------------
  * @brief Uses atomic to prevent 'data races'/sync. It also uses threading.
  *

@@ -1,5 +1,6 @@
 #include <language_specific_truthy_operations.h>
 #include <languages_types.h>
+#include <context_free_grammar.h>
 /* ---------------------------------------------------------------------------------------------------------
  * isTruthy Description:
     Is a method that will return an concrete type if the language the user specifies supports truthy/falsy
@@ -11,17 +12,17 @@
     Otherwise, return false
  * ---------------------------------------------------------------------------------------------------------
 */
-bool truthyOperations::isTruthy(auto& object) {
-    const auto lang = user_language->getTokenLanguage();
+bool truthyOperations::isTruthy(ExprVariant& object, LanguageTokenTypes& lang) {
+    String temp = std::get<Unary>(object).getToken().getLexeme();
     switch(lang) {
         case LanguageTokenTypes::Python:
-            if (std::any_cast<LanguageTypes::Python::None>(object.getValue()) != nullptr) return false;
-            else if (auto b = std::any_cast<LanguageTypes::Python::Bool>(object.getValue())) return *b;
-            else if (auto i = std::any_cast<LanguageTypes::Python::Int>(object.getValue())) return *i != 0;
-            else if (auto f = std::any_cast<LanguageTypes::Python::Float>(object.getValue())) return *f != 0.0;
-            else if (auto s = std::any_cast<LanguageTypes::Python::String>(object.getValue())) return !s->empty();
-            else if (auto l = std::any_cast<LanguageTypes::Python::List>(object.getValue())) return !l->empty();
-            else if (auto d = std::any_cast<LanguageTypes::Python::Dict>(object.getValue())) return !d->empty();
+            if (std::any_cast<LanguageTypes::Python::None>(temp) != nullptr) return false;
+            else if (auto b = std::any_cast<LanguageTypes::Python::Bool>(temp)) return b;
+            else if (auto i = std::any_cast<LanguageTypes::Python::Int>(temp)) return i != 0;
+            else if (auto f = std::any_cast<LanguageTypes::Python::Float>(temp)) return f != 0.0;
+            //else if (auto s = std::any_cast<LanguageTypes::Python::String>(temp)) return !s->empty();
+            //else if (auto l = std::any_cast<LanguageTypes::Python::List>(temp)) return !l->empty();
+            //else if (auto d = std::any_cast<LanguageTypes::Python::Dict>(temp)) return !d->empty();
             return true;
         /*case LanguageTokenTypes::JavaScript:
             if (std::any_cast<LanguageTypes::JavaScript::Null>(object.getValue()) != nullptr) return false;

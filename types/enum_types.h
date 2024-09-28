@@ -1,8 +1,8 @@
 #pragma once
 #ifndef _TOKEN_TYPES_H_
 #define _TOKEN_TYPES_H_
-#include <declarations.h>
-/**---------------------------------------------------------------------------
+
+/** ---------------------------------------------------------------------------
  * @brief The underlying are representations of literals
  *
  * ---------------------------------------------------------------------------
@@ -117,7 +117,7 @@ enum LanguageTokenTypes {
  * @details Add more tokens to the list below, if you add any to the tokenType enum class 
  * -------------------------------------------------------
 */
-static const std::unordered_map<TokenType, std::string> tokenTypeStrings = {
+static const Unordered<TokenType, String> tokenTypeStrings = {
     {TokenType::LEFT_PAREN, "LEFT_PAREN"},
     {TokenType::RIGHT_PAREN, "RIGHT_PAREN"},
     {TokenType::LEFT_BRACE, "LEFT_BRACE"},

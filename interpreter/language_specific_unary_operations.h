@@ -23,7 +23,9 @@ namespace UnaryOperations {
                 value.type() == typeid(float) ||
                 value.type() == typeid(double);
             };
+            
             struct staticLanguages {
+                friend class unaryOperations;
                 auto uC(LanguageTokenTypes& lang, auto& right); // C
                 auto uCPP(LanguageTokenTypes& lang, auto& right); // C++
                 auto uJava(LanguageTokenTypes& lang, auto& right); // Java
@@ -43,8 +45,9 @@ namespace UnaryOperations {
                 auto uAda(LanguageTokenTypes& lang, auto& right); // Ada
                 auto uEiffel(LanguageTokenTypes& lang, auto& right); // Eiffel
             };
+            
             struct dynamicLanguages {
-                auto uPython(LanguageTokenTypes& lang, auto& right); // Python
+                static Any uPython(LanguageTokenTypes& lang, ExprVariant& right); // Python  
                 auto uJavaScript(LanguageTokenTypes& lang, auto& right); // JavaScript
                 auto uRuby(LanguageTokenTypes& lang, auto& right); // Ruby
                 auto uR(LanguageTokenTypes& lang, auto& right); // R
@@ -79,11 +82,23 @@ namespace UnaryOperations {
                 auto uErlang(LanguageTokenTypes& lang, auto& right); // Elrang
             };
         private:
-            static bool checkNumberOperand(auto& right);
+            static bool checkNumberOperand(ExprVariant& right);
             logTable<std::map<std::string, std::vector<std::string>>> logs_;
         protected:
             inline static bool isString(const std::any value) { return value.type() == typeid(std::string);};
             inline static const char* what(const char* msg = catcher<unaryOperations>::getMsg()) throw() { return msg; };
+            inline static const char* what(TokenType&& type = runtimeerror<Interpreter::interpreter>::getType(), const char* msg = runtimeerror<Interpreter::interpreter>::getMsg()) throw() {
+                static String output;
+                try {
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
+                }
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
+                }
+            };
 
     };
 };

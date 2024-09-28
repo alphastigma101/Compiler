@@ -1,5 +1,6 @@
 #include <language_specific_unary_operations.h>
 #include <languages_types.h>
+#include <context_free_grammar.h>
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------
  * checkNumberOperand Description: 
     Is a method that calls in isNumeric, the helper function
@@ -10,13 +11,13 @@
     Otherwise, return false 
  * ----------------------------------------------------------------------------------------------------------------------------------------------------
 */
-bool unaryOperations::checkNumberOperand(auto& right) {
+bool unaryOperations::checkNumberOperand(ExprVariant& right) {
     try {
-        if (isNumeric(right) == true) { return true; }
+        if (isNumeric(std::get<Unary>(right).getToken().getLexeme()) == true) { return true; }
         return false;
     }
     catch(...) {
-        throw runtimeerror(right.getType(), "Failed to check the number operands!");
+        throw runtimeerror(std::get<Unary>(right).getToken().getType(), "Failed to check the number operands!");
     }
     return false;
 }
@@ -25,18 +26,18 @@ bool unaryOperations::checkNumberOperand(auto& right) {
  *
  *
 */
-auto unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes& lang, auto& right)  {
+Any unaryOperations::dynamicLanguages::uPython(LanguageTokenTypes& lang, ExprVariant& right) {
     try {
         if (checkNumberOperand(right) == false) { return NULL; }
         else {
-            if (auto val = std::any_cast<LanguageTypes::Python::Int>(&right)) { return -(*val); }
-            if (auto val = std::any_cast<LanguageTypes::Python::Float>(&right)) { return -(*val); }
-            else { throw runtimeerror(right.getType(), "Unknown Type! in uPython"); }
+            if (auto val = std::any_cast<LanguageTypes::Python::Int>(std::get<Unary>(right).getToken().getLexeme())) {  return -(val); }
+            if (auto val = std::any_cast<LanguageTypes::Python::Float>(std::get<Unary>(right).getToken().getLexeme())) { return -(val); }
+            else { throw runtimeerror(std::get<Unary>(right).getToken().getType(), "Unknown Type! in uPython"); }
         }
     }
     catch(runtimeerror& e) { 
         //TODO: Logging needs to go here
-        std::cout << e.what() << std::endl;
+        //std::cout << e.what() << std::endl;
     }
     return NULL;
 }
@@ -1155,7 +1156,7 @@ auto unaryOperations::dynamicLanguages::uHaskell(LanguageTokenTypes& lang, auto&
 /*
  *
 */
-auto unaryOperations::otherLanguages::uCustom(LanguageTokenTypes& lang, auto& right) {
+//auto unaryOperations::otherLanguages::uCustom(LanguageTokenTypes& lang, auto& right) {
     /*try {
         if (auto val = std::any_cast<Custom::numeric>(&right)) { return -(*val); }
         else {
@@ -1205,5 +1206,5 @@ auto unaryOperations::otherLanguages::uCustom(LanguageTokenTypes& lang, auto& ri
     //catch(runtimeerror& e) {
         //std::cout << e.what() << std::endl;
     //}
-    return NULL;
-}
+    //return NULL;
+//}

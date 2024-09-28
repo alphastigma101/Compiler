@@ -9,67 +9,67 @@ namespace Operations {
     // operations struct 
     // functions that operate on a string aka the code
     struct operations {
-        std::string replace(std::string &code, const std::string for_loops, const std::string while_loops, const std::string if_blocks, const std::string function, const std::unordered_map<std::string, std::pair<int,int>> values); 
+        String replace(String &code, const String for_loops, const String while_loops, const String if_blocks, const String function, const std::unordered_map<String, std::pair<int,int>> values); 
     };
 };
 using namespace Operations;
 namespace Languages {
     // Static languages struct
     struct static_languages: operations {
-        std::string C();
-        std::string CPP();
-        std::string Java();
-        std::string Go();
-        std::string Kotlin();
-        std::string Swift();
-        std::string Rust();
-        std::string Haskell();
-        std::string CSharp();
-        std::string FSharp();
-        std::string ObjectiveC();
-        std::string VHDLVerilog();
-        std::string Fortran();
-        std::string COBOL();
-        std::string Pascal();
-        std::string Ada();
-        std::string Scala();
-        std::string TypeScript();
-        std::string Dart();
+        String C();
+        String CPP();
+        String Java();
+        String Go();
+        String Kotlin();
+        String Swift();
+        String Rust();
+        String Haskell();
+        String CSharp();
+        String FSharp();
+        String ObjectiveC();
+        String VHDLVerilog();
+        String Fortran();
+        String COBOL();
+        String Pascal();
+        String Ada();
+        String Scala();
+        String TypeScript();
+        String Dart();
     };
     // Dynamic languages struct
     struct dynamic_languages: operations {
-        std::string Python();
-        std::string JavaScript();
-        std::string Ruby();
-        std::string PHP();
-        std::string Perl();
-        std::string R();
-        std::string Lua();
-        std::string Shell();
-        std::string MATLAB();
-        std::string VBA();
-        std::string LISPScheme();
-        std::string Groovy();
-        std::string Erlang();
-        std::string Clojure();
-        std::string Prolog();
-        std::string AWK();
-        std::string TCL();
-        std::string Julia();
-        std::string PowerShell();
-        std::string Racket();
-        std::string Smalltalk();
+        String Python();
+        String JavaScript();
+        String Ruby();
+        String PHP();
+        String Perl();
+        String R();
+        String Lua();
+        String Shell();
+        String MATLAB();
+        String VBA();
+        String LISPScheme();
+        String Groovy();
+        String Erlang();
+        String Clojure();
+        String Prolog();
+        String AWK();
+        String TCL();
+        String Julia();
+        String PowerShell();
+        String Racket();
+        String Smalltalk();
     };
     // Other languages that don't fit neatly into static/dynamic categories
     struct other_languages: operations {
-        std::string HTMLCSS();
-        std::string SQL();
-        std::string LabVIEW();
-        std::string VisualBasic();
-        std::string Elm();
-        std::string Eiffel();
-        std::string StandardML();
-        std::string Dlang();
+        String HTMLCSS();
+        String SQL();
+        String LabVIEW();
+        String VisualBasic();
+        String Elm();
+        String Eiffel();
+        String StandardML();
+        String Dlang();
     };
 
     // Main languages struct

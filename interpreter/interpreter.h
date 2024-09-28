@@ -16,6 +16,7 @@ namespace Interpreter {
         public:
             friend class catcher<interpreter>; // Useful for one error 
             friend class runtimeerror<interpreter>; // Useful for displaying the token type and a string literal
+
             /** -----------------------------------------------
              * 
              * @brief A constructor that handles the traversing of the ast
@@ -39,8 +40,8 @@ namespace Interpreter {
                 auto literal = std::get_if<ContextFreeGrammar::Literal>(&expr); 
                 return literal->getValue(); 
             };
-            std::any visitUnaryExpr(auto& expr);
-            std::any visitBinaryExpr(auto& expr);
+            static std::any visitUnaryExpr(auto& expr);
+            static std::any visitBinaryExpr(auto& expr);
             /** --------------------------------------
              * @brief A method that wraps around another method called evaluate
              * 
@@ -59,7 +60,7 @@ namespace Interpreter {
             };
             static void setExpr(const std::any& visitor);
         private:
-            LanguageTokenTypes currentLanguage;
+            inline static LanguageTokenTypes currentLanguage;
             inline static logTable<std::map<std::string, std::vector<std::string>>> logs_;
         protected:
             // temp is a representation of the class node ie Binary, Unary, Grouping, and literal
@@ -77,9 +78,7 @@ namespace Interpreter {
              * 
              * ---------------------------------------
             */
-            inline static const char* what(const char* msg = runtimeerror<interpreter>::getMsg()) throw() {
-                return msg;
-            };
+            inline static const char* what(const char* msg = runtimeerror<interpreter>::getMsg()) throw() { return msg; };
             /** --------------------------------------
              * @brief A method that is overloaded here from this class 
              * 
@@ -94,7 +93,16 @@ namespace Interpreter {
              * ---------------------------------------
             */
             inline static const char* what(TokenType&& type = runtimeerror<interpreter>::getType(), const char* msg = runtimeerror<interpreter>::getMsg()) throw() {
-                return msg;
+                static String output;
+                try {
+                    if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
+                        output = search->second.c_str() + String(msg);
+                        return output.c_str();
+                    }
+                }
+                catch(...) {
+                    std::cout << "Error! conversion has failed!" << std::endl;
+                }
             };
     };
 };

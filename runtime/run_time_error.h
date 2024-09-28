@@ -8,7 +8,7 @@ namespace RunTimeError {
         public:
             // Constructor with token and message
             explicit runtimeerror(const TokenType& type, const char* message) {
-                message_ = std::move(message);
+                message_ = message;
                 type_ = std::move(type);
             };
             // Default constructor
@@ -16,7 +16,7 @@ namespace RunTimeError {
                 //message_ = "Unspecified runtime error"; 
             };
 
-            inline static char* getMsg() { return message_; };
+            inline static const char* getMsg() { return message_; };
             // Default deconstructor
             ~runtimeerror() = default;
 
@@ -27,7 +27,7 @@ namespace RunTimeError {
             inline static const TokenType getType() { return type_; };
         private:
             inline static TokenType type_;
-            inline static char* message_;
+            inline static const char* message_;
     };
 };
 using namespace RunTimeError;

@@ -82,7 +82,7 @@ inline astTree<T, U, V> compressedAstTree(T first, U second, V third) {
         std::move(first),
         std::make_pair(
             std::move(second),
-            std::make_unique<V>(third)
+            std::forward<V>(third)
         )
     );
 }

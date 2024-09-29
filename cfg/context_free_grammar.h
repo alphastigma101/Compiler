@@ -56,6 +56,7 @@ namespace ContextFreeGrammar {
             Unique<Expr> expression;
             ~Expr() noexcept = default;
         protected:
+            int idx = 0;
             Expr() = default;
             Expr(const Expr&) = default;
             Expr(Expr&&) = default;
@@ -82,7 +83,7 @@ namespace ContextFreeGrammar {
             friend class runtimeerror<Binary>; // Use to output TokenType and message
             friend class catcher<Binary>; // Use to output a message
             explicit Binary(Unique<Expr> left_, const Token& op_, Unique<Expr> right_);
-            explicit Binary(Unique<Expr> expr) noexcept;
+            explicit Binary(Unique<Expr> expr, bool move) noexcept;
             Binary(Binary&&) = default;
             ~Binary() noexcept = default;
             inline Token getToken() { return *op; };
@@ -196,6 +197,7 @@ namespace ContextFreeGrammar {
              *          It points to the left and right binary node trees
             */
             explicit Grouping(Unique<Expr> expression);
+             explicit Grouping(Unique<Expr> expression, bool move);
             ~Grouping() noexcept = default;
             Grouping(Grouping&&) = default;
             inline Token getToken() { return *op; };
@@ -250,6 +252,7 @@ namespace ContextFreeGrammar {
             friend class runtimeerror<Expr>; // Use to output TokenType and message
             friend class catcher<Expr>; // Use to output a message
             explicit Literal(const Token&& oP);
+            //explicit Literal(Unique<Expr> expression);
             ~Literal() noexcept = default;
             inline Token getToken() { return *op; };
         private:

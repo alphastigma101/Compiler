@@ -56,7 +56,10 @@ namespace Parser {
              * ----------------------------------------------------------------------------------------------------------
             */
             explicit parser(std::vector<Token>& tokens) {  tokens_ = std::move(tokens); };
-            inline void beginParse() { parse(); };
+            inline void beginParse() { 
+                parse().release(); 
+                return;
+            };
             void printNodes();
             ~parser() noexcept = default; // This shouldn't be a virtual... 
         protected:
@@ -149,7 +152,7 @@ namespace Parser {
                 throw pp;
             };
         private:
-            Vector<treeStructure> nodes;
+            Vector<astTree<int, String, Unique<ContextFreeGrammar::Expr>>> nodes;
             Vector<Token> tokens_;
             inline static logTable<Map<String, Vector<String>>> logs_;
             int current = 0;

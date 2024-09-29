@@ -20,8 +20,7 @@ Unique<Expr> parser::equality()  {
         const Token op = previous();
         // Recursion right ==
         auto right = comparison();
-        Binary B(std::move(expr), op, std::move(right)); // Always use move semantics when dealing with unique_ptr or any pointers in general 
-        expr = std::make_unique<Binary>(std::move(B));
+        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
@@ -36,8 +35,7 @@ Unique<Expr> parser::comparison() {
     while (match(TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL)) {
         const Token op = previous();
         auto right = term();
-        Binary B(std::move(expr), op, std::move(right));
-        expr = std::make_unique<Binary>(std::move(B));
+        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
@@ -54,8 +52,7 @@ Unique<Expr> parser::term() {
     while (match(TokenType::MINUS, TokenType::PLUS)) {
         const Token op = previous();
         auto right = factor();
-        Binary B(std::move(expr), op, std::move(right));
-        expr = std::make_unique<Binary>(std::move(B));
+        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
@@ -74,8 +71,7 @@ Unique<Expr> parser::factor() {
     while (match(TokenType::SLASH, TokenType::STAR, TokenType::MODULO)) {
         const Token op = previous();
         auto right = unary();
-        Binary B(std::move(expr), op, std::move(right));
-        expr = std::make_unique<Binary>(std::move(B));
+        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
@@ -91,8 +87,7 @@ Unique<Expr> parser::unary() {
     if (match(TokenType::BANG, TokenType::MINUS)) {
         const Token op = previous();
         auto right = unary();
-        Unary U(std::move(right), previous());
-        auto expr = std::make_unique<Unary>(std::move(U));
+        auto expr = std::make_unique<Unary>(std::move(right), previous());
         return expr;
     }
     return primary();
@@ -111,10 +106,7 @@ Unique<Expr> parser::primary() {
     if (match(TokenType::LEFT_PAREN)) {
         auto expr = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-        Grouping group(std::move(expr));
-        expr = std::make_unique<Grouping>(std::move(group));
-        expr.release(); // if expr is not null but contains null addresses, release it 
-        return std::move(expr);
+        return std::make_unique<Grouping>(std::move(expr));
     }
     parseError<parser> pp(peek(), "Expect expression.");
     throw pp;
@@ -140,7 +132,6 @@ Unique<Expr> parser::expression() { return equality(); }
 Unique<Expr> parser::parse() {
     try { 
         auto result = expression();
-        printNodes();
         return result;
     }
     catch (parseError<parser>& e) { 
@@ -207,7 +198,7 @@ Unique<Expr> parser::ecosystem() {
 
     }
 
-    return std::move(expr);
+    return expr;
 }
 // Additional rules go above this line
 //
@@ -245,18 +236,23 @@ String parser::report(int line, const String where, const String message) throw(
 void parser::printNodes() {
     nodes = std::move(cTree);
     for (int i = 0; i < nodes.size(); i++) {
-        const auto& [intVal, pairVal] = nodes[i];
+        auto& [intVal, pairVal] = nodes[i];
         if (pairVal.first == "Grouping") {
-            if ((*pairVal.second.get())->op != nullptr) {
-                std::cout << (*pairVal.second.get())->op.get()->getLexeme() << std::endl;
+            if (pairVal.second.get()->expression.get() != nullptr) {
+                std::cout << pairVal.second.get()->expression.get()->op.get()->getLexeme() << std::endl;
             }
         }
         if (pairVal.first == "Binary") {
-            if ((*pairVal.second.get()) != nullptr) {
-                if ((*pairVal.second.get())->op != nullptr) {
-                    std::cout << (*pairVal.second.get())->op.get()->getLiteral() << std::endl;
+            if (pairVal.second.get() != nullptr) {
+                if (pairVal.second.get()->left.get() != nullptr) {
+                    std::cout << pairVal.second.get()->left.get()->op.get()->getLiteral() << std::endl;
+                }
+                if (pairVal.second.get()->right.get() != nullptr) {
+                    std::cout << pairVal.second.get()->right.get()->op.get()->getLiteral() << std::endl;
                 }
             }
         }
+        pairVal.second.release();
     }
+    return;
 }

@@ -1,6 +1,10 @@
 #pragma once
 #ifndef _ADDON_H_
 #define _ADDON_H_
+
+#ifndef ENABLE_TREE_BUILD
+    #define ENABLE_TREE_BUILD 0
+#endif
 /** --------------------------------------------------------------------------
  * @brief this macro will be set to one if the executable that start with 'exec_debug_...' during compilation. Otherwise, will remain off
  * 

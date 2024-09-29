@@ -37,7 +37,7 @@ g++ -g -std=c++17 -fconcepts $INCLUDE -c ../scanner/scanner.cc -o scanner.o
 #g++ -g -std=c++17 test_scanner.o token.o scanner.o languages.o logging.o -o test_scanner $LDFLAGS
 
 echo "Building the expression types object files"
-g++ -g -std=c++17 -fconcepts $INCLUDE -c ../cfg/context_free_grammar.cc -o context_free_grammar.o
+g++ -g -std=c++17 -fconcepts $INCLUDE -DENABLE_TREE_BUILD=1 -c ../cfg/context_free_grammar.cc -o context_free_grammar.o
 
 
 echo "Build object file for parser.cc"

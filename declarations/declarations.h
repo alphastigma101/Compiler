@@ -151,11 +151,11 @@ namespace ArgumentOperations {
 template<typename... Derived>
 using ExprTypes = Shared<Derived...>;
 template<typename T, typename U, typename V>
-using astTree = std::tuple<T, std::pair<U, Unique<V>>>;
+using astTree = std::tuple<T, std::pair<U, V>>;
 template<typename T, typename U, typename V>
 extern astTree<T, U, V> compressedAstTree(T first, U second, V third);
-using treeStructure = astTree<int, String, ContextFreeGrammar::Expr*>;
-extern Vector<treeStructure> cTree;
+using treeStructure = astTree<int, String, ContextFreeGrammar::Expr>;
+extern Vector<astTree<int, String, Unique<ContextFreeGrammar::Expr>>> cTree;
 //template<typename X, typename Y, typename Z>
 //using Vertices =
 //template<typename X, typename Y, typename Z>

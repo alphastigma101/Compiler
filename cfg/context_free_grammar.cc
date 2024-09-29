@@ -1,6 +1,7 @@
 #include <context_free_grammar.h>
-Vector<treeStructure> cTree;
-int idx = 0;
+#if ENABLE_TREE_BUILD
+   Vector<astTree<int, String, Unique<ContextFreeGrammar::Expr>>> cTree;
+#endif
 /** --------------------------------------------------------------------------
  * @brief This class will represent the Binary node tree in a absraction syntax tree
  *
@@ -17,10 +18,24 @@ int idx = 0;
 */
 Binary::Binary(Unique<Expr> left_, const Token& op_, Unique<Expr> right_) {
     try {
-        if (left_ != nullptr && right_ != nullptr) {
-            this->left = std::move(left_);
-            this->right = std::move(right_);
+        if (left_.get() != nullptr) {
+            if (left_.get()->op.get() != nullptr) {
+                auto binary = compressedAstTree(idx, String("Binary"), std::make_unique<Binary>(std::move(left_), true));
+                cTree.push_back(std::move(binary));
+                idx++;
+            }
+            else {left_.release();}
         }
+        else {left_.release();}
+        if (right_.get() != nullptr) {
+            if (right_.get()->op.get() != nullptr) {
+               auto binary = compressedAstTree(idx, String("Binary"), std::make_unique<Binary>(std::move(right_), false));
+               cTree.push_back(std::move(binary));
+               idx++;
+            }
+            else {right_.release();} 
+        }
+        else {right_.release();}
         this->op = std::make_unique<Token>(std::move(op_));
     }
     catch(...) {
@@ -39,13 +54,9 @@ Binary::Binary(Unique<Expr> left_, const Token& op_, Unique<Expr> right_) {
  *          So create a constructor that does such a thing. This is a Binary example.
  * ------------------------------
 */
-Binary::Binary(Unique<Expr> expr) noexcept {
-    if (left != right) {
-        this->right = std::move(expr); 
-    }
-    else {
-        this->left = std::move(expr);
-    }
+Binary::Binary(Unique<Expr> expr, bool move) noexcept {
+    if (move == true) { this->left = std::move(expr); }
+    else { this->right = std::move(expr); }
 }
 
 
@@ -101,26 +112,29 @@ Unary::Unary(Unique<Expr> expr) noexcept {
  * ----------------------------------------------------------------
 */
 Grouping::Grouping(Unique<Expr> expression) {
-    // Code logic works but it also removes the important leaf nodes
-    /*if (expression->left.get() != nullptr && expression->right.get() != nullptr) {
-        auto res = compressedAstTree(idx, String("Binary"), expression->left.release());
-        cTree.push_back(std::move(res));
-        idx++;
-        res = compressedAstTree(idx, String("Binary"), expression->right.release());
-        cTree.push_back(std::move(res));
-        idx++;
-    }*/
-    auto res = compressedAstTree(idx, String("Binary"), expression->left.release());
-    cTree.push_back(std::move(res));
-    idx++;
-    res = compressedAstTree(idx, String("Binary"), expression->right.release());
-    cTree.push_back(std::move(res));
-    idx++;
-    res = compressedAstTree(idx, String("Grouping"), expression.release());
-    cTree.push_back(std::move(res));
+    if (expression.get() != nullptr) {
+        if (expression.get()->op.get() != nullptr) {
+            auto grouping = compressedAstTree(idx, String("Grouping"), std::make_unique<Grouping>(std::move(expression), true));
+            cTree.push_back(std::move(grouping));
+            idx++;
+        }
+        else {expression.release(); }
+    }
+    else {expression.release(); }
+}
+/** -----------------------------------
+ * @brief Move the sources over back to the grouping instance
+ * 
+ * @details Will get called in if a template that has user defined types inside of it match the arguments below.
+ *          Refer to Grouping(Unique<Expr> expression) scope for more info
+ * @param expression The resources you are wanting to transfer ownership over too
+ * @param move To determine if resources should be moved or not 
+*/
+Grouping::Grouping(Unique<Expr> expression, bool move) {
+   if (move) { this->expression = std::move(expression); }
 }
 
-Literal::Literal(const Token&& oP){
+Literal::Literal(const Token&& oP) {
     try {
         this->op = std::make_unique<Token>(std::move(oP));
     }
@@ -129,6 +143,7 @@ Literal::Literal(const Token&& oP){
         throw cl;
     }
 }
+
 
 Methods::Methods(Unique<Expr> meth, const Token& op_) {
 

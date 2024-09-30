@@ -149,20 +149,8 @@ namespace Parser {
                 auto clear = [this]() {
                     for (int i = 0; i < nodes.size(); i++) {
                         auto& [intVal, pairVal] = nodes[i];
-                        if (pairVal.first == "Grouping") {
-                            if (auto expression =  std::get<Unique<Expr>>(pairVal.second).get()->expression.get()) {
-                                std::cout << expression->op.get()->getLexeme() << std::endl;
-                            }
-                        }
-                        if (pairVal.first == "Binary") {
-                            if (auto expr = std::get<Expr*>(pairVal.second)) {
-                                if (expr->op.get() != nullptr) {
-                                    std::cout << expr->op.get()->getLiteral() << std::endl;
-                                }
-                            }
-                        }
-                        if (std::holds_alternative<std::unique_ptr<Expr>>(pairVal.second)) {
-                            auto& clean = std::get<std::unique_ptr<Expr>>(pairVal.second);
+                        if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                            auto& clean = std::get<Unique<Expr>>(pairVal.second);
                             clean.release();
                         }
                     }

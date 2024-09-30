@@ -168,7 +168,148 @@ EcoSystem::EcoSystem(Unique<Expr> ecoSystem, const Token& op_) {
 
 
 }
+// Helper methods for constructing the AST
+//
+//
+String Binary::parenthesize(String name, Expr& expr) {
+    /*builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
 
+    return builder.toString();*/
+    return "\0";
+}
+//
+String Binary::visit(Binary&& expr) {
+    return "\0";
+}
+//
+String Binary::accept(Binary&) {
+    return "\0";
+}
+//
+String Unary::parenthesize(String name, Expr& expr) {
+    /*builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
+
+    return builder.toString();*/
+    return "\0";
+}
+//
+String Unary::visit(Unary&& expr) {
+    return "\0";
+}
+//
+String Unary::accept(Unary&) {
+    return "\0";
+}
+//
+String Grouping::parenthesize(String name, Expr& expr) {
+    /*builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
+
+    return builder.toString();*/
+    return "\0";
+}
+//
+String Grouping::visit(Grouping&& expr) {
+    return "\0";
+}
+//
+String Grouping::accept(Grouping&) {
+    return "\0";
+}
+//
+String Literal::parenthesize(String name, Expr& expr) {
+    /*builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
+
+    return builder.toString();*/
+    return "\0";
+}
+//
+String Literal::visit(Literal&& expr) {
+    return "\0";
+}
+//
+String Literal::accept(Literal&) {
+    return "\0";
+}
+//
+String Methods::parenthesize(String name, Expr& expr) {
+    /*builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
+
+    return builder.toString();*/
+    return "\0";
+}
+//
+String Methods::visit(Methods&& expr) {
+    return "\0";
+}
+//
+String Methods::accept(Methods&) {
+    return "\0";
+}
+//
+String Arguments::parenthesize(String name, Expr& expr) {
+    /*builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
+
+    return builder.toString();*/
+    return "\0";
+}
+//
+String Arguments::visit(Arguments&& expr) {
+    return "\0";
+}
+//
+String Arguments::accept(Arguments&) {
+    return "\0";
+}
+//
+String EcoSystem::parenthesize(String name, Expr& expr) {
+    /*builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
+
+    return builder.toString();*/
+    return "\0";
+}
+//
+String EcoSystem::visit(EcoSystem&& expr) {
+    return "\0";
+}
+//
+String EcoSystem::accept(EcoSystem&) {
+    return "\0";
+}
 #if ENABLE_TREE_BUILD
    Vector<astTree<int, String, ExprVariant>> cTree;
 #endif

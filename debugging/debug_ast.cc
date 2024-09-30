@@ -31,7 +31,9 @@ int main(void) {
         Vector<Token> tokens = scanner.ScanTokens();
         parser p(tokens);
         p.beginParse();
-        p.printNodes();
+        #if ENABLE_TREE_DEBUGGING
+            p.printNodes();
+        #endif
 
     }
     return 0;

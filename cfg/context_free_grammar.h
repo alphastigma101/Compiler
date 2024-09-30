@@ -47,8 +47,7 @@ namespace ContextFreeGrammar {
              * ---------------------------------------------------------
             */
             Unique<Expr> expression;
-            ~Expr() noexcept = default;
-            //Expr* raw;
+            virtual ~Expr() noexcept = default;
         protected:
             int idx = 0;
             Expr() = default;
@@ -57,7 +56,7 @@ namespace ContextFreeGrammar {
             Expr& operator=(const Expr&) = default;
             Expr& operator=(Expr&&) = default;
     };
-    class Binary: public Expr,  public logging<Binary>, public runtimeerror<Binary>, public catcher<Binary> {
+    class Binary: public Expr, public Visitor<Binary>, public logging<Binary>, public runtimeerror<Binary>, public catcher<Binary> {
         /** --------------------------------------------------------------------
              * @brief A class that represents a binary abstraction syntax tree
              * 
@@ -73,13 +72,13 @@ namespace ContextFreeGrammar {
              *          Would print out this: (* (- 123) (group 45.67)) Note: Parathesis are always included 
          */
         public:
-            friend ::Parser::parser;
             friend class runtimeerror<Binary>; // Use to output TokenType and message
             friend class catcher<Binary>; // Use to output a message
+            friend class Visitor<Binary>;
             explicit Binary(Unique<Expr> left_, const Token& op_, Unique<Expr> right_);
             explicit Binary(Unique<Expr> expr, bool move) noexcept;
             Binary(Binary&&) = default;
-            ~Binary() noexcept = default;
+            ~Binary() noexcept = default; // Using Virtual when it shouldn't. So I am mis-understanding something
             inline Token getToken() { return *op; };
         protected:
             Binary() = default;
@@ -125,9 +124,15 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
+            static String parenthesize(String name, Expr& expr);
+            static String visit(Binary&& expr);
+            static String accept(Binary&);
     };
-    class Unary: public Expr, public logging<Unary>, public runtimeerror<Unary>, public catcher<Unary> {
+    class Unary: public Expr, public Visitor<Unary>, public logging<Unary>, public runtimeerror<Unary>, public catcher<Unary> {
         public:
+            friend class runtimeerror<Unary>; // Use to output TokenType and message
+            friend class catcher<Unary>; // Use to output a message
+            friend class Visitor<Unary>;
             explicit Unary(Unique<Expr> right_, const Token& op_);
             explicit Unary(Unique<Expr> expr) noexcept;
             Unary(Unary&&) = default;
@@ -176,11 +181,15 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
+            static String parenthesize(String name, Expr& expr);
+            static String visit(Unary&& expr);
+            static String accept(Unary&);
     };
-    class Grouping: public Expr,  public logging<Grouping>, public runtimeerror<Grouping>, public catcher<Grouping> {
+    class Grouping: public Expr, public  Visitor<Grouping>, public logging<Grouping>, public runtimeerror<Grouping>, public catcher<Grouping> {
         public:
             friend class runtimeerror<Grouping>; // Use to output TokenType and message
             friend class catcher<Grouping>; // Use to output a message
+            friend class Visitor<Grouping>;
             /** ----------------------------------------------------------------------------------------------------------
              * @brief constructor for creating the memory addresses that will later on be accessed by a vector 
              *
@@ -191,7 +200,7 @@ namespace ContextFreeGrammar {
              *          It points to the left and right binary node trees
             */
             explicit Grouping(Unique<Expr> expression);
-             explicit Grouping(Unique<Expr> expression, bool move);
+            explicit Grouping(Unique<Expr> expression, bool move);
             ~Grouping() noexcept = default;
             Grouping(Grouping&&) = default;
             inline Token getToken() { return *op; };
@@ -239,14 +248,16 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
+            static String parenthesize(String name, Expr& expr);
+            static String visit(Grouping&& expr);
+            static String accept(Grouping&);
     };
-    class Literal: public Expr, public logging<Literal>, public runtimeerror<Literal>, public catcher<Literal> {
+    class Literal: public Expr, public Visitor<Literal>, public logging<Literal>, public runtimeerror<Literal>, public catcher<Literal> {
         public:
-            friend ::Parser::parser;
-            friend class runtimeerror<Expr>; // Use to output TokenType and message
-            friend class catcher<Expr>; // Use to output a message
+            friend class runtimeerror<Literal>; // Use to output TokenType and message
+            friend class catcher<Literal>; // Use to output a message
+            friend class Visitor<Literal>;
             explicit Literal(const Token&& oP);
-            //explicit Literal(Unique<Expr> expression);
             ~Literal() noexcept = default;
             inline Token getToken() { return *op; };
         private:
@@ -288,6 +299,9 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
+            static String parenthesize(String name, Expr& expr);
+            static String visit(Literal&& expr);
+            static String accept(Literal&);
         protected:
             Literal() = default;
             Literal(const Literal&) = default;
@@ -296,11 +310,11 @@ namespace ContextFreeGrammar {
             Literal& operator=(Literal&&) = default;
            
     };
-    class Methods: public Expr, public logging<Methods>, public runtimeerror<Methods>, public catcher<Methods> {
+    class Methods: public Expr, public  Visitor<Methods>, public logging<Methods>, public runtimeerror<Methods>, public catcher<Methods> {
         public:
-            friend ::Parser::parser;
-            friend class runtimeerror<Expr>; // Use to output TokenType and message
-            friend class catcher<Expr>; // Use to output a message
+            friend class runtimeerror<Methods>; // Use to output TokenType and message
+            friend class catcher<Methods>; // Use to output a message
+            friend class Visitor<Methods>;
             explicit Methods(Unique<Expr> meth, const Token& op_);
             ~Methods() noexcept = default;
         protected:
@@ -336,7 +350,7 @@ namespace ContextFreeGrammar {
              * 
              * ---------------------------------------
             */
-            inline static const char* what(TokenType&& type = runtimeerror<Expr>::getType(), const char* msg = runtimeerror<Methods>::getMsg()) throw() {
+            inline static const char* what(TokenType&& type = runtimeerror<Methods>::getType(), const char* msg = runtimeerror<Methods>::getMsg()) throw() {
                 static String output;
                 try {
                     if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
@@ -348,12 +362,15 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
+            static String parenthesize(String name, Expr& expr);
+            static String visit(Methods&& expr);
+            static String accept(Methods&);
     };
-    class Arguments: public Expr, public logging<Arguments>, public runtimeerror<Arguments>, public catcher<Arguments> {
+    class Arguments: public Expr, public Visitor<Arguments>, public logging<Arguments>, public runtimeerror<Arguments>, public catcher<Arguments> {
         public:
-            friend ::Parser::parser;
-            friend class runtimeerror<Expr>; // Use to output TokenType and message
-            friend class catcher<Expr>; // Use to output a message
+            friend class runtimeerror<Arguments>; // Use to output TokenType and message
+            friend class catcher<Arguments>; // Use to output a message
+            friend class Visitor<Arguments>;
             explicit Arguments(Unique<Expr> arg, const Token& op_);
             ~Arguments() noexcept = default;
         private:
@@ -384,7 +401,7 @@ namespace ContextFreeGrammar {
              * 
              * ---------------------------------------
             */
-            inline static const char* what(TokenType&& type = runtimeerror<Expr>::getType(), const char* msg = runtimeerror<Arguments>::getMsg()) throw() {
+            inline static const char* what(TokenType&& type = runtimeerror<Arguments>::getType(), const char* msg = runtimeerror<Arguments>::getMsg()) throw() {
                 static String output;
                 try {
                     if (auto search = tokenTypeStrings.find(type); search != tokenTypeStrings.end()) {
@@ -396,6 +413,9 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
+            static String parenthesize(String name, Expr& expr);
+            static String visit(Arguments&& expr);
+            static String accept(Arguments&);
         protected:
             Arguments() = default;
             Arguments(const Arguments&) = default;
@@ -403,11 +423,11 @@ namespace ContextFreeGrammar {
             Arguments& operator=(const Arguments&) = default;
             Arguments& operator=(Arguments&&) = default;
     };
-    class EcoSystem: public Expr, public logging<EcoSystem>, public runtimeerror<EcoSystem>, public catcher<EcoSystem> {
+    class EcoSystem: public Expr, public Visitor<EcoSystem>, public logging<EcoSystem>, public runtimeerror<EcoSystem>, public catcher<EcoSystem> {
         public:
-            friend ::Parser::parser;
-            friend class runtimeerror<Expr>; // Use to output TokenType and message
-            friend class catcher<Expr>; // Use to output a message
+            friend class runtimeerror<EcoSystem>; // Use to output TokenType and message
+            friend class catcher<EcoSystem>; // Use to output a message
+            friend class Visitor<EcoSystem>;
             explicit EcoSystem(Unique<Expr> ecoSystem, const Token& op_);
             ~EcoSystem() noexcept = default;
         private:
@@ -450,6 +470,9 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
+            static String parenthesize(String name, Expr& expr);
+            static String visit(EcoSystem&& expr);
+            static String accept(EcoSystem&);
         protected:
             EcoSystem() = default;
             EcoSystem(const EcoSystem&) = default;

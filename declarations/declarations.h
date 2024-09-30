@@ -155,7 +155,6 @@ template<typename T, typename U, typename V>
 using astTree = std::tuple<T, std::pair<U, V>>;
 template<typename T, typename U, typename V>
 extern astTree<T, U, V> compressedAstTree(T first, U second, V third);
-using treeStructure = astTree<int, String, ContextFreeGrammar::Expr>;
 extern Vector<astTree<int, String, ExprVariant>> cTree;
 //template<typename X, typename Y, typename Z>
 //using Vertices =

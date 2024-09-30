@@ -9,7 +9,7 @@
 //extern template struct std::tuple<int, std::pair<String, Unique<ExprVariant>>>; // Create the underlying of the astTree
 namespace AbstractionTreeSyntax {
     template<class Type>
-    class generateAst: /*public Visitor<generateAst<Expr>>*/ public catcher<Type>, public runtimeerror<Type> {
+    class generateAst: public catcher<Type>, public runtimeerror<Type> {
         /** ---------------------------------------------------------------------
             * @brief A disorienated class object isolating its behavior. It will write data to a file by getting the literals from each expression it visits. 
             * ---------------------------------------------------------------------
@@ -18,10 +18,7 @@ namespace AbstractionTreeSyntax {
             friend class ast;
             friend class catcher<Type>;
             friend class runtimeerror<Type>;
-            //explicit generateAst<Type>(Expr& expr) noexcept;
-            explicit generateAst<Type>() noexcept;
             ~generateAst<Type>() noexcept = default;
-            String parenthesize(String& name, Expr exprs);
             inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
         protected:
             inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
@@ -31,24 +28,37 @@ namespace AbstractionTreeSyntax {
             inline static std::string nameOfFile = std::move(file_name);
             inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
         private:
+            /** ---------------------
+             * @brief  the default constructor and objects that will be used throughout all the classes defined in this header
+             * ----------------------
+            */
+            explicit generateAst<Type>() noexcept;
             inline static std::string outputDir_;
             inline static Unique<Atomic<const char*>> accessCodeStr;
             inline static String codeStr;
             inline static String compactedTreeStr;
             inline static logTable<Map<String, Vector<String>>> logs_;
-            inline static Vector<treeStructure> compactedTreeNodes;
+            inline static Vector<astTree<int, String, ExprVariant>> compactedTreeNodes;
             inline static String ext;
+        private:
+            // Visitor objects that are used in generateAst class
+            Visitor<Binary> visitBinary;
+            Visitor<Unary> visitUnary;
+            Visitor<Grouping> visitGrouping;
+            Visitor<Literal> visitLiteral;
+            Visitor<Methods> visitMethods;
+            Visitor<Arguments> visitArguments;
+            Visitor<EcoSystem> visitEcoSystem;
     };
     class ast: public generateAst<ast> {
-        /* ---------------------------------------------------------------------
+        /** ---------------------------------------------------------------------
             * @brief This class creates an abstraction syntax tree by storing each expression instance inside a vector. 
             *        for the intepreter class to evaulaute each instance using the visitor technique
             * ---------------------------------------------------------------------
         */
         public:
             friend class generateAst<ast>; // Link the generateAst together with the ast 
-            ast(std::vector<treeStructure>& expr_);
-            //ast(const ast&);
+            ast() noexcept;
             ~ast() noexcept = default;
             inline static Table getTable() { return table; };
             inline static Unique<Atomic<const char*>> getCode() { return std::move(accessCodeStr); };
@@ -57,7 +67,7 @@ namespace AbstractionTreeSyntax {
             static void writeFile(std::string& ext);
             inline static Table table;
     };
-    class analyzeSemantics: public catcher<analyzeSemantics>,  public ThreadTracker<analyzeSemantics> {
+    class analyzeSemantics: public catcher<analyzeSemantics>, public ThreadTracker<analyzeSemantics> {
         /** ------------------------------------------------------------------
             * @brief A class that inherits a crtp threading class that has mutex embeded into it
             *

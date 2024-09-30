@@ -1,7 +1,7 @@
 #ifndef _INTERFACE_H_
 #define _INTERFACE_H_
-//#include <assembly_visitor_access.h>
 #include <definitions.h>
+// TODO: Assembly will be added here eventually 
 template<class Type>
 class NonMemberConv {
     // An abstract class used for converting object types that are not a member object of the class 
@@ -27,7 +27,8 @@ class MemberConv {
 template<class Type>
 class Visitor {
     public:
-        inline String visit(Type&& visitor) { return static_cast<Type*>(this)->accept(*this); }
-        inline String accept(Type&) { return static_cast<Type*>(this)->visit(this); }
+        inline String visit(Type&& visitor) { return static_cast<Type*>(this)->accept(*this); };
+        inline String accept(Type& expr) { return static_cast<Type*>(this)->visit(std::move(expr)); };
+        inline String parenthesize(String name, ContextFreeGrammar::Expr& expr) { return static_cast<Type*>(this)->parenthesize(name, expr); };
 };
 #endif 

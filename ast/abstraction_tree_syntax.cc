@@ -1,16 +1,72 @@
 #include <abstraction_tree_syntax.h>
 #include <lookup_language.h> // get the file extensions 
-//template struct std::tuple<int, std::pair<String, Expr>>; // Explicit initialize the underyling of astTree type
-
 /** ------------------------------------
  * @brief An abstraction class that checks to see if it allowed to create a .txt flie
  * 
  * --------------------------------------
- */
+*/
 template<>
-//generateAst<ast>::generateAst(Expr& expr) 
 generateAst<ast>::generateAst() noexcept {
-    
+    // 1. Need to check if it the userspace has permission to output the generated ast as a text
+    // 2. Iterate through cTree 
+    for (auto& it : cTree) {
+        auto& [intVal, pairVal] = it;
+        if (pairVal.first == "Grouping") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (auto grouping = dynamic_cast<Grouping*>(conv.get()))
+                    visitGrouping.accept(*grouping);
+            }
+        }
+        // Raw pointer and not Unique
+        if (pairVal.first == "Binary") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (auto binary = dynamic_cast<Binary*>(conv.get()))
+                    visitBinary.accept(*binary);
+            }
+        }
+        // Raw pointer and not Unique
+        if (pairVal.first == "Literal") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (auto literal = dynamic_cast<Literal*>(conv.get()))
+                    visitLiteral.accept(*literal);
+            }
+        }
+        // Raw pointer and not Unique
+        if (pairVal.first == "Unary") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (auto unary = dynamic_cast<Unary*>(conv.get()))
+                    visitUnary.accept(*unary);
+            }
+        }
+        // Raw pointer and not Unique
+        if (pairVal.first == "Methods") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (auto meth = dynamic_cast<Methods*>(conv.get()))
+                    visitMethods.accept(*meth);
+            }
+        }
+        // Raw pointer and not Unique
+        if (pairVal.first == "Arguments") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (auto arguments = dynamic_cast<Arguments*>(conv.get()))
+                    visitArguments.accept(*arguments);
+            }
+        }
+        // Raw pointer and not Unique
+        if (pairVal.first == "EcoSystem") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (auto ecosystem = dynamic_cast<EcoSystem*>(conv.get()))
+                    visitEcoSystem.accept(*ecosystem);
+            }
+        }
+    }
 }
 /** -----------------------------------------------------------------------------------------
  * @brief The default constructor that calls in generateAst to start creating the .txt file 
@@ -18,7 +74,7 @@ generateAst<ast>::generateAst() noexcept {
  * @param expr: The data structure that represents the compacted abstraction syntax tree 
  * -----------------------------------------------------------------------------------------
 */
-ast::ast(Vector<treeStructure>& expr_) {
+ast::ast() noexcept {
     generateAst<ast> gA;
     if (user_choice.empty()) {
         // Subject to change. Have not decided if I want to compile the custom languyage or not
@@ -41,7 +97,7 @@ ast::ast(Vector<treeStructure>& expr_) {
             }
         }
     }
-    compactedTreeNodes = std::move(expr_);
+    compactedTreeNodes = std::move(cTree);
     try {
         //ThreadTracker<generateAst<ast>> createTree;
         if (settings) { 

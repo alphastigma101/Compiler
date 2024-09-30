@@ -1,7 +1,4 @@
 #include <context_free_grammar.h>
-#if ENABLE_TREE_BUILD
-   Vector<astTree<int, String, Unique<ContextFreeGrammar::Expr>>> cTree;
-#endif
 /** --------------------------------------------------------------------------
  * @brief This class will represent the Binary node tree in a absraction syntax tree
  *
@@ -20,18 +17,14 @@ Binary::Binary(Unique<Expr> left_, const Token& op_, Unique<Expr> right_) {
     try {
         if (left_.get() != nullptr) {
             if (left_.get()->op.get() != nullptr) {
-                auto binary = compressedAstTree(idx, String("Binary"), std::make_unique<Binary>(std::move(left_), true));
-                cTree.push_back(std::move(binary));
-                idx++;
+                this->left = std::move(left_);
             }
             else {left_.release();}
         }
         else {left_.release();}
         if (right_.get() != nullptr) {
             if (right_.get()->op.get() != nullptr) {
-               auto binary = compressedAstTree(idx, String("Binary"), std::make_unique<Binary>(std::move(right_), false));
-               cTree.push_back(std::move(binary));
-               idx++;
+              this->right = std::move(right_);
             }
             else {right_.release();} 
         }
@@ -58,8 +51,6 @@ Binary::Binary(Unique<Expr> expr, bool move) noexcept {
     if (move == true) { this->left = std::move(expr); }
     else { this->right = std::move(expr); }
 }
-
-
 /** --------------------------------------------------------------------------
  * @brief This class will represent the Binary node tree in a absraction syntax tree
  *
@@ -75,7 +66,15 @@ Binary::Binary(Unique<Expr> expr, bool move) noexcept {
 */
 Unary::Unary(Unique<Expr> right_, const Token& op_)  {
     try {
-        this->right = std::make_unique<Unary>(std::move(right_));
+        if (right_.get() != nullptr) {
+            if (right_.get()->op.get() != nullptr) {
+               auto unary = compressedAstTree(idx, String("Unary"), right_.get());
+               cTree.push_back(std::move(unary));
+               idx++;
+            }
+            else {right_.release();} 
+        }
+        else {right_.release();}
         this->op = std::make_unique<Token>(op_);
     }
     catch(...) {
@@ -112,6 +111,16 @@ Unary::Unary(Unique<Expr> expr) noexcept {
  * ----------------------------------------------------------------
 */
 Grouping::Grouping(Unique<Expr> expression) {
+    if (expression->left.get() != nullptr ) {
+        auto binary = compressedAstTree(idx, String("Binary"), expression->left.get());
+        cTree.push_back(std::move(binary));
+        idx++;
+    }
+    if (expression->right.get() != nullptr) {
+        auto binary = compressedAstTree(idx, String("Binary"), expression->right.get());
+        cTree.push_back(std::move(binary));
+        idx++;
+    }
     if (expression.get() != nullptr) {
         if (expression.get()->op.get() != nullptr) {
             auto grouping = compressedAstTree(idx, String("Grouping"), std::make_unique<Grouping>(std::move(expression), true));
@@ -160,4 +169,6 @@ EcoSystem::EcoSystem(Unique<Expr> ecoSystem, const Token& op_) {
 
 }
 
-
+#if ENABLE_TREE_BUILD
+   Vector<astTree<int, String, ExprVariant>> cTree;
+#endif

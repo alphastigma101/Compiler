@@ -1,7 +1,6 @@
 #ifndef _PARSER_H_
 #define _PARSER_H_
 #include <abstraction_tree_syntax.h>
-extern Vector<deepCopy<treeStructure>> temp;
 namespace Parser {
     template<class Derived>
     class parseError: public catcher<Derived> {
@@ -89,7 +88,6 @@ namespace Parser {
             inline Token peek() {
                 return tokens_.at(current);
             };
-            //return (current + 1 < tokens_.size()) ? tokens_.at(current + 1) : tokens_.at(current); };
             /** ----------------------------------------------------------------------------------------------------------
              * @brief Copy constructor. You will need a default constructor if you want to inherit from this constructor
              * ----------------------------------------------------------------------------------------------------------
@@ -148,11 +146,33 @@ namespace Parser {
             inline bool match(Args... types) {  return (... || (check(types) ? (advance(), true) : false)); };
             inline Token consume(const TokenType type, const std::string message) {
                 if (check(type)) return advance();
+                auto clear = [this]() {
+                    for (int i = 0; i < nodes.size(); i++) {
+                        auto& [intVal, pairVal] = nodes[i];
+                        if (pairVal.first == "Grouping") {
+                            if (auto expression =  std::get<Unique<Expr>>(pairVal.second).get()->expression.get()) {
+                                std::cout << expression->op.get()->getLexeme() << std::endl;
+                            }
+                        }
+                        if (pairVal.first == "Binary") {
+                            if (auto expr = std::get<Expr*>(pairVal.second)) {
+                                if (expr->op.get() != nullptr) {
+                                    std::cout << expr->op.get()->getLiteral() << std::endl;
+                                }
+                            }
+                        }
+                        if (std::holds_alternative<std::unique_ptr<Expr>>(pairVal.second)) {
+                            auto& clean = std::get<std::unique_ptr<Expr>>(pairVal.second);
+                            clean.release();
+                        }
+                    }
+                };
+                clear();
                 parseError<parser> pp(peek(), message);
                 throw pp;
             };
         private:
-            Vector<astTree<int, String, Unique<ContextFreeGrammar::Expr>>> nodes;
+            Vector<astTree<int, String, ExprVariant>> nodes;
             Vector<Token> tokens_;
             inline static logTable<Map<String, Vector<String>>> logs_;
             int current = 0;

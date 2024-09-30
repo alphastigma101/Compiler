@@ -25,13 +25,6 @@ namespace ContextFreeGrammar {
          * ------------------------------------------------------------------------------------------
         */
         public:
-            friend class Binary;
-            friend class Literal;
-            friend class Grouping;
-            friend class Unary;
-            friend class Methods;
-            friend class Arguments;
-            friend class EcoSystem;
             /** --------------------------------------------------------
              * @brief left represents the left binary node.
              * ---------------------------------------------------------
@@ -55,6 +48,7 @@ namespace ContextFreeGrammar {
             */
             Unique<Expr> expression;
             ~Expr() noexcept = default;
+            //Expr* raw;
         protected:
             int idx = 0;
             Expr() = default;

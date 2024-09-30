@@ -26,7 +26,6 @@ int main(void) {
         //"(((25 * 2 - 10 + 45 / 3) == (67 - 3 * 5)) && ((90 >= 45) || (50 < 60))) && (34 != (2 + 1 * 2))",
         //"((((67 + 89) / (34 - 12)) * (45 + 5)) >= ((100 / 2) - (5 * 6))) || ((30 <= 40) && (9 + 7 != (4 * 4)))"
     };
-    //Scanner scanner("((45 > 67) + (67 / 70))");
     for (const auto& it : test_strs) {
         Scanner scanner(it);
         Vector<Token> tokens = scanner.ScanTokens();

@@ -111,7 +111,6 @@ Unique<Expr> parser::primary() {
     parseError<parser> pp(peek(), "Expect expression.");
     throw pp;
 }
-
 /** --------------------------------------------------------------------------
  * @brief Expands into equality to start the recrusion
  *
@@ -162,7 +161,7 @@ Unique<Expr> parser::identifier() {
     }
     return primary(); // indentifier has a literal 
 }
-/**---------------------------------------------------------------------------
+/** ---------------------------------------------------------------------------
  * @brief A rule that will call to the left and to the right to parse. 
  * 
  * ---------------------------------------------------------------------------
@@ -238,21 +237,21 @@ void parser::printNodes() {
     for (int i = 0; i < nodes.size(); i++) {
         auto& [intVal, pairVal] = nodes[i];
         if (pairVal.first == "Grouping") {
-            if (pairVal.second.get()->expression.get() != nullptr) {
-                std::cout << pairVal.second.get()->expression.get()->op.get()->getLexeme() << std::endl;
+            if (auto expression =  std::get<Unique<Expr>>(pairVal.second).get()->expression.get()) {
+                std::cout << expression->op.get()->getLexeme() << std::endl;
             }
         }
         if (pairVal.first == "Binary") {
-            if (pairVal.second.get() != nullptr) {
-                if (pairVal.second.get()->left.get() != nullptr) {
-                    std::cout << pairVal.second.get()->left.get()->op.get()->getLiteral() << std::endl;
-                }
-                if (pairVal.second.get()->right.get() != nullptr) {
-                    std::cout << pairVal.second.get()->right.get()->op.get()->getLiteral() << std::endl;
+            if (auto expr = std::get<Expr*>(pairVal.second)) {
+                if (expr->op.get() != nullptr) {
+                    std::cout << expr->op.get()->getLiteral() << std::endl;
                 }
             }
         }
-        pairVal.second.release();
+        if (std::holds_alternative<std::unique_ptr<Expr>>(pairVal.second)) {
+            auto& clean = std::get<std::unique_ptr<Expr>>(pairVal.second);
+            clean.release();
+        }
     }
     return;
 }

@@ -15,55 +15,49 @@ generateAst<ast>::generateAst() noexcept {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto grouping = dynamic_cast<Grouping*>(conv.get()))
-                    visitGrouping.accept(*grouping);
+                    outputDir_ += visitGrouping.accept(*grouping);
             }
         }
-        // Raw pointer and not Unique
         if (pairVal.first == "Binary") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto binary = dynamic_cast<Binary*>(conv.get()))
-                    visitBinary.accept(*binary);
+                    outputDir_ += visitBinary.accept(*binary);
             }
         }
-        // Raw pointer and not Unique
         if (pairVal.first == "Literal") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto literal = dynamic_cast<Literal*>(conv.get()))
-                    visitLiteral.accept(*literal);
+                    outputDir_ += visitLiteral.accept(*literal);
             }
         }
-        // Raw pointer and not Unique
         if (pairVal.first == "Unary") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto unary = dynamic_cast<Unary*>(conv.get()))
-                    visitUnary.accept(*unary);
+                    outputDir_ += visitUnary.accept(*unary);
             }
         }
-        // Raw pointer and not Unique
         if (pairVal.first == "Methods") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto meth = dynamic_cast<Methods*>(conv.get()))
-                    visitMethods.accept(*meth);
+                    outputDir_ += visitMethods.accept(*meth);
             }
         }
-        // Raw pointer and not Unique
         if (pairVal.first == "Arguments") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto arguments = dynamic_cast<Arguments*>(conv.get()))
-                    visitArguments.accept(*arguments);
+                    outputDir_ += visitArguments.accept(*arguments);
             }
         }
-        // Raw pointer and not Unique
         if (pairVal.first == "EcoSystem") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto ecosystem = dynamic_cast<EcoSystem*>(conv.get()))
-                    visitEcoSystem.accept(*ecosystem);
+                    outputDir_ += visitEcoSystem.accept(*ecosystem);
             }
         }
     }

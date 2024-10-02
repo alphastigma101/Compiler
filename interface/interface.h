@@ -29,6 +29,7 @@ class Visitor {
     public:
         inline String visit(Type&& visitor) { return static_cast<Type*>(this)->accept(*this); };
         inline String accept(Type& expr) { return static_cast<Type*>(this)->visit(std::move(expr)); };
-        inline String parenthesize(String name, ContextFreeGrammar::Expr& expr) { return static_cast<Type*>(this)->parenthesize(name, expr); };
+        template<typename... Args>
+        inline String parenthesize(Args... args) { return static_cast<Type*>(this)->parenthesize(std::forward<Args>(args)...); };
 };
 #endif 

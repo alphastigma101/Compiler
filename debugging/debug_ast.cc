@@ -31,9 +31,12 @@ int main(void) {
         Vector<Token> tokens = scanner.ScanTokens();
         parser p(tokens);
         p.beginParse();
-        #if ENABLE_TREE_DEBUGGING
-            p.printNodes();
-        #endif
+        ast aT;
+        //#if ENABLE_TREE_DEBUGGING
+            //p.printNodes();
+        //#else
+
+        //#endif
 
     }
     return 0;

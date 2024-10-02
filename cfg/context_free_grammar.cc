@@ -153,7 +153,6 @@ Literal::Literal(const Token&& oP) {
     }
 }
 
-
 Methods::Methods(Unique<Expr> meth, const Token& op_) {
 
 
@@ -163,7 +162,6 @@ Arguments::Arguments(Unique<Expr> arg, const Token& op_) {
 
 }
 
-
 EcoSystem::EcoSystem(Unique<Expr> ecoSystem, const Token& op_) {
 
 
@@ -171,84 +169,34 @@ EcoSystem::EcoSystem(Unique<Expr> ecoSystem, const Token& op_) {
 // Helper methods for constructing the AST
 //
 //
-String Binary::parenthesize(String name, Expr& expr) {
-    /*builder.append("(").append(name);
-    for (Expr expr : exprs) {
-      builder.append(" ");
-      builder.append(expr.accept(this));
-    }
-    builder.append(")");
-
-    return builder.toString();*/
-    return "\0";
-}
-//
-String Binary::visit(Binary&& expr) {
-    return "\0";
-}
-//
-String Binary::accept(Binary&) {
-    return "\0";
+String Binary::parenthesize(String name, Expr& right, Expr& left) {
+    String result;
+    result += "(" + name;
+    result += " ";
+    if (auto literal = dynamic_cast<Literal*>(&left)) result += literal->accept(*literal);
+    if (auto literal = dynamic_cast<Literal*>(&right))  result += literal->accept(*literal);
+    return result + ")";
 }
 //
 String Unary::parenthesize(String name, Expr& expr) {
-    /*builder.append("(").append(name);
-    for (Expr expr : exprs) {
-      builder.append(" ");
-      builder.append(expr.accept(this));
-    }
-    builder.append(")");
-
-    return builder.toString();*/
-    return "\0";
-}
-//
-String Unary::visit(Unary&& expr) {
-    return "\0";
-}
-//
-String Unary::accept(Unary&) {
-    return "\0";
+    String result;
+    result += "(" + name;
+    result += " ";
+    if (auto literal = dynamic_cast<Literal*>(&expr)) result += literal->accept(*literal);
+    return result + ")";
 }
 //
 String Grouping::parenthesize(String name, Expr& expr) {
-    /*builder.append("(").append(name);
-    for (Expr expr : exprs) {
-      builder.append(" ");
-      builder.append(expr.accept(this));
-    }
-    builder.append(")");
-
-    return builder.toString();*/
-    return "\0";
-}
-//
-String Grouping::visit(Grouping&& expr) {
-    return "\0";
-}
-//
-String Grouping::accept(Grouping&) {
-    return "\0";
-}
-//
-String Literal::parenthesize(String name, Expr& expr) {
-    /*builder.append("(").append(name);
-    for (Expr expr : exprs) {
-      builder.append(" ");
-      builder.append(expr.accept(this));
-    }
-    builder.append(")");
-
-    return builder.toString();*/
-    return "\0";
+    String result;
+    result += "(" + name;
+    result += " ";
+    if (auto binary = dynamic_cast<Binary*>(&expr)) result += binary->accept(*binary);
+    return result + ")";
 }
 //
 String Literal::visit(Literal&& expr) {
-    return "\0";
-}
-//
-String Literal::accept(Literal&) {
-    return "\0";
+    if (expr.getToken().getTypeStr() == "NULL" || expr.getToken().getTypeStr() == "NIL") return "null";
+    return expr.getToken().getLiteral();
 }
 //
 String Methods::parenthesize(String name, Expr& expr) {
@@ -268,7 +216,7 @@ String Methods::visit(Methods&& expr) {
 }
 //
 String Methods::accept(Methods&) {
-    return "\0";
+    return visit(std::move(*this));
 }
 //
 String Arguments::parenthesize(String name, Expr& expr) {
@@ -288,7 +236,7 @@ String Arguments::visit(Arguments&& expr) {
 }
 //
 String Arguments::accept(Arguments&) {
-    return "\0";
+    return visit(std::move(*this));
 }
 //
 String EcoSystem::parenthesize(String name, Expr& expr) {
@@ -308,8 +256,9 @@ String EcoSystem::visit(EcoSystem&& expr) {
 }
 //
 String EcoSystem::accept(EcoSystem&) {
-    return "\0";
+    return visit(std::move(*this));
 }
+
 #if ENABLE_TREE_BUILD
    Vector<astTree<int, String, ExprVariant>> cTree;
 #endif

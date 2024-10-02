@@ -80,13 +80,14 @@ namespace ContextFreeGrammar {
             Binary(Binary&&) = default;
             ~Binary() noexcept = default; // Using Virtual when it shouldn't. So I am mis-understanding something
             inline Token getToken() { return *op; };
+            inline String accept(Binary&) { return visit(std::move(*this)); };
         protected:
             Binary() = default;
             Binary(const Binary&) = default;
             Binary& operator=(const Binary&) = default;
             Binary& operator=(Binary&&) = default;
         private:
-            inline static logTable<std::map<String, Vector<String>>> logs_;
+            inline static logTable<Map<String, Vector<String>>> logs_;
             /** --------------------------------------
              * @brief A method that is overloaded by this class 
              * 
@@ -124,9 +125,8 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
-            static String parenthesize(String name, Expr& expr);
-            static String visit(Binary&& expr);
-            static String accept(Binary&);
+            static String parenthesize(String name, Expr& left, Expr& right);
+            inline String visit(Binary&& expr) { return parenthesize(expr.op.get()->getLexeme(), *(expr.left.get()), *(expr.right.get())); };
     };
     class Unary: public Expr, public Visitor<Unary>, public logging<Unary>, public runtimeerror<Unary>, public catcher<Unary> {
         public:
@@ -182,8 +182,8 @@ namespace ContextFreeGrammar {
                 }
             };
             static String parenthesize(String name, Expr& expr);
-            static String visit(Unary&& expr);
-            static String accept(Unary&);
+            inline String visit(Unary&& expr) { return parenthesize(expr.op.get()->getLexeme(), *(expr.right.get())); };
+            inline String accept(Unary&) { return visit(std::move(*this)); };
     };
     class Grouping: public Expr, public  Visitor<Grouping>, public logging<Grouping>, public runtimeerror<Grouping>, public catcher<Grouping> {
         public:
@@ -249,8 +249,8 @@ namespace ContextFreeGrammar {
                 }
             };
             static String parenthesize(String name, Expr& expr);
-            static String visit(Grouping&& expr);
-            static String accept(Grouping&);
+            inline String visit(Grouping&& expr) { return parenthesize("group", *(expr.expression.get())); };
+            inline String accept(Grouping&) { return visit(std::move(*this)); };
     };
     class Literal: public Expr, public Visitor<Literal>, public logging<Literal>, public runtimeerror<Literal>, public catcher<Literal> {
         public:
@@ -260,6 +260,7 @@ namespace ContextFreeGrammar {
             explicit Literal(const Token&& oP);
             ~Literal() noexcept = default;
             inline Token getToken() { return *op; };
+            inline String accept(Literal&) { return visit(std::move(*this)); };
         private:
             inline static logTable<std::map<String, Vector<String>>> logs_;
             /** --------------------------------------
@@ -299,16 +300,13 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
-            static String parenthesize(String name, Expr& expr);
-            static String visit(Literal&& expr);
-            static String accept(Literal&);
+            String visit(Literal&& expr);
         protected:
             Literal() = default;
             Literal(const Literal&) = default;
             Literal(Literal&&) = default;
             Literal& operator=(const Literal&) = default;
-            Literal& operator=(Literal&&) = default;
-           
+            Literal& operator=(Literal&&) = default;     
     };
     class Methods: public Expr, public  Visitor<Methods>, public logging<Methods>, public runtimeerror<Methods>, public catcher<Methods> {
         public:
@@ -363,8 +361,8 @@ namespace ContextFreeGrammar {
                 }
             };
             static String parenthesize(String name, Expr& expr);
-            static String visit(Methods&& expr);
-            static String accept(Methods&);
+            String visit(Methods&& expr);
+            String accept(Methods&);
     };
     class Arguments: public Expr, public Visitor<Arguments>, public logging<Arguments>, public runtimeerror<Arguments>, public catcher<Arguments> {
         public:
@@ -414,8 +412,8 @@ namespace ContextFreeGrammar {
                 }
             };
             static String parenthesize(String name, Expr& expr);
-            static String visit(Arguments&& expr);
-            static String accept(Arguments&);
+            String visit(Arguments&& expr);
+            String accept(Arguments&);
         protected:
             Arguments() = default;
             Arguments(const Arguments&) = default;
@@ -471,8 +469,8 @@ namespace ContextFreeGrammar {
                 }
             };
             static String parenthesize(String name, Expr& expr);
-            static String visit(EcoSystem&& expr);
-            static String accept(EcoSystem&);
+            String visit(EcoSystem&& expr);
+            String accept(EcoSystem&);
         protected:
             EcoSystem() = default;
             EcoSystem(const EcoSystem&) = default;

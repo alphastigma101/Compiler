@@ -11,17 +11,15 @@ generateAst<ast>::generateAst() noexcept {
     // 2. Iterate through cTree 
     for (auto& it : cTree) {
         auto& [intVal, pairVal] = it;
-        if (pairVal.first == "Grouping") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (auto grouping = dynamic_cast<Grouping*>(conv.get()))
-                    outputDir_ += visitGrouping.accept(*grouping);
-            }
-        }
-        if (pairVal.first == "Binary") {
+         if (pairVal.first == "Binary") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto binary = dynamic_cast<Binary*>(conv.get()))
+                    outputDir_ += visitBinary.accept(*binary);
+            }
+            if (std::holds_alternative<Expr*>(pairVal.second)) {
+                auto& conv = std::get<Expr*>(pairVal.second);
+                if (auto binary = dynamic_cast<Binary*>(conv))
                     outputDir_ += visitBinary.accept(*binary);
             }
         }
@@ -31,11 +29,21 @@ generateAst<ast>::generateAst() noexcept {
                 if (auto literal = dynamic_cast<Literal*>(conv.get()))
                     outputDir_ += visitLiteral.accept(*literal);
             }
+            if (std::holds_alternative<Expr*>(pairVal.second)) {
+                auto& conv = std::get<Expr*>(pairVal.second);
+                if (auto literal = dynamic_cast<Literal*>(conv))
+                    outputDir_ += visitLiteral.accept(*literal);
+            }
         }
         if (pairVal.first == "Unary") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto unary = dynamic_cast<Unary*>(conv.get()))
+                    outputDir_ += visitUnary.accept(*unary);
+            }
+            if (std::holds_alternative<Expr*>(pairVal.second)) {
+                auto& conv = std::get<Expr*>(pairVal.second);
+                if (auto unary = dynamic_cast<Unary*>(conv))
                     outputDir_ += visitUnary.accept(*unary);
             }
         }
@@ -45,11 +53,21 @@ generateAst<ast>::generateAst() noexcept {
                 if (auto meth = dynamic_cast<Methods*>(conv.get()))
                     outputDir_ += visitMethods.accept(*meth);
             }
+            if (std::holds_alternative<Expr*>(pairVal.second)) {
+                auto& conv = std::get<Expr*>(pairVal.second);
+                if (auto meth = dynamic_cast<Methods*>(conv))
+                    outputDir_ += visitMethods.accept(*meth);
+            }
         }
         if (pairVal.first == "Arguments") {
             if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto arguments = dynamic_cast<Arguments*>(conv.get()))
+                    outputDir_ += visitArguments.accept(*arguments);
+            }
+            if (std::holds_alternative<Expr*>(pairVal.second)) {
+                auto& conv = std::get<Expr*>(pairVal.second);
+                if (auto arguments = dynamic_cast<Arguments*>(conv))
                     outputDir_ += visitArguments.accept(*arguments);
             }
         }
@@ -58,6 +76,24 @@ generateAst<ast>::generateAst() noexcept {
                 auto& conv = std::get<Unique<Expr>>(pairVal.second);
                 if (auto ecosystem = dynamic_cast<EcoSystem*>(conv.get()))
                     outputDir_ += visitEcoSystem.accept(*ecosystem);
+            }
+            if (std::holds_alternative<Expr*>(pairVal.second)) {
+                auto& conv = std::get<Expr*>(pairVal.second);
+                if (auto ecosystem = dynamic_cast<EcoSystem*>(conv))
+                    outputDir_ += visitEcoSystem.accept(*ecosystem);
+            }
+        }
+        if (pairVal.first == "Grouping") {
+            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                auto& conv = std::get<Unique<Expr>>(pairVal.second);
+                if (conv.get() != nullptr) {
+                    if (auto grouping = dynamic_cast<Grouping*>(conv.get()))
+                        outputDir_ += " " + visitGrouping.accept(*grouping);
+                    if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+                        auto& clean = std::get<Unique<Expr>>(pairVal.second);
+                        clean.release();
+                    }
+                }
             }
         }
     }

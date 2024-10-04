@@ -248,8 +248,8 @@ void parser::printNodes() {
                 }
             }
         }
-        if (std::holds_alternative<std::unique_ptr<Expr>>(pairVal.second)) {
-            auto& clean = std::get<std::unique_ptr<Expr>>(pairVal.second);
+        if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
+            auto& clean = std::get<Unique<Expr>>(pairVal.second);
             clean.release();
         }
     }

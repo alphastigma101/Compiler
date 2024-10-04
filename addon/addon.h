@@ -1,7 +1,9 @@
 #pragma once
 #ifndef _ADDON_H_
 #define _ADDON_H_
-
+/** ------------------------------------------------------------------------------------------------------------
+ * @brief Builds the bits that will prevent undefined reference to cTree 
+ */
 #ifndef ENABLE_TREE_DEBUGGING
     #define ENABLE_TREE_DEBUGGING 0
 #endif

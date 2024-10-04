@@ -169,13 +169,13 @@ EcoSystem::EcoSystem(Unique<Expr> ecoSystem, const Token& op_) {
 // Helper methods for constructing the AST
 //
 //
-String Binary::parenthesize(String name, Expr& right, Expr& left) {
+String Binary::parenthesize(String name, Expr* right, Expr* left) {
     String result;
     result += "(" + name;
     result += " ";
-    if (auto literal = dynamic_cast<Literal*>(&left)) result += literal->accept(*literal);
-    if (auto literal = dynamic_cast<Literal*>(&right))  result += literal->accept(*literal);
-    return result + ")";
+    if (auto literal = dynamic_cast<Literal*>(left)) result += literal->accept(*literal);
+    if (auto literal = dynamic_cast<Literal*>(right))  result += literal->accept(*literal);
+    return result;
 }
 //
 String Unary::parenthesize(String name, Expr& expr) {
@@ -188,15 +188,16 @@ String Unary::parenthesize(String name, Expr& expr) {
 //
 String Grouping::parenthesize(String name, Expr& expr) {
     String result;
-    result += "(" + name;
+    //result += "(" + name;
     result += " ";
     if (auto binary = dynamic_cast<Binary*>(&expr)) result += binary->accept(*binary);
-    return result + ")";
+    result += " ";
+    return result;
 }
 //
 String Literal::visit(Literal&& expr) {
     if (expr.getToken().getTypeStr() == "NULL" || expr.getToken().getTypeStr() == "NIL") return "null";
-    return expr.getToken().getLiteral();
+    return " " + expr.getToken().getLiteral();
 }
 //
 String Methods::parenthesize(String name, Expr& expr) {

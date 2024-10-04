@@ -77,6 +77,7 @@ namespace ContextFreeGrammar {
             friend class Visitor<Binary>;
             explicit Binary(Unique<Expr> left_, const Token& op_, Unique<Expr> right_);
             explicit Binary(Unique<Expr> expr, bool move) noexcept;
+            explicit Binary(Expr* other, bool move) noexcept;
             Binary(Binary&&) = default;
             ~Binary() noexcept = default; // Using Virtual when it shouldn't. So I am mis-understanding something
             inline Token getToken() { return *op; };
@@ -125,8 +126,8 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
-            static String parenthesize(String name, Expr& left, Expr& right);
-            inline String visit(Binary&& expr) { return parenthesize(expr.op.get()->getLexeme(), *(expr.left.get()), *(expr.right.get())); };
+            String parenthesize(String name, Expr* left, Expr* right);
+            inline String visit(Binary&& expr) { return parenthesize(expr.op.get()->getLexeme(), expr.left.get(), expr.right.get()); };
     };
     class Unary: public Expr, public Visitor<Unary>, public logging<Unary>, public runtimeerror<Unary>, public catcher<Unary> {
         public:
@@ -181,7 +182,7 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
-            static String parenthesize(String name, Expr& expr);
+            String parenthesize(String name, Expr& expr);
             inline String visit(Unary&& expr) { return parenthesize(expr.op.get()->getLexeme(), *(expr.right.get())); };
             inline String accept(Unary&) { return visit(std::move(*this)); };
     };
@@ -248,8 +249,8 @@ namespace ContextFreeGrammar {
                     std::cout << "Error! conversion has failed!" << std::endl;
                 }
             };
-            static String parenthesize(String name, Expr& expr);
-            inline String visit(Grouping&& expr) { return parenthesize("group", *(expr.expression.get())); };
+            String parenthesize(String name, Expr& expr);
+            inline String visit(Grouping&& expr) {return parenthesize("group", *(expr.expression.get()));};
             inline String accept(Grouping&) { return visit(std::move(*this)); };
     };
     class Literal: public Expr, public Visitor<Literal>, public logging<Literal>, public runtimeerror<Literal>, public catcher<Literal> {

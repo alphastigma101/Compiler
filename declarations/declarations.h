@@ -107,6 +107,12 @@ namespace ContextFreeGrammar {
 };
 /** ---------------------------------------------------------------------------
  * @brief defined in parser.h 
+ * 
+ * @details The parser I am making is a top-down parser. 
+ *          Meaning it starts at the top, and works it's way down the grammar
+ * 
+ * @details The precendence are in reverse, because the lower precendence might contain higher precendence.
+ *          That means 
  *
  * ---------------------------------------------------------------------------
 */
@@ -155,7 +161,7 @@ template<typename T, typename U, typename V>
 using astTree = std::tuple<T, std::pair<U, V>>;
 template<typename T, typename U, typename V>
 extern astTree<T, U, V> compressedAstTree(T first, U second, V third);
-extern Vector<astTree<int, String, ExprVariant>> cTree;
+extern Set<astTree<int, String, ExprVariant>> cTree;
 //template<typename X, typename Y, typename Z>
 //using Vertices =
 //template<typename X, typename Y, typename Z>

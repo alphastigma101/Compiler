@@ -2,11 +2,6 @@
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
 #include <threading.h>
-#if ENABLE_TESTING
-    String file_name, user_choice;
-    int settings;
-#endif
-//extern template struct std::tuple<int, std::pair<String, Unique<ExprVariant>>>; // Create the underlying of the astTree
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public catcher<Type>, public runtimeerror<Type> {
@@ -15,31 +10,28 @@ namespace AbstractionTreeSyntax {
             * ---------------------------------------------------------------------
         */
         public:
-            friend class ast;
             friend class catcher<Type>;
             friend class runtimeerror<Type>;
             ~generateAst<Type>() noexcept = default;
-            inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
+            inline static generateAst<Type> buildTree() { return generateAst<Type>(); };
         protected:
-            inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
-            inline static const char* what(TokenType&& type = runtimeerror<Type>::getType(), const char* msg = runtimeerror<Type>::getMsg()) throw() {
-                return msg;
-            };
-            inline static std::string nameOfFile = std::move(file_name);
-            inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
-        private:
             /** ---------------------
              * @brief  the default constructor and objects that will be used throughout all the classes defined in this header
              * ----------------------
             */
-            explicit generateAst<Type>() noexcept;
-            inline static std::string outputDir_;
-            inline static Unique<Atomic<const char*>> accessCodeStr;
-            inline static String codeStr;
-            inline static String compactedTreeStr;
+            explicit generateAst<Type>() noexcept = default;
+            String outputDir_;
+            static Unique<Atomic<const char*>> accessCodeStr;
+            static String codeStr;
+            String compactedTreeStr;
             inline static logTable<Map<String, Vector<String>>> logs_;
-            inline static Vector<astTree<int, String, ExprVariant>> compactedTreeNodes;
-            inline static String ext;
+            Set<astTree<int, String, ExprVariant>> compactedTreeNodes;
+            static String ext;
+            inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
+            inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
+            inline static std::string nameOfFile = std::move(file_name);
+            inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
+            inline static const char* what(TokenType&& type = runtimeerror<Type>::getType(), const char* msg = runtimeerror<Type>::getMsg()) throw() { return msg;};
         private:
             // Visitor objects that are used in generateAst class
             Visitor<Binary> visitBinary;
@@ -49,23 +41,24 @@ namespace AbstractionTreeSyntax {
             Visitor<Methods> visitMethods;
             Visitor<Arguments> visitArguments;
             Visitor<EcoSystem> visitEcoSystem;
+            void streamOutAst();
+            void formatAst();
     };
-    class ast: public generateAst<ast> {
+    class ast: protected generateAst<ast> {
         /** ---------------------------------------------------------------------
             * @brief This class creates an abstraction syntax tree by storing each expression instance inside a vector. 
             *        for the intepreter class to evaulaute each instance using the visitor technique
             * ---------------------------------------------------------------------
         */
         public:
-            friend class generateAst<ast>; // Link the generateAst together with the ast 
             ast() noexcept;
-            ~ast() noexcept = default;
+            ~ast() noexcept = default; // TODO: This is virtual for some reason, and it needs to be not virtual
             inline static Table getTable() { return table; };
             inline static Unique<Atomic<const char*>> getCode() { return std::move(accessCodeStr); };
         private:
             static void tree_(const generateAst<ast>& gA);
             static void writeFile(std::string& ext);
-            inline static Table table;
+            static Table table;
     };
     class analyzeSemantics: public catcher<analyzeSemantics>, public ThreadTracker<analyzeSemantics> {
         /** ------------------------------------------------------------------
@@ -104,9 +97,9 @@ namespace AbstractionTreeSyntax {
 
                         // Might have to check and see if it is not null
                         // Or make the this thread wait until the atomic value is a new one
-                        String stringLiteral = Ast.get()->getCode()->load(std::memory_order_release);
-                        analyzeCode[node] = stringLiteral;
-                        node++;
+                        //String stringLiteral = Ast.get()->getCode()->load(std::memory_order_release);
+                        //analyzeCode[node] = stringLiteral;
+                        //node++;
                     }
                 }
             };

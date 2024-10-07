@@ -13,14 +13,14 @@ template struct std::shared_ptr<Variant<Binary, Unary, Grouping, Literal, Method
  *
  * ---------------------------------------------------------------------------------------------------------------------------------------
 */
-Unique<Expr> parser::equality()  {
+Expr* parser::equality()  {
     // Recursion left !=
     auto expr = comparison();
     while (match(TokenType::BANG_EQUAL, TokenType::EQUAL_EQUAL)) {
         const Token op = previous();
         // Recursion right ==
         auto right = comparison();
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr = new Binary(expr, op, right);
     }
     return expr;
 }
@@ -30,12 +30,12 @@ Unique<Expr> parser::equality()  {
  * @return term()
  * --------------------------------------------------------------------------
 */
-Unique<Expr> parser::comparison() {
+Expr* parser::comparison() {
     auto expr = term();
     while (match(TokenType::GREATER, TokenType::GREATER_EQUAL, TokenType::LESS, TokenType::LESS_EQUAL)) {
         const Token op = previous();
         auto right = term();
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr = new Binary(expr, op, right);
     }
     return expr;
 }
@@ -47,12 +47,12 @@ Unique<Expr> parser::comparison() {
  * @details expr is a shared_ptr wrapped with variant that holds Binary, Unary, Grouping, and Literal instances
  * --------------------------------------------------------------------------
 */
-Unique<Expr> parser::term() {
+Expr* parser::term() {
     auto expr = factor();
     while (match(TokenType::MINUS, TokenType::PLUS)) {
         const Token op = previous();
         auto right = factor();
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr = new Binary(expr, op, right);
     }
     return expr;
 }
@@ -66,12 +66,12 @@ Unique<Expr> parser::term() {
    Ex: Factor can handle the () but Grouping is needed so it can get the nested () expression as it's own 
  * --------------------------------------------------------------------------
 */
-Unique<Expr> parser::factor() {
+Expr* parser::factor() {
     auto expr = unary(); 
     while (match(TokenType::SLASH, TokenType::STAR, TokenType::MODULO)) {
         const Token op = previous();
         auto right = unary();
-        expr = std::make_unique<Binary>(std::move(expr), op, std::move(right));
+        expr = new Binary(expr, op, right);
     }
     return expr;
 }
@@ -83,11 +83,11 @@ Unique<Expr> parser::factor() {
  * @details expr is a shared_ptr that wraps around a variant that holds Binary, Unary, Grouping, and Literal instances
  * --------------------------------------------------------------------------
 */
-Unique<Expr> parser::unary() {
+Expr* parser::unary() {
     if (match(TokenType::BANG, TokenType::MINUS)) {
         const Token op = previous();
         auto right = unary();
-        auto expr = std::make_unique<Unary>(std::move(right), previous());
+        auto expr = new Unary(right, op);
         return expr;
     }
     return primary();
@@ -98,15 +98,17 @@ Unique<Expr> parser::unary() {
  * @return expr after going through a series of if statements or will through an exception of '(' or ')'  
  * --------------------------------------------------------------------------
 */
-Unique<Expr> parser::primary() {
-    if (match(TokenType::FALSE)) return std::make_unique<Literal>(previous());
-    if (match(TokenType::TRUE)) return std::make_unique<Literal>(previous());
-    if (match(TokenType::NIL)) return std::make_unique<Literal>(previous());
-    if (match(TokenType::NUMBER, TokenType::STRING)) return std::make_unique<Literal>(previous());
+Expr* parser::primary() {
+    if (match(TokenType::FALSE)) return new Literal(previous());
+    if (match(TokenType::TRUE)) return new Literal(previous());
+    if (match(TokenType::NIL)) return new Literal(previous());
+    if (match(TokenType::NUMBER, TokenType::STRING)) {
+        return new Literal(previous());
+    }
     if (match(TokenType::LEFT_PAREN)) {
         auto expr = expression();
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
-        return std::make_unique<Grouping>(std::move(expr));
+        return new Grouping(expr);
     }
     parseError<parser> pp(peek(), "Expect expression.");
     throw pp;
@@ -119,7 +121,7 @@ Unique<Expr> parser::primary() {
  * @return equality()
  * --------------------------------------------------------------------------
 */
-Unique<Expr> parser::expression() { return equality(); }
+Expr* parser::expression() { return equality(); }
 /** --------------------------------------------------------------------------
  * @brief Calls in expression to start the parsing sequence by following the grammar
  *
@@ -128,7 +130,7 @@ Unique<Expr> parser::expression() { return equality(); }
  * @return Either return from all the recrusive calls if nothing was thrown, otherwise return null 
  * --------------------------------------------------------------------------
 */
-Unique<Expr> parser::parse() {
+Expr* parser::parse() {
     try { 
         auto result = expression();
         return result;
@@ -145,7 +147,7 @@ Unique<Expr> parser::parse() {
  * 
  * ------------------------------------------------------------------------------
 */
-Unique<Expr> parser::identifier() {
+Expr* parser::identifier() {
     // Rules usually require recrusion 
     // Think of Calling a funciton again as if you're looking ahead 
     // LR is look ahead right 
@@ -166,7 +168,7 @@ Unique<Expr> parser::identifier() {
  * 
  * ---------------------------------------------------------------------------
 */
-Unique<Expr> parser::arguments() {
+Expr* parser::arguments() {
     auto expr = primary(); // Start with a primary expression
     /*while(match(TokenType::COMMA)) {
         auto right = primary();
@@ -179,7 +181,7 @@ Unique<Expr> parser::arguments() {
  * 
  * ---------------------------------------------------------------------------
 */
-Unique<Expr> parser::methods() {
+Expr* parser::methods() {
     auto expr = methods();
     while(TokenType::DOT, TokenType::IDENTIFIER) {
 
@@ -191,7 +193,7 @@ Unique<Expr> parser::methods() {
  * 
  * ---------------------------------------------------------------------------
 */
-Unique<Expr> parser::ecosystem() {
+Expr* parser::ecosystem() {
     auto expr = ecosystem();
     while(TokenType::IMPORT) {
 
@@ -233,11 +235,11 @@ String parser::report(int line, const String where, const String message) throw(
     return err;
 }
 void parser::printNodes() {
-    nodes = std::move(cTree);
-    for (int i = 0; i < nodes.size(); i++) {
+    ///nodes = std::move(cTree);
+    /*for (int i = 0; i < nodes.size(); i++) {
         auto& [intVal, pairVal] = nodes[i];
         if (pairVal.first == "Grouping") {
-            if (auto expression =  std::get<Unique<Expr>>(pairVal.second).get()->expression.get()) {
+            if (auto expression =  std::get<Expr*>(pairVal.second).get()->expression.get()) {
                 std::cout << expression->op.get()->getLexeme() << std::endl;
             }
         }
@@ -248,10 +250,10 @@ void parser::printNodes() {
                 }
             }
         }
-        if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-            auto& clean = std::get<Unique<Expr>>(pairVal.second);
+        if (std::holds_alternative<Expr*>(pairVal.second)) {
+            auto& clean = std::get<Expr*>(pairVal.second);
             clean.release();
         }
-    }
+    }*/
     return;
 }

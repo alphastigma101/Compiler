@@ -27,9 +27,11 @@ class MemberConv {
 template<class Type>
 class Visitor {
     public:
-        inline String visit(Type&& visitor) { return static_cast<Type*>(this)->accept(*this); };
-        inline String accept(Type& expr) { return static_cast<Type*>(this)->visit(std::move(expr)); };
-        template<typename... Args>
-        inline String parenthesize(Args... args) { return static_cast<Type*>(this)->parenthesize(std::forward<Args>(args)...); };
+    template<typename... Args>
+    inline String visit(Args&&... args) {  return static_cast<Type*>(this)->visit(std::forward<Args>(args)...); }
+    template<typename... Args>
+    inline String accept(Args&&... args) {  return static_cast<Type*>(this)->accept(std::forward<Args>(args)...);  }
+    template<typename... Args>
+    inline String parenthesize(Args... args) { return static_cast<Type*>(this)->parenthesize(std::forward<Args>(args)...); };
 };
 #endif 

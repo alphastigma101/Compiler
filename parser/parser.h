@@ -56,25 +56,25 @@ namespace Parser {
             */
             explicit parser(std::vector<Token>& tokens) {  tokens_ = std::move(tokens); };
             inline void beginParse() { 
-                parse().release(); 
+                parse(); 
                 return;
             };
             void printNodes();
             ~parser() noexcept = default; // This shouldn't be a virtual... 
         protected:
             // Current rules that were made from a grammar 
-            Unique<Expr> equality();
-            Unique<Expr> comparison();
-            Unique<Expr> expression();
-            Unique<Expr> term();
-            Unique<Expr> factor();
-            Unique<Expr> unary();
-            Unique<Expr> primary();
-            Unique<Expr> identifier();
-            Unique<Expr> arguments();
-            Unique<Expr> methods();
-            Unique<Expr> ecosystem();
-            Unique<Expr> parse();
+            Expr* equality();
+            Expr* comparison();
+            Expr* expression();
+            Expr* term();
+            Expr* factor();
+            Expr* unary();
+            Expr* primary();
+            Expr* identifier();
+            Expr* arguments();
+            Expr* methods();
+            Expr* ecosystem();
+            Expr* parse();
         protected:
             /** ----------------------------------------------------------------------------------------------------------
              * @brief Get the previous TokenType
@@ -146,16 +146,16 @@ namespace Parser {
             inline bool match(Args... types) {  return (... || (check(types) ? (advance(), true) : false)); };
             inline Token consume(const TokenType type, const std::string message) {
                 if (check(type)) return advance();
-                auto clear = [this]() {
+                /*auto clear = [this]() {
                     for (int i = 0; i < nodes.size(); i++) {
                         auto& [intVal, pairVal] = nodes[i];
-                        if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                            auto& clean = std::get<Unique<Expr>>(pairVal.second);
+                        if (std::holds_alternative<Expr*>(pairVal.second)) {
+                            auto& clean = std::get<Expr*>(pairVal.second);
                             clean.release();
                         }
                     }
                 };
-                clear();
+                clear();*/
                 parseError<parser> pp(peek(), message);
                 throw pp;
             };

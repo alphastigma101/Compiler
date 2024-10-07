@@ -1,5 +1,14 @@
 #include <abstraction_tree_syntax.h>
-#include <lookup_language.h> // get the file extensions 
+#include <lookup_language.h> // get the file extensions
+// Initialize the static data member types for generateAst
+template<typename Type>
+String AbstractionTreeSyntax::generateAst<Type>::ext = "\0";
+template<typename Type>
+String AbstractionTreeSyntax::generateAst<Type>::codeStr = "\0";
+template<typename Type>
+Unique<Atomic<const char*>> AbstractionTreeSyntax::generateAst<Type>::accessCodeStr = nullptr;
+// Initialize the static data member types for ast 
+Table ast::table = {};
 /** ------------------------------------
  * @brief An abstraction class that checks to see if it allowed to create a .txt flie
  * 
@@ -7,96 +16,92 @@
 */
 template<>
 generateAst<ast>::generateAst() noexcept {
-    // 1. Need to check if it the userspace has permission to output the generated ast as a text
-    // 2. Iterate through cTree 
     for (auto& it : cTree) {
         auto& [intVal, pairVal] = it;
-         if (pairVal.first == "Binary") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (auto binary = dynamic_cast<Binary*>(conv.get()))
-                    outputDir_ += visitBinary.accept(*binary);
-            }
+        if (pairVal.first == "Binary") {
             if (std::holds_alternative<Expr*>(pairVal.second)) {
                 auto& conv = std::get<Expr*>(pairVal.second);
                 if (auto binary = dynamic_cast<Binary*>(conv))
-                    outputDir_ += visitBinary.accept(*binary);
+                    outputDir_ += " " + conv->accept(binary);
             }
         }
-        if (pairVal.first == "Literal") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (auto literal = dynamic_cast<Literal*>(conv.get()))
-                    outputDir_ += visitLiteral.accept(*literal);
-            }
-            if (std::holds_alternative<Expr*>(pairVal.second)) {
-                auto& conv = std::get<Expr*>(pairVal.second);
-                if (auto literal = dynamic_cast<Literal*>(conv))
-                    outputDir_ += visitLiteral.accept(*literal);
-            }
-        }
-        if (pairVal.first == "Unary") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (auto unary = dynamic_cast<Unary*>(conv.get()))
-                    outputDir_ += visitUnary.accept(*unary);
-            }
+        /*if (pairVal.first == "Unary") {
             if (std::holds_alternative<Expr*>(pairVal.second)) {
                 auto& conv = std::get<Expr*>(pairVal.second);
                 if (auto unary = dynamic_cast<Unary*>(conv))
-                    outputDir_ += visitUnary.accept(*unary);
+                    //outputDir_ += visitUnary.accept(unary);
+                    outputDir_ += conv->accept(unary);
             }
-        }
+        }*/
         if (pairVal.first == "Methods") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (auto meth = dynamic_cast<Methods*>(conv.get()))
-                    outputDir_ += visitMethods.accept(*meth);
-            }
             if (std::holds_alternative<Expr*>(pairVal.second)) {
                 auto& conv = std::get<Expr*>(pairVal.second);
                 if (auto meth = dynamic_cast<Methods*>(conv))
-                    outputDir_ += visitMethods.accept(*meth);
+                    //outputDir_ += visitMethods.accept(*meth);
+                    outputDir_ += conv->accept(meth);
             }
         }
         if (pairVal.first == "Arguments") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (auto arguments = dynamic_cast<Arguments*>(conv.get()))
-                    outputDir_ += visitArguments.accept(*arguments);
-            }
             if (std::holds_alternative<Expr*>(pairVal.second)) {
                 auto& conv = std::get<Expr*>(pairVal.second);
                 if (auto arguments = dynamic_cast<Arguments*>(conv))
-                    outputDir_ += visitArguments.accept(*arguments);
+                    //outputDir_ += visitArguments.accept(*arguments);
+                    outputDir_ += conv->accept(arguments);
             }
         }
         if (pairVal.first == "EcoSystem") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (auto ecosystem = dynamic_cast<EcoSystem*>(conv.get()))
-                    outputDir_ += visitEcoSystem.accept(*ecosystem);
-            }
             if (std::holds_alternative<Expr*>(pairVal.second)) {
                 auto& conv = std::get<Expr*>(pairVal.second);
                 if (auto ecosystem = dynamic_cast<EcoSystem*>(conv))
-                    outputDir_ += visitEcoSystem.accept(*ecosystem);
+                    //outputDir_ += visitEcoSystem.accept(*ecosystem);
+                    outputDir_ += conv->accept(ecosystem);
             }
         }
-        if (pairVal.first == "Grouping") {
-            if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                auto& conv = std::get<Unique<Expr>>(pairVal.second);
-                if (conv.get() != nullptr) {
-                    if (auto grouping = dynamic_cast<Grouping*>(conv.get()))
-                        outputDir_ += " " + visitGrouping.accept(*grouping);
-                    if (std::holds_alternative<Unique<Expr>>(pairVal.second)) {
-                        auto& clean = std::get<Unique<Expr>>(pairVal.second);
-                        clean.release();
-                    }
-                }
+        /*if (pairVal.first == "Grouping") {
+            if (std::holds_alternative<Expr*>(pairVal.second)) {
+                auto& conv = std::get<Expr*>(pairVal.second);
+                if (auto grouping = dynamic_cast<Grouping*>(conv))
+                    outputDir_ += " " + conv->accept(grouping);
             }
-        }
+        }*/
     }
+    formatAst();
+}
+/** ----------------------------------------------
+ * 
+ * @brief formats outputDir_ string that will represent an ast
+ * 
+ * -----------------------------------------------
+*/
+template<class Type>
+void generateAst<Type>::streamOutAst() {
+    try {
+        std::filesystem::path filePath = "Ast.txt";
+        std::ofstream fAst(filePath, std::ios::out | std::ios::trunc);
+        if (!fAst.is_open()) {
+            std::cerr << "Failed to open file: " << filePath << std::endl;
+            return;
+        }
+        fAst << outputDir_;
+        fAst.flush();  // Ensure all data is written
+        fAst.close();
+        if (fAst.fail()) { std::cerr << "Error occurred while writing to file: " << filePath << std::endl;
+        } else { std::cout << "Successfully wrote to file: " << filePath << std::endl; }
+    } catch (const std::exception& e) { std::cerr << "Exception occurred: " << e.what() << std::endl; }
+    return;
+}
+/** ----------------------------------------------
+ * 
+ * @brief formats outputDir_ string that will represent an ast
+ * 
+ * -----------------------------------------------
+*/
+template<class Type>
+void generateAst<Type>::formatAst() {
+    //int indentLevel = 0;
+    /*for (int it = 0; it < outputDir_.size(); it++) {
+    }*/
+    streamOutAst();
 }
 /** -----------------------------------------------------------------------------------------
  * @brief The default constructor that calls in generateAst to start creating the .txt file 
@@ -105,8 +110,8 @@ generateAst<ast>::generateAst() noexcept {
  * -----------------------------------------------------------------------------------------
 */
 ast::ast() noexcept {
-    generateAst<ast> gA;
-    if (user_choice.empty()) {
+    auto gA = buildTree();
+    /*if (user_choice.empty()) {
         // Subject to change. Have not decided if I want to compile the custom languyage or not
         ENABLE_COMPILER(); // set it to zero by default
         ENABLE_INTERPRETER(); // set it to one by default
@@ -151,7 +156,7 @@ ast::ast() noexcept {
         logs.update();
         logs.write();
         logs.rotate();
-    }
+    }*/
 }
 /** -------------------------------------------------------------------------
  * @brief Writes the code to target file
@@ -163,11 +168,6 @@ ast::ast() noexcept {
  * --------------------------------------------------------------------------
 */
 void ast::writeFile(std::string& ext) {
-    std::string Ast = "Ast.txt";
-    std::ofstream fAst(Ast);
-    fAst << compactedTreeStr;
-    fAst.close();
-
     if (ext.empty()) { ext = std::string(".custom");}
     if (file_name.empty()) { file_name = std::string("change_name_please"); }
     std::ofstream fs(file_name + ext);
@@ -255,8 +255,6 @@ void ast::tree_(const generateAst<ast>& gA)  {
     }*/                           
     return writeFile(ext);
 }
-
-
 /** ----------------------------------------------------------------------------
  * @brief Maps the characters from the source code string to a semantic map.
  *
@@ -387,3 +385,7 @@ void intermediateRepresentation::set_vertex_value(auto& G, int x, int v) {
     // sets the value associated with the vertex x to v.
 }
 
+#if ENABLE_TESTING
+    String file_name, user_choice;
+    int settings;
+#endif

@@ -2,6 +2,10 @@
 #define _ABSTRACTION_TREE_SYNTAX_H_
 #include <context_free_grammar.h>
 #include <threading.h>
+#if ENABLE_TESTING
+    String file_name, user_choice;
+    int settings;
+#endif
 namespace AbstractionTreeSyntax {
     template<class Type>
     class generateAst: public catcher<Type>, public runtimeerror<Type> {
@@ -13,13 +17,14 @@ namespace AbstractionTreeSyntax {
             friend class catcher<Type>;
             friend class runtimeerror<Type>;
             ~generateAst<Type>() noexcept = default;
-            inline static generateAst<Type> buildTree() { return generateAst<Type>(); };
+            inline void streamOutAst(String res) { return static_cast<Type*>(this)->streamOutAst(res); }; // could change the parameter so it uses Type* and use this
+            inline void formatAst(String res) { return static_cast<Type*>(this)->formatAst(res);};
+            inline String buildTree() { return static_cast<Type*>(this)->buildTree();};
+            inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext);};
+            inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA);};
+            inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg;};
+            inline static const char* what(TokenType&& type = runtimeerror<Type>::getType(), const char* msg = runtimeerror<Type>::getMsg()) throw() { return msg;};          
         protected:
-            /** ---------------------
-             * @brief  the default constructor and objects that will be used throughout all the classes defined in this header
-             * ----------------------
-            */
-            explicit generateAst<Type>() noexcept = default;
             String outputDir_;
             static Unique<Atomic<const char*>> accessCodeStr;
             static String codeStr;
@@ -27,13 +32,6 @@ namespace AbstractionTreeSyntax {
             inline static logTable<Map<String, Vector<String>>> logs_;
             Set<astTree<int, String, ExprVariant>> compactedTreeNodes;
             static String ext;
-            inline void writeFile(std::string& ext) { return static_cast<Type*>(this)->writeFile(ext); };
-            inline void tree_(const generateAst<Type>& gA) { return static_cast<Type*>(this)->tree_(gA); };
-            inline static std::string nameOfFile = std::move(file_name);
-            inline static const char* what(const char* msg = catcher<Type>::getMsg()) throw() { return msg; };
-            inline static const char* what(TokenType&& type = runtimeerror<Type>::getType(), const char* msg = runtimeerror<Type>::getMsg()) throw() { return msg;};
-        private:
-            // Visitor objects that are used in generateAst class
             Visitor<Binary> visitBinary;
             Visitor<Unary> visitUnary;
             Visitor<Grouping> visitGrouping;
@@ -41,8 +39,8 @@ namespace AbstractionTreeSyntax {
             Visitor<Methods> visitMethods;
             Visitor<Arguments> visitArguments;
             Visitor<EcoSystem> visitEcoSystem;
-            void streamOutAst();
-            void formatAst();
+            inline static std::string nameOfFile = std::move(file_name);
+           
     };
     class ast: protected generateAst<ast> {
         /** ---------------------------------------------------------------------
@@ -51,14 +49,20 @@ namespace AbstractionTreeSyntax {
             * ---------------------------------------------------------------------
         */
         public:
+            friend class generateAst<ast>;
             ast() noexcept;
             ~ast() noexcept = default; // TODO: This is virtual for some reason, and it needs to be not virtual
             inline static Table getTable() { return table; };
             inline static Unique<Atomic<const char*>> getCode() { return std::move(accessCodeStr); };
+        protected:
+            String buildTree();
+            void streamOutAst(String res);
+            void formatAst(String res);
         private:
             static void tree_(const generateAst<ast>& gA);
             static void writeFile(std::string& ext);
             static Table table;
+            generateAst<ast> gA;
     };
     class analyzeSemantics: public catcher<analyzeSemantics>, public ThreadTracker<analyzeSemantics> {
         /** ------------------------------------------------------------------

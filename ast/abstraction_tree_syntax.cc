@@ -9,13 +9,70 @@ template<typename Type>
 Unique<Atomic<const char*>> AbstractionTreeSyntax::generateAst<Type>::accessCodeStr = nullptr;
 // Initialize the static data member types for ast 
 Table ast::table = {};
+/** -----------------------------------------------------------------------------------------
+ * @brief The default constructor that calls in generateAst to start creating the .txt file 
+ * 
+ * @param expr: The data structure that represents the compacted abstraction syntax tree 
+ * -----------------------------------------------------------------------------------------
+*/
+ast::ast() noexcept {
+    String stringTree = gA.buildTree();
+    gA.formatAst(stringTree);
+    /*if (user_choice.empty()) {
+        // Subject to change. Have not decided if I want to compile the custom languyage or not
+        ENABLE_COMPILER(); // set it to zero by default
+        ENABLE_INTERPRETER(); // set it to one by default
+        user_choice = "Custom";
+    }
+    else {
+        table = initTable(languageExtensions, downloads); 
+        auto getPair = table.at(user_choice);
+        ext = getPair.first;
+        if (auto search = languageTypes.find(user_choice); search != languageTypes.end()) {
+            if (search->first == "Compiled") {
+                settings = ENABLE_COMPILER(1); // Set it to true 
+                ENABLE_INTERPRETER(0); // Set it to false
+            }
+            else {
+                ENABLE_COMPILER(); // Set it to false
+                ENABLE_INTERPRETER(); // Set it to true
+            }
+        }
+    }
+    compactedTreeNodes = std::move(cTree);
+    try {
+        //ThreadTracker<generateAst<ast>> createTree;
+        if (settings) { 
+            ThreadTracker<generateAst<ast>> createTree([&]() { gA.tree_(std::move(gA)); });
+            createTree.detach(); // detach main
+            analyzeSemantics aS(Shared<ast>(this)); // Create thread one
+            analyzeSemantics* rawAS = &aS;
+            intermediateRepresentation iR(Weak<analyzeSemantics>(Shared<analyzeSemantics>(rawAS,  [](analyzeSemantics*){}))); // Create thread two
+            aS.detach(); // Detach one
+            iR.detach(); // Detach two
+            createTree.join(); // TODO: Haven't decided if I should detach or not... 
+        }
+        else {
+            //createTree = std::thread(gA.tree_(std::move(gA)));
+        }
+    }
+    catch(catcher<ast>& e) {
+        std::cout << "Logs folder has been updated!" << std::endl;
+        std::string temp = e.what();
+        logging<generateAst<ast>> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
+        logs.update();
+        logs.write();
+        logs.rotate();
+    }*/
+}
 /** ------------------------------------
- * @brief An abstraction class that checks to see if it allowed to create a .txt flie
+ * @brief A simple method that creates the ast tree  
+ * 
+ * @details It iterates through a vector visiting each node to form the abstraction syntax tree
  * 
  * --------------------------------------
 */
-template<>
-generateAst<ast>::generateAst() noexcept {
+String ast::buildTree() {
     for (auto& it : cTree) {
         auto& [intVal, pairVal] = it;
         if (pairVal.first == "Binary") {
@@ -65,7 +122,7 @@ generateAst<ast>::generateAst() noexcept {
             }
         }*/
     }
-    formatAst();
+    return outputDir_;
 }
 /** ----------------------------------------------
  * 
@@ -73,8 +130,7 @@ generateAst<ast>::generateAst() noexcept {
  * 
  * -----------------------------------------------
 */
-template<class Type>
-void generateAst<Type>::streamOutAst() {
+void ast::streamOutAst(String res) {
     try {
         std::filesystem::path filePath = "Ast.txt";
         std::ofstream fAst(filePath, std::ios::out | std::ios::trunc);
@@ -82,7 +138,7 @@ void generateAst<Type>::streamOutAst() {
             std::cerr << "Failed to open file: " << filePath << std::endl;
             return;
         }
-        fAst << outputDir_;
+        fAst << res;
         fAst.flush();  // Ensure all data is written
         fAst.close();
         if (fAst.fail()) { std::cerr << "Error occurred while writing to file: " << filePath << std::endl;
@@ -96,67 +152,11 @@ void generateAst<Type>::streamOutAst() {
  * 
  * -----------------------------------------------
 */
-template<class Type>
-void generateAst<Type>::formatAst() {
+void ast::formatAst(String res) {
     //int indentLevel = 0;
     /*for (int it = 0; it < outputDir_.size(); it++) {
     }*/
-    streamOutAst();
-}
-/** -----------------------------------------------------------------------------------------
- * @brief The default constructor that calls in generateAst to start creating the .txt file 
- * 
- * @param expr: The data structure that represents the compacted abstraction syntax tree 
- * -----------------------------------------------------------------------------------------
-*/
-ast::ast() noexcept {
-    auto gA = buildTree();
-    /*if (user_choice.empty()) {
-        // Subject to change. Have not decided if I want to compile the custom languyage or not
-        ENABLE_COMPILER(); // set it to zero by default
-        ENABLE_INTERPRETER(); // set it to one by default
-        user_choice = "Custom";
-    }
-    else {
-        table = initTable(languageExtensions, downloads); 
-        auto getPair = table.at(user_choice);
-        ext = getPair.first;
-        if (auto search = languageTypes.find(user_choice); search != languageTypes.end()) {
-            if (search->first == "Compiled") {
-                settings = ENABLE_COMPILER(1); // Set it to true 
-                ENABLE_INTERPRETER(0); // Set it to false
-            }
-            else {
-                ENABLE_COMPILER(); // Set it to false
-                ENABLE_INTERPRETER(); // Set it to true
-            }
-        }
-    }
-    compactedTreeNodes = std::move(cTree);
-    try {
-        //ThreadTracker<generateAst<ast>> createTree;
-        if (settings) { 
-            ThreadTracker<generateAst<ast>> createTree([&]() { gA.tree_(std::move(gA)); });
-            createTree.detach(); // detach main
-            analyzeSemantics aS(Shared<ast>(this)); // Create thread one
-            analyzeSemantics* rawAS = &aS;
-            intermediateRepresentation iR(Weak<analyzeSemantics>(Shared<analyzeSemantics>(rawAS,  [](analyzeSemantics*){}))); // Create thread two
-            aS.detach(); // Detach one
-            iR.detach(); // Detach two
-            createTree.join(); // TODO: Haven't decided if I should detach or not... 
-        }
-        else {
-            //createTree = std::thread(gA.tree_(std::move(gA)));
-        }
-    }
-    catch(catcher<ast>& e) {
-        std::cout << "Logs folder has been updated!" << std::endl;
-        std::string temp = e.what();
-        logging<generateAst<ast>> logs(logs_, temp); // Keep the logs updated throughout the whole codebase
-        logs.update();
-        logs.write();
-        logs.rotate();
-    }*/
+    gA.streamOutAst(res);
 }
 /** -------------------------------------------------------------------------
  * @brief Writes the code to target file
@@ -384,8 +384,3 @@ void intermediateRepresentation::get_vertex_value(auto& G, int x) {
 void intermediateRepresentation::set_vertex_value(auto& G, int x, int v) { 
     // sets the value associated with the vertex x to v.
 }
-
-#if ENABLE_TESTING
-    String file_name, user_choice;
-    int settings;
-#endif

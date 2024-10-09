@@ -15,7 +15,7 @@
 ### Getting Started:
 * You have two options you can do:
     - 1. You can run tatical nuke by issuing `make` inside the root directory to generate `exec_compiler, exec_interpreter, exec_virtual_machine`. If you are stuck on understanding tatical nuke's syntax, view the syntax located in `Code-Analysis`.
-    - 2. Choose a language you want to learn, and launch a virtual machine along with the tools to help you get started. 
+    - 2. Choose a language you want to learn, and launch a virtual machine along with the tools to help you execute the code. 
          You can also generate the code for a specific language and use that as a `boilder-plate`
 
 ### Product Construction
@@ -31,7 +31,7 @@
 
 ### Project Motivation and Potential Applications
 
-This project serves as my inaugural venture into crafting a `toy lagnuage`, a `compiler`, and a `virtual machine`. Beyond this primary goal, I'm eager to explore how the techniques learned can be applied to various domains in software development and data processing. Some intriguing areas for future exploration include:
+This project serves as my inaugural venture into crafting a `toy lagnuage`, a `compiler`, and a `virtual machine`. Beyond this primary goals, I'm eager to explore how the techniques learned can be applied to various domains in software development and data processing. Some intriguing areas for future exploration include:
 
 - Parsing complex configuration files
 - Handling data serialization formats
@@ -41,8 +41,6 @@ This project serves as my inaugural venture into crafting a `toy lagnuage`, a `c
 - Interpreting query languages
 - Building code analysis and static checking tools
 - Enhancing document processing systems
-
-
 ### Supported Languages
 * [C](https://en.cppreference.com/w/c)
 * [C++ (CPP)](https://en.cppreference.com/w/cpp)

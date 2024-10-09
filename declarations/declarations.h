@@ -101,6 +101,8 @@ namespace ContextFreeGrammar {
     class Unary;
     class Grouping;
     class Literal;
+    class Statement;
+    class Variable;
     class Methods;
     class Arguments;
     class EcoSystem;

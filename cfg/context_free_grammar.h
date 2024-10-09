@@ -288,6 +288,9 @@ namespace ContextFreeGrammar {
         protected:
             Literal() = default; 
     };
+    class Statement: public Expr, public Visitor<Statement>, public logging<Statement>, public runtimeerror<Statement>, public catcher<Statement> {
+
+    };
     class Methods: public Expr, public Visitor<Methods>, public logging<Methods>, public runtimeerror<Methods>, public catcher<Methods> {
         public:
             friend class runtimeerror<Methods>; // Use to output TokenType and message

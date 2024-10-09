@@ -16,15 +16,13 @@ Scanner::Scanner(const std::string source): source(std::move(source)) {}
 const std::unordered_map<std::string, TokenType> Scanner::keywords = {
     // Add all the Keywrods here
     {"and",    TokenType::AND},
-    {"class",  TokenType::CLASS},
+    {"radiation",  TokenType::RADIATION},
     {"else",   TokenType::ELSE},
     {"false",  TokenType::FALSE},
     {"for",    TokenType::FOR},
-    {"fun",    TokenType::FUN},
+    {"posion",  TokenType::POSION},
     {"if",     TokenType::IF},
     {"nil",    TokenType::NIL},
-    {"null",   TokenType::NIL},
-    {"nullptr", TokenType::NIL},
     {"or",     TokenType::OR},
     {"print",  TokenType::PRINT},
     {"return", TokenType::RETURN},
@@ -33,22 +31,16 @@ const std::unordered_map<std::string, TokenType> Scanner::keywords = {
     {"true",   TokenType::TRUE},
     {"var",    TokenType::VAR},
     {"while",  TokenType::WHILE},
-    {"finally", TokenType::FINALLY},
     {"protected", TokenType::PROTECTED},
-    {"import", TokenType::IMPORT},
     {"private", TokenType::PRIVATE},
-    {"package", TokenType::PACKAGE},
-    {"fn", TokenType::FN},
     {"catch", TokenType::CATCH},
-    {"def", TokenType::DEF},
     {"final", TokenType::FINAL},
-    {"std", TokenType::STD},
     {"var", TokenType::VAR},
     {"nuke", TokenType::NUKE},
     {"void", TokenType::VOID},
     {"bool", TokenType::BOOL},
-    {"boolean", TokenType::BOOLEAN}, 
-    {"undefined", TokenType::UNDEFINED}
+    {"pointer", TokenType::POINTER},
+    {"ref", TokenType::REF}
 };
 
 /* ------------------------------------------------------------------------------------------------------

@@ -75,6 +75,9 @@ namespace Parser {
             Expr* methods();
             Expr* ecosystem();
             Expr* parse();
+            Expr* program();
+            Expr* statement();
+            Expr* declarations();
         protected:
             /** ----------------------------------------------------------------------------------------------------------
              * @brief Get the previous TokenType
@@ -112,8 +115,7 @@ namespace Parser {
                     // So instead of semicolons, other programming languages most likely do not use ; to indicate a new statement
                     if (previous().getType() == TokenType::SEMICOLON) return;               
                     switch (peek().getType()) {                                             
-                        case TokenType::CLASS:                                              
-                        case TokenType::FUN:                                                
+                        case TokenType::RADIATION:                                             
                         case TokenType::VAR:                                                
                         case TokenType::FOR:                                                
                         case TokenType::IF:                                                 

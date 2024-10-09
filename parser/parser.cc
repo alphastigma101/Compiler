@@ -110,6 +110,9 @@ Expr* parser::primary() {
         consume(TokenType::RIGHT_PAREN, "Expect ')' after expression.");
         return new Grouping(expr);
     }
+    if (match(TokenType::IDENTIFIER)) {
+        return new Variable(previous());
+    }
     parseError<parser> pp(peek(), "Expect expression.");
     throw pp;
 }
@@ -123,45 +126,59 @@ Expr* parser::primary() {
 */
 Expr* parser::expression() { return equality(); }
 /** --------------------------------------------------------------------------
- * @brief Calls in expression to start the parsing sequence by following the grammar
+ * @brief Expands into equality to start the recrusion
  *
- * @details catches any exceptions that were thrown during run time 
+ * @details It becomes equality's caller
  *
- * @return Either return from all the recrusive calls if nothing was thrown, otherwise return null 
+ * @return equality()
  * --------------------------------------------------------------------------
 */
-Expr* parser::parse() {
-    try { 
-        auto result = expression();
-        return result;
-    }
-    catch (parseError<parser>& e) { 
-        std::cout << e.error() << std::endl;
-        return NULL; 
+Expr* parser::program() { return declarations(); }
+/** --------------------------------------------------------------------------
+ * @brief A grammar rule that will bind the statement and hold the value 
+ *
+ * @details It becomes equality's caller
+ *
+ * @return equality()
+ * --------------------------------------------------------------------------
+*/
+Expr* parser::statement() {
+    auto id = identifer();
+}
+Expr* parser::declarations() {
+    //auto expreco = ecosystem(); // TODO: Get the parser to work first with parsing variables and what not then add this feature into it 
+    try {
+      if (match(TokenType::VAR, TokenType::INT, TokenType::AUTO, TokenType::BOOL, TokenType::CHAR, TokenType::FLOAT)) return identifier();
+      return statement();
+    } catch (ParseError<parser>& e) {
+        std::cout << "Logs have been updated!" << std::endl;
+        synchronize();
+        return nullptr;
     }
 }
-/** ----------------------------------------------------------------------------- 
- * @brief An identifier is a name of something. Generallly something that is not wrapped around in quotes
+/** -----------------------------------------------------------------------------
+ * @brief A method that checks to see if the language has an identifier.
  * 
- * @details For example, variable name, function name, class name, if statements, structs, etc.
+ * @details An identifier represents the type of something, essentially a variable type.
+ * Rules usually require recursion. Think of calling a function again as if you're 
+ * looking ahead:
  * 
+ * - LR (Left-to-right) is look-ahead right.
+ * - LL (Right-to-left) is look-ahead left.
+ * - LAR (Look-Ahead Right) occurs when the rule (the function) gets called multiple times, typically in a loop.
+ * - LAL (Look-Ahead Left) is similar, but it looks ahead to the left.
+ * 
+ * For more information, see the Bison manual: https://www.gnu.org/software/bison/manual/bison.html#Grammar-File
  * ------------------------------------------------------------------------------
 */
 Expr* parser::identifier() {
-    // Rules usually require recrusion 
-    // Think of Calling a funciton again as if you're looking ahead 
-    // LR is look ahead right 
-    // LL is look ahead left
-    // LAR occurs when the rule aka the funciton gets called multuple times. Typically in a loop
-    // LAL is the same thing but it looks ahead to the left
-    // https://www.gnu.org/software/bison/manual/bison.html#Grammar-File 
-    // 
-    auto expr = methods();
-    if(match(TokenType::IDENTIFIER)) {
-        auto right = arguments(); // Look to the right
-        // TODO: Gotta call in methods() rule 
+    const Token name = consume(TokenType::IDENTIFIER, "Expect variable name.");
+    Expr initializer = nullptr;
+    if (match(TokenType::EQUAL)) {
+      initializer = expression();
     }
-    return primary(); // indentifier has a literal 
+    consume(TokenType::SEMICOLON, "Expect ';' after variable declaration.");
+    return new Statement(name, initializer);
 }
 /** ---------------------------------------------------------------------------
  * @brief A rule that will call to the left and to the right to parse. 
@@ -201,6 +218,25 @@ Expr* parser::ecosystem() {
 
     return expr;
 }
+/** --------------------------------------------------------------------------
+ * @brief Calls in expression to start the parsing sequence by following the grammar
+ *
+ * @details catches any exceptions that were thrown during run time 
+ *
+ * @return Either return from all the recrusive calls if nothing was thrown, otherwise return null 
+ * --------------------------------------------------------------------------
+*/
+Expr* parser::parse() {
+    try { 
+        auto result = program();
+        return std::move(result);
+    }
+    catch (parseError<parser>& e) { 
+        std::cout << e.error() << std::endl;
+        return NULL; 
+    }
+}
+
 // Additional rules go above this line
 //
 //

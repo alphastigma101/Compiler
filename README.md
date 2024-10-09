@@ -1,19 +1,49 @@
-### Public-Project: Compiler 
+### Compiler 
 ```
-    This is a open source project that uses c++ to compile and run custom programming languages or modern programming languages
+    This is a open source project that uses c++ to compile and run custom programming language called tatical nuke.
+    It is also has a virtual machine that can be used for learning new languages.
 ```
 
 # Table Of Contents
 
-1. [Supported Programming languages](#supported-programming-languages)
+1. [Getting Started](#getting-started)
 2. [Project Construction](#product-construction)
-3. [Macros](#macros)
-    - [Sources](#sources)
-4. [Pragmas](#pragmas)
-    - [Sources](#sources)
+3. [What Is Tatical Nuke?](#what-is-tatical-nuke-?)
+4. [Project Motivation and Potential Applications](#project-motivation-and-potential-applications)
+5. [Supported Languages](#supported-languages)
 
-### Supported Programming languages:
+### Getting Started:
+* You have two options you can do:
+    - 1. You can run tatical nuke by issuing `make` inside the root directory to generate `exec_compiler, exec_interpreter, exec_virtual_machine`. If you are stuck on understanding tatical nuke's syntax, view the syntax located in `Code-Analysis`.
+    - 2. Choose a language you want to learn, and launch a virtual machine along with the tools to help you get started. 
+         You can also generate the code for a specific language and use that as a `boilder-plate`
 
+### Product Construction
+* The goal is split the product's code so that it has a interpreter and a compiler and a virtual machine. The virtual machine is used for downloading the language's interpreter or compiler, in terms of what the user wants to learn.
+* The developer has the option to start out with a `boiler-plate` code 
+
+### What Is Tatical Nuke
+* Tatical Nuke is a toy language that I implemented myself. It is inspired by low level languages and has a mixture of keywords from modern languages. It should be able to compiled or interpreted because.... why not? 
+
+* It will spam out random ASCI characters, and display TATICAL NUKE and delete itself, if the programmer messes up the syntax.
+
+* That is it basically. 
+
+### Project Motivation and Potential Applications
+
+This project serves as my inaugural venture into crafting a `toy lagnuage`, a `compiler`, and a `virtual machine`. Beyond this primary goal, I'm eager to explore how the techniques learned can be applied to various domains in software development and data processing. Some intriguing areas for future exploration include:
+
+- Parsing complex configuration files
+- Handling data serialization formats
+- Creating and processing Domain-Specific Languages (DSLs)
+- Advancing natural language processing capabilities
+- Developing compiler front-ends
+- Interpreting query languages
+- Building code analysis and static checking tools
+- Enhancing document processing systems
+
+
+### Supported Languages
 * [C](https://en.cppreference.com/w/c)
 * [C++ (CPP)](https://en.cppreference.com/w/cpp)
 * [Java](https://docs.oracle.com/en/java/)
@@ -62,45 +92,3 @@
 * [LabVIEW](https://www.ni.com/en-us/support/documentation.html)
 * [Smalltalk](https://wiki.c2.com/?SmalltalkDocumentation)
 * [Standard ML (SML)](https://smlfamily.github.io/)
-
-### Product Construction
-* The goal is split the product's code so that the *exec_compiler* which is located in the Makefile shows which files are being used to built it are either going to be connected to something that looks like a terminal embeded in the navbar.html file or it will be seperated from the *generate_code* which will be either built with the Dockerfile or the Makefile.
-
-* Things that need to be implemented:
-* A database that holds all the supported programming languages which each entities attributes is examples of optimization code for a specific langauge
-* A optimization class that uses regex library that will take tokens and match the patterns to see if it can be optimized 
-* A file callled `generate_code.html` that uses crow web frame works apis and inja template engine which it should contain a drop down menu of all the supported languages which the user should be able to click on and wait for it to generate the code
-* Implement the funcions in languages.h which are inlined. Their job is to create stub function for each supported programming language
-* Implement the routing using crow inside `generate_code.cc` 
-* Implement .css code that will create a nice navbar 
-
-
-
-* *generate_code* will use **crow** as its web-framework and inja for the template engine. I have included notes in *generate_code.cc* that will need to be implemented 
-* **Sources:**
-    * **Crow user manual/releases**:
-        - *https://github.com/CrowCpp/Crow/releases*
-        - *https://crowcpp.org/master/*
-    * **inja user manual**:
-        - *https://github.com/pantor/inja*
-### Macros
-* They function like functions but they are `directives` meaning they are `pre-proccessed` before `compilation`
-* Need to add `\` whenever you want a new line 
-# Sources
-* **macros**:
-    * *https://cplusplus.com/doc/tutorial/preprocessor/*
-    * *https://learn.microsoft.com/en-us/cpp/preprocessor/macros-and-cpp?view=msvc-170*
-    * *https://learn.microsoft.com/en-us/cpp/cpp/alignment-cpp-declarations?view=msvc-170*
-    * *https://learn.microsoft.com/en-us/cpp/standard-library/aligned-storage-class?view=msvc-170*
-    * *https://stackoverflow.com/questions/45477355/difference-between-pragma-and-pragma-in-c*
-    * *https://learn.microsoft.com/en-us/cpp/preprocessor/macros-c-cpp?view=msvc-170*
-### Pragmas
-* They can be embedded with macros and can parse a directive if needed
-
-# Sources
-* **Pragmas**:
-* *https://en.cppreference.com/w/cpp/preprocessor/impl*
-* **Translation Phase**:
-    * *https://en.cppreference.com/w/cpp/language/translation_phases#Phase_3*
-* **preproccessor replace**:
-    * *https://en.cppreference.com/w/cpp/preprocessor/replace*

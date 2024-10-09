@@ -20,7 +20,7 @@
 
 ### Product Construction
 * The goal is split the product's code so that it has a interpreter and a compiler and a virtual machine. The virtual machine is used for downloading the language's interpreter or compiler, in terms of what the user wants to learn.
-* The developer has the option to start out with a `boiler-plate` code 
+* The user who chooses a specific language has the option to also start out with a `boiler-plate` code. 
 
 ### What Is Tatical Nuke
 * Tatical Nuke is a toy language that I implemented myself. It is inspired by low level languages and has a mixture of keywords from modern languages. It should be able to compiled or interpreted because.... why not? 

@@ -1,4 +1,5 @@
 #include <abstraction_tree_syntax.h>
+#include <lookup_language.h> // get the file extensions
 // Initialize the static data member types for generateAst
 template<typename Type>
 String AbstractionTreeSyntax::generateAst<Type>::ext = "\0";
